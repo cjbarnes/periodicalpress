@@ -75,6 +75,7 @@ class PeriodicalPress {
 
 		$this->load_dependencies();
 		$this->set_locale();
+		$this->define_common_hooks();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
@@ -112,6 +113,12 @@ class PeriodicalPress {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-i18n.php';
 
 		/**
+		 * The class responsible for defining all actions that are common to
+		 * both Dashboard and public-facing pages.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-common.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the
 		 * Dashboard.
 		 */
@@ -145,6 +152,27 @@ class PeriodicalPress {
 			'plugins_loaded',
 			$plugin_i18n,
 			'load_plugin_textdomain'
+		);
+
+	}
+
+	/**
+	 * Register all of the hooks that affect both public and admin areas, e.g.
+	 * custom post types.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function define_common_hooks() {
+
+		$plugin_common = new PeriodicalPress_Common( $this->get_plugin_name(), $this->get_version() );
+
+		// Setup custom post types
+		$this->loader->add_action(
+			'init',
+			$plugin_common,
+			'register_custom_post_types',
+			0
 		);
 
 	}
