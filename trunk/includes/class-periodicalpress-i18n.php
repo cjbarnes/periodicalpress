@@ -20,6 +20,7 @@
  * is ready for translation.
  *
  * @since 1.0.0
+ *
  * @package PeriodicalPress
  * @subpackage PeriodicalPress/includes
  * @author cJ barnes <mail@cjbarnes.co.uk>
@@ -31,6 +32,7 @@ class PeriodicalPress_i18n {
 	 *
 	 * @since 1.0.0
 	 * @access private
+	 *
 	 * @var string $domain The domain identifier for this plugin.
 	 */
 	private $domain;
@@ -54,6 +56,7 @@ class PeriodicalPress_i18n {
 	 * Set the domain equal to that of the specified domain.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param string $domain The domain that represents the locale of this
 	 *                       plugin.
 	 */

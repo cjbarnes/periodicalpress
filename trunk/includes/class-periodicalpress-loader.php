@@ -28,6 +28,7 @@ class PeriodicalPress_Loader {
 	 *
 	 * @since 1.0.0
 	 * @access protected
+	 *
 	 * @var array $actions The actions registered with WordPress to fire when
 	 *                     the plugin loads.
 	 */
@@ -38,6 +39,7 @@ class PeriodicalPress_Loader {
 	 *
 	 * @since 1.0.0
 	 * @access protected
+	 *
 	 * @var array $filters The filters registered with WordPress to fire when
 	 *                     the plugin loads.
 	 */
@@ -59,6 +61,7 @@ class PeriodicalPress_Loader {
 	 * Add a new action to the collection to be registered with WordPress.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @var string $hook          The name of the WordPress action that is
 	 *                            being registered.
 	 * @var object $component     A reference to the instance of the object on
@@ -87,6 +90,7 @@ class PeriodicalPress_Loader {
 	 * Add a new filter to the collection to be registered with WordPress.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @var string $hook          The name of the WordPress filter that is
 	 *                            being registered.
 	 * @var object $component     A reference to the instance of the object on
@@ -117,6 +121,7 @@ class PeriodicalPress_Loader {
 	 *
 	 * @since 1.0.0
 	 * @access private
+	 *
 	 * @var array  $hooks         The collection of hooks that is being
 	 *                            registered (that is, actions or filters).
 	 * @var string $hook          The name of the WordPress filter that is

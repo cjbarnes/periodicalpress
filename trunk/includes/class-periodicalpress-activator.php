@@ -16,6 +16,7 @@
  * This class defines all code necessary to run during the plugin's activation.
  *
  * @since 1.0.0
+ *
  * @package PeriodicalPress
  * @subpackage PeriodicalPress/includes
  * @author cJ barnes <mail@cjbarnes.co.uk>
@@ -31,9 +32,8 @@ class PeriodicalPress_Activator {
 	public static function activate() {
 
 		/*
-		 * Make sure the custom post type creation class is loaded
-		 *
-		 * TODO: test whether we need this
+		 * Load the class that creates custom post types and taxonomies, so
+		 * their URL rules can be applied using flush_rewrite_rules.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-common.php';
 		PeriodicalPress_Common::register_custom_post_types();

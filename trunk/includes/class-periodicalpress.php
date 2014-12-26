@@ -23,6 +23,7 @@
  * version of the plugin.
  *
  * @since 1.0.0
+ *
  * @package PeriodicalPress
  * @subpackage PeriodicalPress/includes
  * @author cJ barnes <mail@cjbarnes.co.uk>
@@ -35,6 +36,7 @@ class PeriodicalPress {
 	 *
 	 * @since 1.0.0
 	 * @access protected
+	 *
 	 * @var PeriodicalPress_Loader $loader Maintains and registers all hooks
 	 *                                     for the plugin.
 	 */
@@ -45,6 +47,7 @@ class PeriodicalPress {
 	 *
 	 * @since 1.0.0
 	 * @access protected
+	 *
 	 * @var string $plugin_name The string used to uniquely identify this
 	 *                          plugin.
 	 */
@@ -55,6 +58,7 @@ class PeriodicalPress {
 	 *
 	 * @since 1.0.0
 	 * @access protected
+	 *
 	 * @var string $version The current version of the plugin.
 	 */
 	protected $version;
@@ -239,6 +243,7 @@ class PeriodicalPress {
 	 * WordPress and to define internationalization functionality.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @return string The name of the plugin.
 	 */
 	public function get_plugin_name() {
@@ -249,6 +254,7 @@ class PeriodicalPress {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @return PeriodicalPress_Loader Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
@@ -259,6 +265,7 @@ class PeriodicalPress {
 	 * Retrieve the version number of the plugin.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @return string The version number of the plugin.
 	 */
 	public function get_version() {

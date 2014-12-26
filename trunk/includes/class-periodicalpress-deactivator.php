@@ -17,6 +17,7 @@
  * deactivation.
  *
  * @since 1.0.0
+ *
  * @package PeriodicalPress
  * @subpackage PeriodicalPress/includes
  * @author cJ barnes <mail@cjbarnes.co.uk>

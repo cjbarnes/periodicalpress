@@ -10,6 +10,7 @@
  *
  * @link http://github.com/cjbarnes/periodicalpress
  * @since 1.0.0
+ *
  * @package PeriodicalPress
  *
  * @wordpress-plugin
