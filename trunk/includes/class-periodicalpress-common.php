@@ -5,10 +5,10 @@
  * facing pages.
  *
  * @link http://github.com/cjbarnes/periodicalpress
- * @since 1.0.0
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/includes
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
  */
 
 /**
@@ -16,8 +16,10 @@
  *
  * Defines the plugin name, version, and custom post types.
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/includes
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
+ *
  * @author cJ barnes <mail@cjbarnes.co.uk>
  */
 class PeriodicalPress_Common {
@@ -25,7 +27,7 @@ class PeriodicalPress_Common {
 	/**
 	 * The ID of this plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 *
 	 * @var string $plugin_name The ID of this plugin.
@@ -35,7 +37,7 @@ class PeriodicalPress_Common {
 	/**
 	 * The version of this plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 *
 	 * @var string $version The current version of this plugin.
@@ -45,7 +47,7 @@ class PeriodicalPress_Common {
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 *
 	 * @var string $plugin_name The name of this plugin.
 	 * @var string $version     The version of this plugin.
@@ -58,62 +60,57 @@ class PeriodicalPress_Common {
 	}
 
 	/**
-	 * Register the custom post type for Issues.
+	 * Register the custom taxonomy for Issues.
 	 *
-	 * @since 1.0.0
+	 * Is static so it can be accessed before instantiation by the plugin
+	 * activator class.
+	 *
+	 * @since PeriodicalPress 1.0.0
 	 */
-	public function register_custom_post_types() {
+	public static function register_taxonomies() {
 
 		// Setup the Issue custom post type that is the basis for this plugin.
 		$labels = array(
-			'name'               => _x( 'Issues', 'Post Type General Name', 'periodicalpress' ),
-			'singular_name'      => _x( 'Issue', 'Post Type Singular Name', 'periodicalpress' ),
-			'menu_name'          => __( 'Issue', 'periodicalpress' ),
-			'parent_item_colon'  => __( 'Parent Issue:', 'periodicalpress' ),
-			'all_items'          => __( 'All Issues', 'periodicalpress' ),
-			'view_item'          => __( 'View Issue', 'periodicalpress' ),
-			'add_new_item'       => __( 'Add New Issue', 'periodicalpress' ),
-			'add_new'            => __( 'Add New', 'periodicalpress' ),
-			'edit_item'          => __( 'Edit Issue', 'periodicalpress' ),
-			'update_item'        => __( 'Update Issue', 'periodicalpress' ),
-			'search_items'       => __( 'Search Issue', 'periodicalpress' ),
-			'not_found'          => __( 'Not found', 'periodicalpress' ),
-			'not_found_in_trash' => __( 'Not found in Trash', 'periodicalpress' ),
+			'name'                       => _x( 'Issues', 'Taxonomy General Name', 'periodicalpress' ),
+			'singular_name'              => _x( 'Issue', 'Taxonomy Singular Name', 'periodicalpress' ),
+			'menu_name'                  => __( 'Issue', 'periodicalpress' ),
+			'all_items'                  => __( 'All Issues', 'periodicalpress' ),
+			'parent_item'                => __( 'Parent Issue', 'periodicalpress' ),
+			'parent_item_colon'          => __( 'Parent Issue:', 'periodicalpress' ),
+			'new_item_name'              => __( 'New Issue Name', 'periodicalpress' ),
+			'add_new_item'               => __( 'Add New Issue', 'periodicalpress' ),
+			'edit_item'                  => __( 'Edit Issue', 'periodicalpress' ),
+			'update_item'                => __( 'Update Issue', 'periodicalpress' ),
+			'separate_items_with_commas' => __( 'Separate issues with commas', 'periodicalpress' ),
+			'search_items'               => __( 'Search Issues', 'periodicalpress' ),
+			'add_or_remove_items'        => __( 'Add or remove issues', 'periodicalpress' ),
+			'choose_from_most_used'      => __( 'Choose from the most used issues', 'periodicalpress' ),
+			'not_found'                  => __( 'Not Found', 'periodicalpress' ),
 		);
 		$rewrite = array(
-			'slug'       => 'issue',
-			'with_front' => true,
-			'pages'      => true,
-			'feeds'      => true,
+			'slug'         => 'issue',
+			'with_front'   => false,
+			'hierarchical' => false,
 		);
-		$supports = array(
-			'title',
-			'editor',
-			'excerpt',
-			'thumbnail',
-			'custom-fields',
+		$capabilities = array(
+			'manage_terms' => 'manage_pp_issues',
+			'edit_terms'   => 'edit_pp_issues',
+			'delete_terms' => 'delete_pp_issues',
+			'assign_terms' => 'assign_pp_issues',
 		);
 		$args = array(
-			'label'               => __( 'pp_issue', 'periodicalpress' ),
-			'description'         => __( 'Collections of posts published together in periodical format', 'periodicalpress' ),
-			'labels'              => $labels,
-			'supports'            => $supports,
-			'hierarchical'        => false,
-			'public'              => true,
-			'show_ui'             => true,
-			'show_in_menu'        => true,
-			'show_in_nav_menus'   => true,
-			'show_in_admin_bar'   => true,
-			'menu_position'       => 5,
-			'menu_icon'           => 'dashicons-pressthis',
-			'can_export'          => true,
-			'has_archive'         => true,
-			'exclude_from_search' => false,
-			'publicly_queryable'  => true,
-			'rewrite'             => $rewrite,
-			'capability_type'     => 'post',
+			'labels'            => $labels,
+			'hierarchical'      => false,
+			'public'            => true,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'show_in_nav_menus' => true,
+			'show_tagcloud'     => false,
+			'query_var'         => 'issue',
+			'rewrite'           => $rewrite,
+			'capabilities'      => $capabilities,
 		);
-		register_post_type( 'pp_issue', $args );
+		register_taxonomy( 'pp_issue', array( 'post' ), $args );
 
 		/*
 		 * TODO: customize messages and help - see bottom of page here:

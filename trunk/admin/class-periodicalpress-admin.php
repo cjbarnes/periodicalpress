@@ -4,10 +4,10 @@
  * The dashboard-specific functionality of the plugin.
  *
  * @link http://github.com/cjbarnes/periodicalpress
- * @since 1.0.0
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/admin
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
  */
 
 /**
@@ -16,8 +16,10 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the dashboard-specific stylesheet and JavaScript.
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/admin
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
+ *
  * @author cJ barnes <mail@cjbarnes.co.uk>
  */
 class PeriodicalPress_Admin {
@@ -25,7 +27,7 @@ class PeriodicalPress_Admin {
 	/**
 	 * The ID of this plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 *
 	 * @var string $plugin_name The ID of this plugin.
@@ -35,7 +37,7 @@ class PeriodicalPress_Admin {
 	/**
 	 * The version of this plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 *
 	 * @var string $version The current version of this plugin.
@@ -45,7 +47,7 @@ class PeriodicalPress_Admin {
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 *
 	 * @var string $plugin_name The name of this plugin.
 	 * @var string $version     The version of this plugin.
@@ -60,7 +62,7 @@ class PeriodicalPress_Admin {
 	/**
 	 * Register the stylesheets for the Dashboard.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 */
 	public function enqueue_styles() {
 
@@ -88,7 +90,7 @@ class PeriodicalPress_Admin {
 	/**
 	 * Register the JavaScript for the dashboard.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 */
 	public function enqueue_scripts() {
 

@@ -4,10 +4,10 @@
  * Fired during plugin deactivation
  *
  * @link http://github.com/cjbarnes/periodicalpress
- * @since 1.0.0
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/includes
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
  */
 
 /**
@@ -16,22 +16,52 @@
  * This class defines all code necessary to run during the plugin's
  * deactivation.
  *
- * @since 1.0.0
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/includes
  * @author cJ barnes <mail@cjbarnes.co.uk>
  */
 class PeriodicalPress_Deactivator {
 
 	/**
-	 * Short Description. (use period)
+	 * Run on plugin deactivation. Cleans up after the plugin by removing custom
+	 * capabilities and other reversible changes.
 	 *
-	 * Long Description.
-	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 */
 	public static function deactivate() {
+
+		self::destroy_capabilities();
+
+	}
+
+	/**
+	 * Removes the plugin-specific capabilities from each role in turn.
+	 *
+	 * @since PeriodicalPress 1.0.0
+	 * @access private
+	 *
+	 * @global WP_Roles $wp_roles The WordPress roles and capabilities class
+	 */
+	private static function destroy_capabilities() {
+		global $wp_roles;
+
+		$all_roles = $wp_roles->roles;
+
+		foreach ( $all_roles as $role_name ) {
+
+			// Get the WP_Role object
+			$role = get_role( $role_name );
+
+			// Remove all plugin-set capabilities
+			$role->remove_cap( 'assign_pp_issues' );
+			$role->remove_cap( 'edit_pp_issues' );
+			$role->remove_cap( 'manage_pp_issues' );
+			$role->remove_cap( 'delete_pp_issues' );
+
+		}
+
 
 	}
 

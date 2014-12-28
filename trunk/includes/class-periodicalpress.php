@@ -7,10 +7,10 @@
  * the public-facing side of the site and the dashboard.
  *
  * @link http://github.com/cjbarnes/periodicalpress
- * @since 1.0.0
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/includes
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
  */
 
 /**
@@ -22,10 +22,10 @@
  * Also maintains the unique identifier of this plugin as well as the current
  * version of the plugin.
  *
- * @since 1.0.0
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/includes
  * @author cJ barnes <mail@cjbarnes.co.uk>
  */
 class PeriodicalPress {
@@ -34,7 +34,7 @@ class PeriodicalPress {
 	 * The loader that's responsible for maintaining and registering all hooks
 	 * that power the plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access protected
 	 *
 	 * @var PeriodicalPress_Loader $loader Maintains and registers all hooks
@@ -45,7 +45,7 @@ class PeriodicalPress {
 	/**
 	 * The unique identifier of this plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access protected
 	 *
 	 * @var string $plugin_name The string used to uniquely identify this
@@ -56,7 +56,7 @@ class PeriodicalPress {
 	/**
 	 * The current version of the plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access protected
 	 *
 	 * @var string $version The current version of the plugin.
@@ -70,7 +70,7 @@ class PeriodicalPress {
 	 * the plugin. Load the dependencies, define the locale, and set the hooks
 	 * for the Dashboard and the public-facing side of the site.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 */
 	public function __construct() {
 
@@ -99,7 +99,7 @@ class PeriodicalPress {
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 */
 	private function load_dependencies() {
@@ -144,7 +144,7 @@ class PeriodicalPress {
 	 * Uses the PeriodicalPress_i18n class in order to set the domain and to
 	 * register the hook with WordPress.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 */
 	private function set_locale() {
@@ -164,7 +164,7 @@ class PeriodicalPress {
 	 * Register all of the hooks that affect both public and admin areas, e.g.
 	 * custom post types.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 */
 	private function define_common_hooks() {
@@ -185,7 +185,7 @@ class PeriodicalPress {
 	 * Register all of the hooks related to the dashboard functionality of the
 	 * plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 */
 	private function define_admin_hooks() {
@@ -209,7 +209,7 @@ class PeriodicalPress {
 	 * Register all of the hooks related to the public-facing functionality of
 	 * the plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 */
 	private function define_public_hooks() {
@@ -232,7 +232,7 @@ class PeriodicalPress {
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 */
 	public function run() {
 		$this->loader->run();
@@ -242,7 +242,7 @@ class PeriodicalPress {
 	 * The name of the plugin used to uniquely identify it within the context of
 	 * WordPress and to define internationalization functionality.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 *
 	 * @return string The name of the plugin.
 	 */
@@ -253,7 +253,7 @@ class PeriodicalPress {
 	/**
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 *
 	 * @return PeriodicalPress_Loader Orchestrates the hooks of the plugin.
 	 */
@@ -264,7 +264,7 @@ class PeriodicalPress {
 	/**
 	 * Retrieve the version number of the plugin.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 *
 	 * @return string The version number of the plugin.
 	 */

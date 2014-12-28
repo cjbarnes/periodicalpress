@@ -9,9 +9,10 @@
  * a function that starts the plugin.
  *
  * @link http://github.com/cjbarnes/periodicalpress
- * @since 1.0.0
  *
- * @package PeriodicalPress
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
  *
  * @wordpress-plugin
  * Plugin Name:  PeriodicalPress
@@ -41,6 +42,7 @@ function activate_periodicalpress() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-periodicalpress-activator.php';
 	PeriodicalPress_Activator::activate();
 }
+register_activation_hook( __FILE__, 'activate_periodicalpress' );
 
 /**
  * The code that runs during plugin deactivation.
@@ -50,8 +52,6 @@ function deactivate_periodicalpress() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-periodicalpress-deactivator.php';
 	PeriodicalPress_Deactivator::deactivate();
 }
-
-register_activation_hook( __FILE__, 'activate_periodicalpress' );
 register_deactivation_hook( __FILE__, 'deactivate_periodicalpress' );
 
 /**
@@ -67,7 +67,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-periodicalpress.php';
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
  *
- * @since 1.0.0
+ * @since PeriodicalPress 1.0.0
  */
 function run_periodicalpress() {
 

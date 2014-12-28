@@ -4,10 +4,10 @@
  * Register all actions and filters for the plugin
  *
  * @link http://github.com/cjbarnes/periodicalpress
- * @since 1.0.0
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/includes
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
  */
 
 /**
@@ -17,8 +17,10 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package PeriodicalPress
- * @subpackage PeriodicalPress/includes
+ * @package WordPress
+ * @subpackage PeriodicalPress
+ * @since PeriodicalPress 1.0.0
+ *
  * @author cJ barnes <mail@cjbarnes.co.uk>
  */
 class PeriodicalPress_Loader {
@@ -26,7 +28,7 @@ class PeriodicalPress_Loader {
 	/**
 	 * The array of actions registered with WordPress.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access protected
 	 *
 	 * @var array $actions The actions registered with WordPress to fire when
@@ -37,7 +39,7 @@ class PeriodicalPress_Loader {
 	/**
 	 * The array of filters registered with WordPress.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access protected
 	 *
 	 * @var array $filters The filters registered with WordPress to fire when
@@ -48,7 +50,7 @@ class PeriodicalPress_Loader {
 	/**
 	 * Initialize the collections used to maintain the actions and filters.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 */
 	public function __construct() {
 
@@ -60,7 +62,7 @@ class PeriodicalPress_Loader {
 	/**
 	 * Add a new action to the collection to be registered with WordPress.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 *
 	 * @var string $hook          The name of the WordPress action that is
 	 *                            being registered.
@@ -89,7 +91,7 @@ class PeriodicalPress_Loader {
 	/**
 	 * Add a new filter to the collection to be registered with WordPress.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 *
 	 * @var string $hook          The name of the WordPress filter that is
 	 *                            being registered.
@@ -119,7 +121,7 @@ class PeriodicalPress_Loader {
 	 * A utility function that is used to register the actions and hooks into a
 	 * single collection.
 	 *
-	 * @since 1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 * @access private
 	 *
 	 * @var array  $hooks         The collection of hooks that is being
@@ -154,7 +156,7 @@ class PeriodicalPress_Loader {
 	/**
 	 * Register the filters and actions with WordPress.
 	 *
-	 * @since    1.0.0
+	 * @since PeriodicalPress 1.0.0
 	 */
 	public function run() {
 
