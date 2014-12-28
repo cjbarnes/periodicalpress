@@ -175,7 +175,7 @@ class PeriodicalPress {
 		$this->loader->add_action(
 			'init',
 			$plugin_common,
-			'register_custom_post_types',
+			'register_taxonomies',
 			0
 		);
 
