@@ -55,10 +55,18 @@ class PeriodicalPress_Deactivator {
 			$role = get_role( $role_name );
 
 			// Remove all plugin-set capabilities
-			$role->remove_cap( 'assign_pp_issues' );
-			$role->remove_cap( 'edit_pp_issues' );
-			$role->remove_cap( 'manage_pp_issues' );
-			$role->remove_cap( 'delete_pp_issues' );
+			if ( array_key_exists( 'assign_pp_issues', $role->capabilities ) ) {
+				$role->remove_cap( 'assign_pp_issues' );
+			}
+			if ( array_key_exists( 'edit_pp_issues', $role->capabilities ) ) {
+				$role->remove_cap( 'edit_pp_issues' );
+			}
+			if ( array_key_exists( 'manage_pp_issues', $role->capabilities ) ) {
+				$role->remove_cap( 'manage_pp_issues' );
+			}
+			if ( array_key_exists( 'delete_pp_issues', $role->capabilities ) ) {
+				$role->remove_cap( 'delete_pp_issues' );
+			}
 
 		}
 
