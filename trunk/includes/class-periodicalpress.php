@@ -134,6 +134,12 @@ class PeriodicalPress {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-periodicalpress-public.php';
 
+		/**
+		 * All plugin template tags. These will be registered as methods of
+		 * PeriodicalPress (this class).
+		 */
+		require plugin_dir_path( dirname( __FILE__ ) ) . 'includes/periodicalpress-template-tags.php';
+
 		$this->loader = new PeriodicalPress_Loader();
 
 	}
