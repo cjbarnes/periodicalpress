@@ -73,7 +73,7 @@ class PeriodicalPress_Common {
 		$labels = array(
 			'name'                       => _x( 'Issues', 'Taxonomy General Name', 'periodicalpress' ),
 			'singular_name'              => _x( 'Issue', 'Taxonomy Singular Name', 'periodicalpress' ),
-			'menu_name'                  => __( 'Issue', 'periodicalpress' ),
+			'menu_name'                  => __( 'Issues', 'periodicalpress' ),
 			'all_items'                  => __( 'All Issues', 'periodicalpress' ),
 			'parent_item'                => __( 'Parent Issue', 'periodicalpress' ),
 			'parent_item_colon'          => __( 'Parent Issue:', 'periodicalpress' ),
