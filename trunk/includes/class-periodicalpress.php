@@ -171,7 +171,9 @@ class PeriodicalPress {
 
 		$plugin_common = new PeriodicalPress_Common( $this->get_plugin_name(), $this->get_version() );
 
-		// Setup custom post types
+		/*
+		 * Setup custom taxonomies, including the main pp_issue taxonomy
+		 */
 		$this->loader->add_action(
 			'init',
 			$plugin_common,
@@ -192,6 +194,9 @@ class PeriodicalPress {
 
 		$plugin_admin = new PeriodicalPress_Admin( $this->get_plugin_name(), $this->get_version() );
 
+		/*
+		 * Admin CSS and JavaScript
+		 */
 		$this->loader->add_action(
 			'admin_enqueue_scripts',
 			$plugin_admin,
@@ -201,6 +206,24 @@ class PeriodicalPress {
 			'admin_enqueue_scripts',
 			$plugin_admin,
 			'enqueue_scripts'
+		);
+
+		/*
+		 * Admin menu item changes
+		 */
+		$this->loader->add_action(
+			'admin_menu',
+			$plugin_admin,
+			'admin_menu_setup'
+		);
+
+		/*
+		 * Issues admin page: display Current Issue selector
+		 */
+		$this->loader->add_action(
+			'pp_issue_pre_add_form',
+			$plugin_admin,
+			'current_issue_field'
 		);
 
 	}
@@ -216,6 +239,9 @@ class PeriodicalPress {
 
 		$plugin_public = new PeriodicalPress_Public( $this->get_plugin_name(), $this->get_version() );
 
+		/*
+		 * Public-facing CSS and JavaScript
+		 */
 		$this->loader->add_action(
 			'wp_enqueue_scripts',
 			$plugin_public,

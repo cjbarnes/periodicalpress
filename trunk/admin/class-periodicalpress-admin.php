@@ -115,4 +115,85 @@ class PeriodicalPress_Admin {
 
 	}
 
+	/**
+	 * All changes to admin menu and submenu items.
+	 *
+	 * @since PeriodicalPress 1.0.0
+	 */
+	public function admin_menu_setup() {
+
+		// Get Issues taxonomy labels for use by menu pages/subpages.
+		$tax_labels = get_taxonomy( 'pp_issue' )->labels;
+
+		/*
+		 * Main Issues menu, containing the Issues taxonomy page and some
+		 * plugin settings.
+		 */
+		add_menu_page(
+			$tax_labels->name,
+			$tax_labels->menu_name,
+			'edit_pp_issues', // user capability required to show this menu
+			'pp_issues_admin',
+			array( $this, 'issues_admin' ),
+			'dashicons-pressthis',
+			'4.44' // position in the menu (Posts is 5)
+		);
+
+		/*
+		 * Issues submenu: repeat of top-level menu page
+		 */
+		add_submenu_page(
+			'pp_issues_admin',
+			__( 'Issues Settings', 'periodicalpress' ),
+			__( 'Issues Settings', 'periodicalpress' ),
+			'edit_pp_issues',
+			'pp_issues_admin'
+		);
+
+		/*
+		 * Issues submenu: Add and edit the Issues taxonomy.
+		 */
+		add_submenu_page(
+			'pp_issues_admin',
+			$tax_labels->name,
+			$tax_labels->all_items,
+			'edit_pp_issues', // cap required
+			'edit-tags.php?taxonomy=pp_issue'
+		);
+
+	}
+
+	/**
+	 * Display the main Issues admin page.
+	 *
+	 * @since PeriodicalPress 1.0.0
+	 */
+	public function issues_admin() {
+
+		echo 'TODO';
+
+	}
+
+	/**
+	 * Output the form for choosing the current issue.
+	 *
+	 * Shown above the Add New Issue form on the main Issues taxonomy admin
+	 * page. Only available to users with capability manage_pp_issues.
+	 *
+	 * @since PeriodicalPress 1.0.0
+	 */
+	public function current_issue_field() {
+
+		if ( current_user_can( 'manage_pp_issues' ) ) {
+
+			/*
+			 * Output the form for selecting the current issue.
+			 */
+			@include plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/periodicalpress-current-issue-form.php';
+
+		}
+
+
+	}
+
 }
