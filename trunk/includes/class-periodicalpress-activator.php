@@ -51,34 +51,33 @@ class PeriodicalPress_Activator {
 
 		$all_roles = $wp_roles->roles;
 
-		foreach ( $all_roles as $role_name ) {
+		foreach ( $all_roles as $role_name => $role_contents ) {
 
-			// Get the WP_Role object
-			$role = get_role( $role_name );
+			$role_caps = $role_contents['capabilities'];
 
 			/*
 			 * Create new capability: assign_pp_issues (initially set for users
 			 * with edit_posts capability).
 			 */
-			if ( $role->capabilities['edit_posts'] ) {
-				$role->add_cap( 'assign_pp_issues' );
+			if ( isset( $role_caps['edit_posts'] ) ) {
+				$wp_roles->add_cap( $role_name, 'assign_pp_issues' );
 			}
 
 			/*
 			 * Create new capabilities: edit_pp_issues and manage_pp_issues
 			 * (initially set for users with edit_others_posts capability).
 			 */
-			if ( $role->capabilities['edit_others_posts'] ) {
-				$role->add_cap( 'edit_pp_issues' );
-				$role->add_cap( 'manage_pp_issues' );
+			if ( isset( $role_caps['edit_others_posts'] ) ) {
+				$wp_roles->add_cap( $role_name, 'edit_pp_issues' );
+				$wp_roles->add_cap( $role_name, 'manage_pp_issues' );
 			}
 
 			/*
 			 * Create new capability: delete_pp_issues (initially set for users
 			 * with delete_others_posts capability).
 			 */
-			if ( $role->capabilities['delete_others_posts'] ) {
-				$role->add_cap( 'delete_pp_issues' );
+			if ( isset( $role_caps['delete_others_posts'] ) ) {
+				$wp_roles->add_cap( $role_name, 'delete_pp_issues' );
 			}
 
 		}
