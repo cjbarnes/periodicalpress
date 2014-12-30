@@ -194,7 +194,10 @@ class PeriodicalPress_Admin {
 	 */
 	public function issues_admin() {
 
-		echo 'TODO';
+		/*
+		 * Output the Issue Settings page.
+		 */
+		@include plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/periodicalpress-issues-admin.php';
 
 	}
 
