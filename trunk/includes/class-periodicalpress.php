@@ -209,12 +209,17 @@ class PeriodicalPress {
 		);
 
 		/*
-		 * Admin menu item changes
+		 * Admin menu item setup
 		 */
 		$this->loader->add_action(
 			'admin_menu',
 			$plugin_admin,
 			'admin_menu_setup'
+		);
+		$this->loader->add_filter(
+			'parent_file',
+			$plugin_admin,
+			'fix_submenu_parent_files'
 		);
 
 		/*

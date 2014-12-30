@@ -164,6 +164,30 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
+	 * Change which top-level admin menus are used for this plugin’s submenus.
+	 *
+	 * Hooks into parent_file filter. Primarily exists to avoid taxonomy
+	 * submenu items being forced under the Posts top-level menu.
+	 *
+	 * @since PeriodicalPress 1.0.0
+	 *
+	 * @param string $parent_file The slug of the top-level menu page that the
+	 *                            current screen is a child of
+	 * @return string The modified parent file
+	 */
+	public function fix_submenu_parent_files( $parent_file ) {
+
+		// @see WP_Screen
+		$screen = get_current_screen();
+
+		if ( 'pp_issue' === $screen->taxonomy )  {
+			$parent_file = 'pp_issues_admin';
+		}
+
+		return $parent_file;
+	}
+
+	/**
 	 * Display the main Issues admin page.
 	 *
 	 * @since PeriodicalPress 1.0.0
