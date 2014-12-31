@@ -12,6 +12,6 @@
  * @package PeriodicalPress
  */
 
-public function example_tag() {
+function example_tag() {
 	echo 'Test';
 }
