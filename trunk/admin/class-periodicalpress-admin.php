@@ -3,11 +3,9 @@
 /**
  * The dashboard-specific functionality of the plugin.
  *
- * @link http://github.com/cjbarnes/periodicalpress
+ * @since 1.0.0
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
+ * @package PeriodicalPress\Admin
  */
 
 /**
@@ -16,20 +14,15 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the dashboard-specific stylesheet and JavaScript.
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
- *
- * @author cJ barnes <mail@cjbarnes.co.uk>
+ * @since 1.0.0
  */
 class PeriodicalPress_Admin {
 
 	/**
 	 * The ID of this plugin.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 * @access private
-	 *
 	 * @var string $plugin_name The ID of this plugin.
 	 */
 	private $plugin_name;
@@ -37,9 +30,8 @@ class PeriodicalPress_Admin {
 	/**
 	 * The version of this plugin.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 * @access private
-	 *
 	 * @var string $version The current version of this plugin.
 	 */
 	private $version;
@@ -47,7 +39,7 @@ class PeriodicalPress_Admin {
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 *
 	 * @var string $plugin_name The name of this plugin.
 	 * @var string $version     The version of this plugin.
@@ -60,22 +52,36 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
-	 * Register the stylesheets for the Dashboard.
+	 * Display an admin area HTML ‘partial’.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @param string $file_name The PHP file to be included (just the filename,
+	 *                          not including path, extension, or plugin-name
+	 *                          prefix).
 	 */
-	public function enqueue_styles() {
+	private function load_partial( $file_name ) {
+
+		if ( ! $file_name ) {
+			return false;
+		}
+
+		$file_path = 'admin/partials/periodicalpress-' . $file_name . '.php';
 
 		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in PeriodicalPress_Admin_Loader as all of the hooks are
-		 * defined in that particular class.
-		 *
-		 * The PeriodicalPress_Admin_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this class.
+		 * Include the partial.
 		 */
+		@include plugin_dir_path( dirname( __FILE__ ) ) . $file_path;
+
+	}
+
+	/**
+	 * Register the stylesheets for the Dashboard.
+	 *
+	 * @since 1.0.0
+	 */
+	public function enqueue_styles() {
 
 		wp_enqueue_style(
 			$this->plugin_name,
@@ -90,20 +96,9 @@ class PeriodicalPress_Admin {
 	/**
 	 * Register the JavaScript for the dashboard.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 */
 	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in PeriodicalPress_Admin_Loader as all of the hooks are
-		 * defined in that particular class.
-		 *
-		 * The PeriodicalPress_Admin_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this class.
-		 */
 
 		wp_enqueue_script(
 			$this->plugin_name,
@@ -118,7 +113,7 @@ class PeriodicalPress_Admin {
 	/**
 	 * All changes to admin menu and submenu items.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 */
 	public function admin_menu_setup() {
 
@@ -139,9 +134,7 @@ class PeriodicalPress_Admin {
 			'4.44' // position in the menu (Posts is 5)
 		);
 
-		/*
-		 * Issues submenu: repeat of top-level menu page
-		 */
+		// Issues submenu: repeat of top-level menu page.
 		add_submenu_page(
 			'pp_issues_admin',
 			__( 'Issues Settings', 'periodicalpress' ),
@@ -150,9 +143,7 @@ class PeriodicalPress_Admin {
 			'pp_issues_admin'
 		);
 
-		/*
-		 * Issues submenu: Add and edit the Issues taxonomy.
-		 */
+		// Issues submenu: Add and edit the Issues taxonomy.
 		add_submenu_page(
 			'pp_issues_admin',
 			$tax_labels->name,
@@ -169,15 +160,17 @@ class PeriodicalPress_Admin {
 	 * Hooks into parent_file filter. Primarily exists to avoid taxonomy
 	 * submenu items being forced under the Posts top-level menu.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
+	 *
+	 * @see WP_Screen
 	 *
 	 * @param string $parent_file The slug of the top-level menu page that the
-	 *                            current screen is a child of
-	 * @return string The modified parent file
+	 *                            current screen is a child of.
+	 * @return string The modified parent file.
 	 */
 	public function fix_submenu_parent_files( $parent_file ) {
 
-		// @see WP_Screen
+		// Get WP_Screen object
 		$screen = get_current_screen();
 
 		if ( 'pp_issue' === $screen->taxonomy )  {
@@ -190,33 +183,32 @@ class PeriodicalPress_Admin {
 	/**
 	 * Display the main Issues admin page.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 */
 	public function issues_admin() {
 
-		/*
+		/**
 		 * Output the Issue Settings page.
 		 */
-		@include plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/periodicalpress-issues-admin.php';
+		$this->load_partial( 'issues-admin' );
 
 	}
 
 	/**
-	 * Output the form for choosing the current issue.
+	 * Output the Current Issue form.
 	 *
-	 * Shown above the Add New Issue form on the main Issues taxonomy admin
-	 * page. Only available to users with capability manage_pp_issues.
+	 * Only available to users with capability manage_pp_issues.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 */
 	public function current_issue_field() {
 
 		if ( current_user_can( 'manage_pp_issues' ) ) {
 
-			/*
-			 * Output the form for selecting the current issue.
+			/**
+			 * Output the Current Issue form.
 			 */
-			@include plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/periodicalpress-current-issue-form.php';
+			$this->load_partial( 'current-issue-form' );
 
 		}
 

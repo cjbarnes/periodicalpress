@@ -1,19 +1,16 @@
 <?php
 
 /**
- * Display the PeriodicalPress HTML form for selecting the current issue.
+ * Display the PeriodicalPress HTML form for selecting the current issue
  *
- * @link http://github.com/cjbarnes/periodicalpress
+ * @since 1.0.0
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
+ * @package PeriodicalPress\Admin
  */
-
 ?>
 
 <div class="form-wrap">
-	<h3><?php _e( 'Current Issue', 'periodicalpress' ); ?></h3>
+	<h3><?php esc_html_e( 'Current Issue', 'periodicalpress' ); ?></h3>
 
 	<form id="set-current-issue" method="post" action="edit-tags.php" />
 	<?php wp_nonce_field( 'set-current-issue' ); ?>
@@ -24,7 +21,7 @@
 		<input type="hidden" name="post_type" value="post" />
 
 		<div class="form-field current-tag-wrap">
-			<label for="current-issue" class="screen-reader-text"><?php _e( 'Issue', 'periodicalpress' ); ?></label>
+			<label for="current-issue" class="screen-reader-text"><?php esc_html_e( 'Issue', 'periodicalpress' ); ?></label>
 
 		<?php
 			// Output a dropdown list of issues
@@ -39,9 +36,9 @@
 			wp_dropdown_categories( $args );
 		?>
 
-			<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php _e( 'Set Current Issue', 'periodicalpress' ); ?>" />
+			<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_attr_e( 'Set Current Issue', 'periodicalpress' ); ?>" />
 
-			<p><?php _e( 'The Current Issue is the issue featured on the homepage of the website. Usually it is the most recently published issue.', 'periodicalpress' ); ?></p>
+			<p><?php esc_html_e( 'The Current Issue is the issue featured on the homepage of the website. Usually it is the most recently published issue.', 'periodicalpress' ); ?></p>
 		</div>
 	</form>
 </div>

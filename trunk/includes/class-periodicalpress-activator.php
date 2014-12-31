@@ -3,11 +3,9 @@
 /**
  * Fired during plugin activation
  *
- * @link http://github.com/cjbarnes/periodicalpress
+ * @since 1.0.0
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
+ * @package PeriodicalPress
  */
 
 /**
@@ -15,19 +13,16 @@
  *
  * This class defines all code necessary to run during the plugin's activation.
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
- *
- * @author cJ barnes <mail@cjbarnes.co.uk>
+ * @since 1.0.0
  */
 class PeriodicalPress_Activator {
 
 	/**
-	 * Run on plugin activation. Carries out all one-time setup changes
-	 * (especially to the database).
+	 * Run on plugin activation.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * Carries out all one-time setup changes (especially to the database).
+	 *
+	 * @since 1.0.0
 	 */
 	public static function activate() {
 
@@ -37,11 +32,16 @@ class PeriodicalPress_Activator {
 	}
 
 	/**
-	 * Setup plugin-specific capabilities and apply them to the existing roles
-	 * in WordPress, based on which roles have each capability’s ‘nearest
-	 * neighbour’ already applied to them.
+	 * Register capabilities.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * Setup plugin-specific capabilities and apply them to the existing roles
+	 * in WordPress that have these capabilities:
+	 * - `assign_pp_issues` - edit_posts
+	 * - `edit_pp_issues`   - edit_others_posts
+	 * - `manage_pp_issues` - edit_others_posts
+	 * - `delete_pp_issues` - delete_others_posts
+	 *
+	 * @since 1.0.0
 	 * @access private
 	 *
 	 * @global WP_Roles $wp_roles The WordPress roles and capabilities class
@@ -85,10 +85,12 @@ class PeriodicalPress_Activator {
 	}
 
 	/**
+	 * Flush rewrite rules on plugin activation.
+	 *
 	 * Setup permalinks for all declared custom post types and taxonomies, by
 	 * loading in the new types/taxonomies and then flushing rewrite rules.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 * @access private
 	 */
 	private static function set_rewrite_rules() {

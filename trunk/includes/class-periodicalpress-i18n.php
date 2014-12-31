@@ -6,11 +6,9 @@
  * Loads and defines the internationalization files for this plugin so that it
  * is ready for translation.
  *
- * @link http://github.com/cjbarnes/periodicalpress
+ * @since 1.0.0
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
+ * @package PeriodicalPress
  */
 
 /**
@@ -19,20 +17,15 @@
  * Loads and defines the internationalization files for this plugin so that it
  * is ready for translation.
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
- *
- * @author cJ barnes <mail@cjbarnes.co.uk>
+ * @since 1.0.0
  */
 class PeriodicalPress_i18n {
 
 	/**
 	 * The domain specified for this plugin.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 * @access private
-	 *
 	 * @var string $domain The domain identifier for this plugin.
 	 */
 	private $domain;
@@ -40,7 +33,7 @@ class PeriodicalPress_i18n {
 	/**
 	 * Load the plugin text domain for translation.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 */
 	public function load_plugin_textdomain() {
 
@@ -55,7 +48,7 @@ class PeriodicalPress_i18n {
 	/**
 	 * Set the domain equal to that of the specified domain.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 *
 	 * @param string $domain The domain that represents the locale of this
 	 *                       plugin.

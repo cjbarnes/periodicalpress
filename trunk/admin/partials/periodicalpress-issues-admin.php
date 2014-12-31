@@ -1,16 +1,14 @@
 <?php
 
 /**
- * The main admin page for the plugin.
+ * The main admin page for the plugin
  *
  * Includes general settings and customization options. Options are limited on a
  * per-field rather than per-page basis.
  *
- * @link http://github.com/cjbarnes/periodicalpress
+ * @since 1.0.0
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
+ * @package PeriodicalPress\Admin
  */
 ?>
 

@@ -2,13 +2,11 @@
 
 /**
  * The functionality of the plugin that affects both Dashboard and public-
- * facing pages.
+ * facing pages
  *
- * @link http://github.com/cjbarnes/periodicalpress
+ * @since 1.0.0
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
+ * @package PeriodicalPress
  */
 
 /**
@@ -16,20 +14,15 @@
  *
  * Defines the plugin name, version, and custom post types.
  *
- * @package WordPress
- * @subpackage PeriodicalPress
- * @since PeriodicalPress 1.0.0
- *
- * @author cJ barnes <mail@cjbarnes.co.uk>
+ * @since 1.0.0
  */
 class PeriodicalPress_Common {
 
 	/**
 	 * The ID of this plugin.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 * @access private
-	 *
 	 * @var string $plugin_name The ID of this plugin.
 	 */
 	private $plugin_name;
@@ -37,9 +30,8 @@ class PeriodicalPress_Common {
 	/**
 	 * The version of this plugin.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 * @access private
-	 *
 	 * @var string $version The current version of this plugin.
 	 */
 	private $version;
@@ -47,7 +39,7 @@ class PeriodicalPress_Common {
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 *
 	 * @var string $plugin_name The name of this plugin.
 	 * @var string $version     The version of this plugin.
@@ -65,7 +57,7 @@ class PeriodicalPress_Common {
 	 * Is static so it can be accessed before instantiation by the plugin
 	 * activator class.
 	 *
-	 * @since PeriodicalPress 1.0.0
+	 * @since 1.0.0
 	 */
 	public static function register_taxonomies() {
 
@@ -111,11 +103,6 @@ class PeriodicalPress_Common {
 			'capabilities'      => $capabilities,
 		);
 		register_taxonomy( 'pp_issue', array( 'post' ), $args );
-
-		/*
-		 * TODO: customize messages and help - see bottom of page here:
-		 * http://codex.wordpress.org/Function_Reference/register_post_type
-		 */
 
 	}
 
