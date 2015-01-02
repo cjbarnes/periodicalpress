@@ -292,9 +292,67 @@ class PeriodicalPress_Admin {
 	 *
 	 * @param WP_Post $post The post being edited.
 	 */
-	public function render_issue_metabox( $post ) {
+	public function render_issue_metabox() {
 
 		$this->load_partial( 'issue-metabox' );
+
+	}
+
+	/**
+	 * [save_issue_metabox description]
+	 *
+	 * @since 1.0.0
+	 * @link http://codex.wordpress.org/Function_Reference/add_meta_box
+	 *
+	 * @param  int $post_id ID of the post being saved.
+	 * @return int ID of the post being saved.
+	 */
+	public function save_issue_metabox( $post_id ) {
+
+		/*
+		 * If this is an autosave, our form has not been submitted, so we don't
+         * want to do anything.
+         */
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+			return $post_id;
+
+		// Check this is the correct post type.
+		if ( 'post' !== $_POST['post_type'] ) {
+			return $post_id;
+		}
+
+		// Check form nonce was properly set.
+		if ( empty( $_POST['periodicalpress-post-issue-nonce'] )
+			|| ( 1 !== wp_verify_nonce( $_POST['periodicalpress-post-issue-nonce'], 'set-post-issue' ) ) ) {
+			return $post_id;
+		}
+
+		// Check permissions.
+		if ( ! current_user_can( 'assign_pp_issue' ) ) {
+			return $post_id;
+		}
+
+		// Check new issue data is present and valid.
+		if ( ! isset( $_POST['pp_issue'] ) ) {
+			return $post_id;
+		}
+
+		/**
+		 * Update the DB if the new issue exists or if 'No issue' was selected.
+		 */
+		$new_issue = intval( $_POST['pp_issue'] );
+
+		if ( -1 === $new_issue ) {
+
+			wp_delete_object_term_relationships( $post_id, 'pp_issue' );
+
+		} elseif ( ! is_null( get_term( $new_issue, 'pp_issue' ) ) ) {
+
+			wp_set_post_terms( $post_id, $new_issue, 'pp_issue' );
+
+		} else {
+			return $post_id;
+		}
 
 	}
 

@@ -246,6 +246,11 @@ class PeriodicalPress {
 			$plugin_admin,
 			'add_remove_metaboxes'
 		);
+		$this->loader->add_action(
+			'save_post',
+			$plugin_admin,
+			'save_issue_metabox'
+		);
 
 	}
 
