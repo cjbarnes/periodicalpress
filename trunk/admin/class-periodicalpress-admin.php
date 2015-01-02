@@ -128,24 +128,24 @@ class PeriodicalPress_Admin {
 			$tax_labels->name,
 			$tax_labels->menu_name,
 			'edit_pp_issues', // user capability required to show this menu
-			'pp_issues_admin',
-			array( $this, 'issues_admin' ),
+			'pp_issues_home',
+			array( $this, 'issues_home' ),
 			'dashicons-pressthis',
 			'4.44' // position in the menu (Posts is 5)
 		);
 
 		// Issues submenu: repeat of top-level menu page.
 		add_submenu_page(
-			'pp_issues_admin',
-			__( 'Issues Settings', 'periodicalpress' ),
-			__( 'Issues Settings', 'periodicalpress' ),
+			'pp_issues_home',
+			__( 'Issues Home', 'periodicalpress' ),
+			__( 'Issues Home', 'periodicalpress' ),
 			'edit_pp_issues',
-			'pp_issues_admin'
+			'pp_issues_home'
 		);
 
 		// Issues submenu: Add and edit the Issues taxonomy.
 		add_submenu_page(
-			'pp_issues_admin',
+			'pp_issues_home',
 			$tax_labels->name,
 			$tax_labels->all_items,
 			'edit_pp_issues', // cap required
@@ -174,7 +174,7 @@ class PeriodicalPress_Admin {
 		$screen = get_current_screen();
 
 		if ( 'pp_issue' === $screen->taxonomy )  {
-			$parent_file = 'pp_issues_admin';
+			$parent_file = 'pp_issues_home';
 		}
 
 		return $parent_file;
@@ -185,12 +185,12 @@ class PeriodicalPress_Admin {
 	 *
 	 * @since 1.0.0
 	 */
-	public function issues_admin() {
+	public function issues_home() {
 
 		/**
 		 * Output the Issue Settings page.
 		 */
-		$this->load_partial( 'issues-admin' );
+		$this->load_partial( 'issues-home' );
 
 	}
 
