@@ -212,6 +212,48 @@ class PeriodicalPress_Admin {
 
 		}
 
+	}
+
+	/**
+	 * Save a newly selected Current Issue to the database.
+	 *
+	 * @since 1.0.0
+	 */
+	public function save_current_issue_field() {
+		write_log( $_POST );
+
+		// Check that the Current Issue form was submitted.
+		if ( isset( $_POST['action'] )
+			&& ( 'set-current-issue' === $_POST['action'] ) ) {
+
+			// Check form nonce was properly set.
+			if ( empty( $_POST['periodicalpress-current-issue-nonce'] )
+				|| ( 1 !== wp_verify_nonce( $_POST['periodicalpress-current-issue-nonce'], 'set-current-issue' ) ) ) {
+				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+			}
+
+			// Check current user has sufficient permissions.
+			if ( ! current_user_can( 'manage_pp_issues' ) ) {
+				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+			}
+
+			if ( empty( $_POST['current-issue'] ) ) {
+				return;
+			}
+			$new_current_issue_id = $_POST['current-issue'];
+
+			/*
+			 * Check this Issue exists. Uses get_term() rather than
+			 * term_exists() because the POST data contains a term ID, not a
+			 * term slug.
+			 */
+			$new_current_issue = get_term( +$new_current_issue_id, 'pp_issue' );
+
+			if ( ! is_null( $new_current_issue ) ) {
+				update_option( 'pp_current_issue', $new_current_issue_id );
+			}
+
+		}
 
 	}
 

@@ -220,13 +220,14 @@ class PeriodicalPress {
 		);
 
 		/*
-		 * Issues admin page: display Current Issue selector
+		 * Sanitize settings choices and save to database
 		 */
 		$this->loader->add_action(
-			'pp_issue_pre_add_form',
+			'periodicalpress_admin_top',
 			$plugin_admin,
-			'current_issue_field'
+			'save_current_issue_field'
 		);
+
 
 	}
 

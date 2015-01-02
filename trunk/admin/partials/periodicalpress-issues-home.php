@@ -23,14 +23,10 @@
 	 */
 	do_action( 'periodicalpress_admin_top' );
 
-	if ( current_user_can( 'manage_pp_issues' ) ) {
-
-		/**
-		 * Output the Current Issue form.
-		 */
-		$this->load_partial( 'current-issue-form' );
-
-	}
+	/**
+	 * Output the Current Issue form if the user has permissions.
+	 */
+	$this->current_issue_field();
 
 	/**
 	 * Hook for after the content on every plugin page in the admin area.

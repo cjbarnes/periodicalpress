@@ -23,7 +23,7 @@ $form_action = str_replace( 'toplevel_page_', '?page=', $screen->base );
 
 	<form id="set-current-issue" method="post" action="<?php echo $form_action; ?>" />
 
-	<?php wp_nonce_field( 'periodicalpress-current-issue' ); ?>
+	<?php wp_nonce_field( 'set-current-issue', 'periodicalpress-current-issue-nonce' ); ?>
 
 		<input type="hidden" name="action" value="set-current-issue" />
 		<input type="hidden" name="screen" value="<?php echo $screen->id; ?>" />
