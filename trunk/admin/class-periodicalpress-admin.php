@@ -299,12 +299,12 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
-	 * [save_issue_metabox description]
+	 * Save a post’s chosen Issue to the DB.
 	 *
 	 * @since 1.0.0
 	 * @link http://codex.wordpress.org/Function_Reference/add_meta_box
 	 *
-	 * @param  int $post_id ID of the post being saved.
+	 * @param int $post_id ID of the post being saved.
 	 * @return int ID of the post being saved.
 	 */
 	public function save_issue_metabox( $post_id ) {
