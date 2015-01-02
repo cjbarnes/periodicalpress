@@ -14,4 +14,16 @@
 
 <div class="wrap">
 	<h2><?php _e( 'Issues Settings', 'periodicalpress' ); ?></h2>
+
+<?php
+	if ( current_user_can( 'manage_pp_issues' ) ) {
+
+		/**
+		 * Output the Current Issue form.
+		 */
+		$this->load_partial( 'current-issue-form' );
+
+	}
+?>
+
 </div>

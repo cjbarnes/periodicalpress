@@ -13,13 +13,16 @@
  * input elements.
  */
 $screen = get_current_screen();
+$form_action = str_replace( 'toplevel_page_', '?page=', $screen->base );
 
 ?>
 
 <div class="form-wrap">
 	<h3><?php esc_html_e( 'Current Issue', 'periodicalpress' ); ?></h3>
 
-	<form id="set-current-issue" method="post" action="<?php echo $screen->base; ?>" />
+	<form id="set-current-issue" method="post" action="<?php echo $form_action; ?>" />
+
+	<?php wp_nonce_field( 'periodicalpress-current-issue' ); ?>
 
 		<input type="hidden" name="action" value="set-current-issue" />
 		<input type="hidden" name="screen" value="<?php echo $screen->id; ?>" />
