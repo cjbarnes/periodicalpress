@@ -18,6 +18,7 @@ $form_action = str_replace( 'toplevel_page_', '?page=', $screen->base );
 ?>
 
 <div class="form-wrap">
+
 	<h3><?php esc_html_e( 'Current Issue', 'periodicalpress' ); ?></h3>
 
 	<form id="set-current-issue" method="post" action="<?php echo $form_action; ?>" />
@@ -50,5 +51,7 @@ $form_action = str_replace( 'toplevel_page_', '?page=', $screen->base );
 
 			<p><?php esc_html_e( 'The Current Issue is the issue featured on the homepage of the website. Usually it is the most recently published issue.', 'periodicalpress' ); ?></p>
 		</div>
+
 	</form>
+
 </div>
