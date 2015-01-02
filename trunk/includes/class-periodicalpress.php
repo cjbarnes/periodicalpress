@@ -192,7 +192,7 @@ class PeriodicalPress {
 		$plugin_admin = new PeriodicalPress_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		/*
-		 * Admin CSS and JavaScript
+		 * Admin CSS and JavaScript.
 		 */
 		$this->loader->add_action(
 			'admin_enqueue_scripts',
@@ -206,7 +206,7 @@ class PeriodicalPress {
 		);
 
 		/*
-		 * Admin menu item setup
+		 * Admin menu item setup.
 		 */
 		$this->loader->add_action(
 			'admin_menu',
@@ -220,7 +220,7 @@ class PeriodicalPress {
 		);
 
 		/*
-		 * Sanitize settings choices and save to database
+		 * Sanitize settings choices and save to database.
 		 */
 		$this->loader->add_action(
 			'periodicalpress_admin_top',
@@ -228,6 +228,16 @@ class PeriodicalPress {
 			'save_current_issue_field'
 		);
 
+		/*
+		 * Alterations to the Issues box on the Post Add/Edit page.
+		 */
+		$this->loader->add_filter(
+			'wp_terms_checklist_args',
+			$plugin_admin,
+			'filter_terms_checklist_args',
+			11,
+			2
+		);
 
 	}
 

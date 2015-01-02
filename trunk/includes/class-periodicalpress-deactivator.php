@@ -50,10 +50,8 @@ class PeriodicalPress_Deactivator {
 		 */
 		foreach ( $all_roles as $role_name => $role_contents ) {
 
-			$wp_roles->remove_cap( $role_name, 'assign_pp_issues' );
-			$wp_roles->remove_cap( $role_name, 'edit_pp_issues' );
+			$wp_roles->remove_cap( $role_name, 'assign_pp_issue' );
 			$wp_roles->remove_cap( $role_name, 'manage_pp_issues' );
-			$wp_roles->remove_cap( $role_name, 'delete_pp_issues' );
 
 		}
 

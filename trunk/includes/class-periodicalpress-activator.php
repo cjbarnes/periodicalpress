@@ -36,10 +36,8 @@ class PeriodicalPress_Activator {
 	 *
 	 * Setup plugin-specific capabilities and apply them to the existing roles
 	 * in WordPress that have these capabilities:
-	 * - `assign_pp_issues` - edit_posts
-	 * - `edit_pp_issues`   - edit_others_posts
-	 * - `manage_pp_issues` - edit_others_posts
-	 * - `delete_pp_issues` - delete_others_posts
+	 * - `assign_pp_issue`  - edit_posts        - allows per-post Issue choice
+	 * - `manage_pp_issues` - edit_others_posts - gives access to Issues admin
 	 *
 	 * @since 1.0.0
 	 * @access private
@@ -56,28 +54,19 @@ class PeriodicalPress_Activator {
 			$role_caps = $role_contents['capabilities'];
 
 			/*
-			 * Create new capability: assign_pp_issues (initially set for users
-			 * with edit_posts capability).
+			 * Create new capability: assign_pp_issue (initially set for users
+			 * with edit_posts capability, i.e. Contributors and up).
 			 */
 			if ( isset( $role_caps['edit_posts'] ) ) {
-				$wp_roles->add_cap( $role_name, 'assign_pp_issues' );
+				$wp_roles->add_cap( $role_name, 'assign_pp_issue' );
 			}
 
 			/*
-			 * Create new capabilities: edit_pp_issues and manage_pp_issues
-			 * (initially set for users with edit_others_posts capability).
+			 * Create new capability: manage_pp_issues (initially set for users
+			 * with edit_others_posts capability, i.e. Editors and up).
 			 */
 			if ( isset( $role_caps['edit_others_posts'] ) ) {
-				$wp_roles->add_cap( $role_name, 'edit_pp_issues' );
 				$wp_roles->add_cap( $role_name, 'manage_pp_issues' );
-			}
-
-			/*
-			 * Create new capability: delete_pp_issues (initially set for users
-			 * with delete_others_posts capability).
-			 */
-			if ( isset( $role_caps['delete_others_posts'] ) ) {
-				$wp_roles->add_cap( $role_name, 'delete_pp_issues' );
 			}
 
 		}

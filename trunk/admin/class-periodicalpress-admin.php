@@ -11,9 +11,6 @@
 /**
  * The dashboard-specific functionality of the plugin.
  *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the dashboard-specific stylesheet and JavaScript.
- *
  * @since 1.0.0
  */
 class PeriodicalPress_Admin {
@@ -127,7 +124,7 @@ class PeriodicalPress_Admin {
 		add_menu_page(
 			$tax_labels->name,
 			$tax_labels->menu_name,
-			'edit_pp_issues', // user capability required to show this menu
+			'manage_pp_issues', // user capability required to show this menu
 			'pp_issues_home',
 			array( $this, 'issues_home' ),
 			'dashicons-pressthis',
@@ -139,7 +136,7 @@ class PeriodicalPress_Admin {
 			'pp_issues_home',
 			__( 'Issues Home', 'periodicalpress' ),
 			__( 'Issues Home', 'periodicalpress' ),
-			'edit_pp_issues',
+			'manage_pp_issues',
 			'pp_issues_home'
 		);
 
@@ -148,7 +145,7 @@ class PeriodicalPress_Admin {
 			'pp_issues_home',
 			$tax_labels->name,
 			$tax_labels->all_items,
-			'edit_pp_issues', // cap required
+			'manage_pp_issues', // cap required
 			'edit-tags.php?taxonomy=pp_issue'
 		);
 
@@ -256,5 +253,44 @@ class PeriodicalPress_Admin {
 		}
 
 	}
+
+	/**
+	 * Adjusts Issues field on the Post Editor.
+	 *
+	 * Filter for the arguments passed to wp_terms_checklist(), which displays
+	 * the Issues choice field within the Add/Edit Post page.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $args    The original arguments array
+	 * @param int   $post_id The ID of the post being edited
+	 * @return array The revised arguments array
+	 */
+	public function filter_terms_checklist_args( $args, $post_id ) {
+
+		if ( 'pp_issue' === $args['taxonomy'] ) {
+
+			// Hide the 'Most Used' tab.
+			$args['popular_cats'] = array( false );
+
+			/**
+			 * Select the Current Issue by default (but only for new posts).
+			 */
+			if ( 'add' === get_current_screen()->action ) {
+
+				$current_issue = get_option( 'pp_current_issue', 0 );
+				$args['selected_cats'] = $current_issue
+					? array( $current_issue )
+					: false;
+
+			}
+
+		}
+
+		write_log( $args );
+
+		return $args;
+	}
+
 
 }

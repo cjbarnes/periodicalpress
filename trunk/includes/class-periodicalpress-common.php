@@ -86,9 +86,9 @@ class PeriodicalPress_Common {
 		);
 		$capabilities = array(
 			'manage_terms' => 'manage_pp_issues',
-			'edit_terms'   => 'edit_pp_issues',
-			'delete_terms' => 'delete_pp_issues',
-			'assign_terms' => 'assign_pp_issues',
+			'edit_terms'   => 'manage_pp_issues',
+			'delete_terms' => 'manage_pp_issues',
+			'assign_terms' => 'assign_pp_issue',
 		);
 		$args = array(
 			'labels'            => $labels,
