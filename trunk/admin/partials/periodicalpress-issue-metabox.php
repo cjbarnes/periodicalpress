@@ -25,7 +25,6 @@ wp_nonce_field( 'set-post-issue', 'periodicalpress-post-issue-nonce' );
 	 * posts. Multiple issues can't be selected. If the DB has more than one
 	 * issue for this post, ignore.
 	 */
-
 	if ( 'add' === get_current_screen()->action ) {
 		$selected_issue = 0;
 	} else {
