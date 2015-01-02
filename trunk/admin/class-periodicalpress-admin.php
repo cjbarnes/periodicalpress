@@ -255,42 +255,47 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
-	 * Adjusts Issues field on the Post Editor.
+	 * Replaces Issues metabox on the Post Editor.
 	 *
-	 * Filter for the arguments passed to wp_terms_checklist(), which displays
-	 * the Issues choice field within the Add/Edit Post page.
+	 * Runs after all core metaboxes have been added. Removes the default
+	 * taxonomy metabox and declares a simpler, bespoke alternative.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $args    The original arguments array
-	 * @param int   $post_id The ID of the post being edited
-	 * @return array The revised arguments array
+	 * @param WP_Post $post The post being edited.
 	 */
-	public function filter_terms_checklist_args( $args, $post_id ) {
+	public function add_remove_metaboxes( $post ) {
 
-		if ( 'pp_issue' === $args['taxonomy'] ) {
+		// Remove old, multi-selecting Issues metabox
+		remove_meta_box( 'pp_issuediv', 'post', 'side' );
 
-			// Hide the 'Most Used' tab.
-			$args['popular_cats'] = array( false );
+		// Add a new, bespoke Issue metabox
+		if ( current_user_can( 'assign_pp_issue' ) ) {
 
-			/**
-			 * Select the Current Issue by default (but only for new posts).
-			 */
-			if ( 'add' === get_current_screen()->action ) {
-
-				$current_issue = get_option( 'pp_current_issue', 0 );
-				$args['selected_cats'] = $current_issue
-					? array( $current_issue )
-					: false;
-
-			}
+			add_meta_box(
+				'pp_issuediv',
+				__( 'Issue', 'periodicalpress' ),
+				array( $this, 'render_issue_metabox' ),
+				'post',
+				'side',
+				'high'
+			);
 
 		}
 
-		write_log( $args );
-
-		return $args;
 	}
 
+	/**
+	 * The Issue metabox contents.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param WP_Post $post The post being edited.
+	 */
+	public function render_issue_metabox( $post ) {
+
+		$this->load_partial( 'issue-metabox' );
+
+	}
 
 }

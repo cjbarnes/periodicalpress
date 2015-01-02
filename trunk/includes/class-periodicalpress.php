@@ -71,8 +71,12 @@ class PeriodicalPress {
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_common_hooks();
-		$this->define_admin_hooks();
-		$this->define_public_hooks();
+
+		if ( is_admin() ) {
+			$this->define_admin_hooks();
+		} else {
+			$this->define_public_hooks();
+		}
 
 	}
 
@@ -113,17 +117,23 @@ class PeriodicalPress {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-common.php';
 
-		/**
-		 * The class responsible for defining all actions that occur in the
-		 * Dashboard.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-periodicalpress-admin.php';
+		if ( is_admin() ) {
 
-		/**
-		 * The class responsible for defining all actions that occur in the
-		 * public-facing side of the site.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-periodicalpress-public.php';
+			/**
+			 * The class responsible for defining all actions that occur in the
+			 * Dashboard.
+			 */
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-periodicalpress-admin.php';
+
+		} else {
+
+			/**
+			 * The class responsible for defining all actions that occur in the
+			 * public-facing side of the site.
+			 */
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-periodicalpress-public.php';
+
+		}
 
 		/**
 		 * All plugin template tags. These will be registered as methods of
@@ -229,14 +239,12 @@ class PeriodicalPress {
 		);
 
 		/*
-		 * Alterations to the Issues box on the Post Add/Edit page.
+		 * Replace the Issues box on the Post Add/Edit page.
 		 */
-		$this->loader->add_filter(
-			'wp_terms_checklist_args',
+		$this->loader->add_action(
+			'add_meta_boxes_post',
 			$plugin_admin,
-			'filter_terms_checklist_args',
-			11,
-			2
+			'add_remove_metaboxes'
 		);
 
 	}
