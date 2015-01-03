@@ -57,12 +57,20 @@ class PeriodicalPress_Admin {
 	 * @param string $file_name The PHP file to be included (just the filename,
 	 *                          not including path, extension, or plugin-name
 	 *                          prefix).
+	 * @param array  $vars      Any variables being passed from the parent
+	 *                          function's scope into the partial's scope.
 	 */
-	private function load_partial( $file_name ) {
+	private function load_partial( $file_name, $vars = array() ) {
 
 		if ( ! $file_name ) {
 			return false;
 		}
+
+		/*
+		 * Convert array of items passed to this function into fully-fledged
+		 * variables, which can then be accessed by the included partial.
+		 */
+		extract( $vars, EXTR_SKIP );
 
 		$file_path = 'admin/partials/periodicalpress-' . $file_name . '.php';
 
@@ -261,10 +269,8 @@ class PeriodicalPress_Admin {
 	 * taxonomy metabox and declares a simpler, bespoke alternative.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param WP_Post $post The post being edited.
 	 */
-	public function add_remove_metaboxes( $post ) {
+	public function add_remove_metaboxes() {
 
 		// Remove old, multi-selecting Issues metabox
 		remove_meta_box( 'pp_issuediv', 'post', 'side' );
@@ -292,9 +298,9 @@ class PeriodicalPress_Admin {
 	 *
 	 * @param WP_Post $post The post being edited.
 	 */
-	public function render_issue_metabox() {
+	public function render_issue_metabox( $post ) {
 
-		$this->load_partial( 'issue-metabox' );
+		$this->load_partial( 'issue-metabox', array( $post ) );
 
 	}
 

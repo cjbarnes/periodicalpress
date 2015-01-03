@@ -5,12 +5,8 @@
  *
  * @since 1.0.0
  *
- * @global WP_Post $post The post object for the currently edited post.
- *
  * @package PeriodicalPress\Admin
  */
-
-global $post;
 
 // Output a nonce field for security.
 wp_nonce_field( 'set-post-issue', 'periodicalpress-post-issue-nonce' );

@@ -60,12 +60,20 @@ class PeriodicalPress_Public {
 	 * @param string $file_name The PHP file to be included (just the filename,
 	 *                          not including path, extension, or plugin-name
 	 *                          prefix).
+	 * @param array  $vars      Any variables being passed from the parent
+	 *                          function's scope into the partial's scope.
 	 */
 	private function load_partial( $file_name ) {
 
 		if ( ! $file_name ) {
 			return false;
 		}
+
+		/*
+		 * Convert array of items passed to this function into fully-fledged
+		 * variables, which can then be accessed by the included partial.
+		 */
+		extract( $vars, EXTR_SKIP );
 
 		$file_path = 'public/partials/periodicalpress-' . $file_name . '.php';
 
