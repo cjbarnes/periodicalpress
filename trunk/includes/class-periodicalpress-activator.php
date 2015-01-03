@@ -27,6 +27,7 @@ class PeriodicalPress_Activator {
 	public static function activate() {
 
 		self::create_capabilities();
+		self::create_termmeta_table();
 		self::set_rewrite_rules();
 
 	}
@@ -70,6 +71,49 @@ class PeriodicalPress_Activator {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Create a DB table for taxonomy term metadata.
+	 *
+	 * Used by add_metadata(), update_metadata(), delete_metadata(), and
+	 * get_metadata() when applied to taxonomy terms (i.e. Issues).
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @global wpdb $wpdb The database interaction wrapper.
+	 */
+	private static function create_termmeta_table() {
+		global $wpdb;
+
+		/*
+		 * Assemble table creation SQL.
+		 */
+
+		$table_name = $wpdb->prefix . 'pp_termmeta';
+
+		$charset_collate = '';
+		if ( ! empty ( $wpdb->charset ) ) {
+			$charset_collate .= "DEFAULT CHARACTER SET {$wpdb->charset}";
+		}
+		if ( ! empty ( $wpdb->collate ) ) {
+			$charset_collate .= " COLLATE {$wpdb->collate}";
+		}
+
+		$sql = "CREATE TABLE IF NOT EXISTS `$table_name` (
+			`meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			`term_id` bigint(20) unsigned NOT NULL DEFAULT '0',
+			`meta_key` varchar(255) DEFAULT NULL,
+			`meta_value` longtext,
+			PRIMARY KEY (`meta_id`),
+			KEY `term_id` (`term_id`),
+			KEY `meta_key` (`meta_key`)
+		) $charset_collate;";
+
+		// Add to DB
+		$wpdb->query( $sql );
 
 	}
 
