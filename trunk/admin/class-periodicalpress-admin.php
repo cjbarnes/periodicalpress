@@ -263,6 +263,30 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
+	 * Outputs form fields on the Add Issue pages for metadata items.
+	 *
+	 * @since 1.0.0
+	 */
+	public function display_add_issue_metadata_fields() {
+
+		$this->load_partial( 'add-issue-metadata' );
+
+	}
+
+	/**
+	 * Outputs form fields on the Edit Issue pages for metadata items.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param object $issue    Taxonomy term object for the Issue being edited.
+	 */
+	public function display_edit_issue_metadata_fields( $issue ) {
+
+		$this->load_partial( 'edit-issue-metadata', array( $issue ) );
+
+	}
+
+	/**
 	 * Replaces Issues metabox on the Post Editor.
 	 *
 	 * Runs after all core metaboxes have been added. Removes the default
