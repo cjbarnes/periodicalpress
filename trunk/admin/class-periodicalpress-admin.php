@@ -20,16 +20,16 @@ class PeriodicalPress_Admin {
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * @var string $plugin_name The ID of this plugin.
+	 * @var string $plugin_name
 	 */
 	private $plugin_name;
 
 	/**
-	 * The version of this plugin.
+	 * The current version of this plugin.
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * @var string $version The current version of this plugin.
+	 * @var string $version
 	 */
 	private $version;
 
@@ -38,7 +38,7 @@ class PeriodicalPress_Admin {
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * @var string $partials_path The path of the folder for HTML partials.
+	 * @var string $partials_path
 	 */
 	private $partials_path;
 

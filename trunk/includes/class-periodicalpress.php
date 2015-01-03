@@ -30,8 +30,7 @@ class PeriodicalPress {
 	 *
 	 * @since 1.0.0
 	 * @access protected
-	 * @var PeriodicalPress_Loader $loader Maintains and registers all hooks
-	 *                                     for the plugin.
+	 * @var PeriodicalPress_Loader $loader
 	 */
 	protected $loader;
 
@@ -40,8 +39,7 @@ class PeriodicalPress {
 	 *
 	 * @since 1.0.0
 	 * @access protected
-	 * @var string $plugin_name The string used to uniquely identify this
-	 *                          plugin.
+	 * @var string $plugin_name
 	 */
 	protected $plugin_name;
 
@@ -50,7 +48,7 @@ class PeriodicalPress {
 	 *
 	 * @since 1.0.0
 	 * @access protected
-	 * @var string $version The current version of the plugin.
+	 * @var string $version
 	 */
 	protected $version;
 
@@ -62,8 +60,6 @@ class PeriodicalPress {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @var PeriodicalPress $instance Static. The reusable instance of this
-	 *                                class.
 	 * @return PeriodicalPress Instance of this class.
 	 */
 	public static function get_instance() {

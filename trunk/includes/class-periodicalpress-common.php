@@ -23,16 +23,16 @@ class PeriodicalPress_Common {
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * @var string $plugin_name The ID of this plugin.
+	 * @var string $plugin_name
 	 */
 	private $plugin_name;
 
 	/**
-	 * The version of this plugin.
+	 * The current version of this plugin.
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * @var string $version The current version of this plugin.
+	 * @var string $version
 	 */
 	private $version;
 

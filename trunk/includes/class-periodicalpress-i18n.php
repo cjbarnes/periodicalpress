@@ -26,7 +26,7 @@ class PeriodicalPress_i18n {
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * @var string $domain The domain identifier for this plugin.
+	 * @var string $domain
 	 */
 	private $domain;
 
