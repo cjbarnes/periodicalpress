@@ -347,7 +347,9 @@ class PeriodicalPress_Admin {
 			return $post_id;
 
 		// Check this is the correct post type.
-		if ( 'post' !== $_POST['post_type'] ) {
+		if ( ! isset( $_POST['post_type'] )
+			|| ( 'post' !== $_POST['post_type'] ) ) {
+
 			return $post_id;
 		}
 
