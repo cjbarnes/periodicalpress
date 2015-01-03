@@ -87,22 +87,21 @@ register_deactivation_hook( __FILE__, 'deactivate_periodicalpress' );
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-periodicalpress.php';
 
-/*
- * Instance of the main plugin class.
+
+/**
+ * Begins execution of the plugin.
  *
- * This is the biggest departure from the WP Plugin Boilerplate approach: here
- * we create a persistent and globally available instance of the plugin class,
- * instead of enclosing it in a function. This approach allows us to use plugin
- * methods outside of hooks - e.g. as template tags.
+ * Since everything within the plugin is registered via hooks, then kicking off
+ * the plugin from this point in the file does not affect the page life cycle.
  *
  * @since 1.0.0
- * @var PeriodicalPress $periodicalpress The main plugin class.
+ *
+ * @see PeriodicalPress
  */
-$periodicalpress = new PeriodicalPress();
+function run_periodicalpress() {
 
-/*
- * Begin execution of the plugin. Since everything within the plugin is
- * registered via hooks, kicking off the plugin from this point in the file
- * does not affect the page life cycle.
- */
-$periodicalpress->run();
+	$plugin = PeriodicalPress::get_instance();
+	$plugin->run();
+
+}
+run_periodicalpress();
