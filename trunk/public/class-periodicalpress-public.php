@@ -37,6 +37,15 @@ class PeriodicalPress_Public {
 	private $version;
 
 	/**
+	 * The path for including HTML partials.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 * @var string $partials_path The path of the folder for HTML partials.
+	 */
+	private $partials_path;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since 1.0.0
@@ -46,41 +55,10 @@ class PeriodicalPress_Public {
 	 */
 	public function __construct( $plugin_name, $version ) {
 
+		$this->partials_path = plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/periodicalpress-';
+
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
-	}
-
-	/**
-	 * Display a public website HTML ‘partial’.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param string $file_name The PHP file to be included (just the filename,
-	 *                          not including path, extension, or plugin-name
-	 *                          prefix).
-	 * @param array  $vars      Any variables being passed from the parent
-	 *                          function's scope into the partial's scope.
-	 */
-	private function load_partial( $file_name ) {
-
-		if ( ! $file_name ) {
-			return false;
-		}
-
-		/*
-		 * Convert array of items passed to this function into fully-fledged
-		 * variables, which can then be accessed by the included partial.
-		 */
-		extract( $vars, EXTR_SKIP );
-
-		$file_path = 'public/partials/periodicalpress-' . $file_name . '.php';
-
-		/**
-		 * Include the partial.
-		 */
-		@include plugin_dir_path( dirname( __FILE__ ) ) . $file_path;
 
 	}
 

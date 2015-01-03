@@ -34,6 +34,15 @@ class PeriodicalPress_Admin {
 	private $version;
 
 	/**
+	 * The path for including HTML partials.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 * @var string $partials_path The path of the folder for HTML partials.
+	 */
+	private $partials_path;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since 1.0.0
@@ -43,41 +52,10 @@ class PeriodicalPress_Admin {
 	 */
 	public function __construct( $plugin_name, $version ) {
 
+		$this->partials_path = plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/periodicalpress-';
+
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
-	}
-
-	/**
-	 * Display an admin area HTML ‘partial’.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param string $file_name The PHP file to be included (just the filename,
-	 *                          not including path, extension, or plugin-name
-	 *                          prefix).
-	 * @param array  $vars      Any variables being passed from the parent
-	 *                          function's scope into the partial's scope.
-	 */
-	private function load_partial( $file_name, $vars = array() ) {
-
-		if ( ! $file_name ) {
-			return false;
-		}
-
-		/*
-		 * Convert array of items passed to this function into fully-fledged
-		 * variables, which can then be accessed by the included partial.
-		 */
-		extract( $vars, EXTR_SKIP );
-
-		$file_path = 'admin/partials/periodicalpress-' . $file_name . '.php';
-
-		/**
-		 * Include the partial.
-		 */
-		@include plugin_dir_path( dirname( __FILE__ ) ) . $file_path;
 
 	}
 
@@ -195,7 +173,7 @@ class PeriodicalPress_Admin {
 		/**
 		 * Output the Issue Settings page.
 		 */
-		$this->load_partial( 'issues-home' );
+		require $this->partials_path . 'issues-home.php';
 
 	}
 
@@ -213,7 +191,7 @@ class PeriodicalPress_Admin {
 			/**
 			 * Output the Current Issue form.
 			 */
-			$this->load_partial( 'current-issue-form' );
+			require $this->partials_path . 'current-issue-form.php';
 
 		}
 
@@ -269,7 +247,7 @@ class PeriodicalPress_Admin {
 	 */
 	public function display_add_issue_metadata_fields() {
 
-		$this->load_partial( 'add-issue-metadata' );
+		require $this->partials_path . 'add-issue-metadata.php';
 
 	}
 
@@ -282,7 +260,7 @@ class PeriodicalPress_Admin {
 	 */
 	public function display_edit_issue_metadata_fields( $issue ) {
 
-		$this->load_partial( 'edit-issue-metadata', array( $issue ) );
+		require $this->partials_path . 'edit-issue-metadata.php';
 
 	}
 
@@ -324,7 +302,7 @@ class PeriodicalPress_Admin {
 	 */
 	public function render_issue_metabox( $post ) {
 
-		$this->load_partial( 'issue-metabox', array( $post ) );
+		require $this->partials_path . 'issue-metabox.php';
 
 	}
 
