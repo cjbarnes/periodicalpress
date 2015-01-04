@@ -53,15 +53,6 @@ class PeriodicalPress {
 	protected $version;
 
 	/**
-	 * The name of the Issues taxonomy.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @var string $taxonomy_name
-	 */
-	protected $taxonomy_name;
-
-	/**
 	 * Returns the instance of this class.
 	 *
 	 * The key method that enables the Singleton pattern for this class. Calls
@@ -98,7 +89,6 @@ class PeriodicalPress {
 
 		$this->plugin_name = 'periodicalpress';
 		$this->version = '1.0.0';
-		$this->taxonomy_name = 'pp_issue';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -228,23 +218,14 @@ class PeriodicalPress {
 	 */
 	private function define_common_hooks() {
 
-		$plugin_common = new PeriodicalPress_Common(
-			$this->get_plugin_name(),
-			$this->get_version()
-		);
-
-		$plugin_taxonomy = new PeriodicalPress_Issue_Taxonomy(
-			$this->get_plugin_name(),
-			$this->get_version(),
-			$this->get_taxonomy_name()
-		);
+		$plugin_common = new PeriodicalPress_Common( $this->get_plugin_name(), $this->get_version() );
 
 		/*
 		 * Setup custom taxonomies, including the main pp_issue taxonomy
 		 */
 		$this->loader->add_action(
 			'init',
-			$plugin_taxonomy,
+			$plugin_common,
 			'register_taxonomies',
 			0
 		);
@@ -260,10 +241,7 @@ class PeriodicalPress {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new PeriodicalPress_Admin(
-			$this->get_plugin_name(),
-			$this->get_version()
-		);
+		$plugin_admin = new PeriodicalPress_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		/*
 		 * Admin CSS and JavaScript.
@@ -341,10 +319,7 @@ class PeriodicalPress {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new PeriodicalPress_Public(
-			$this->get_plugin_name(),
-			$this->get_version()
-		);
+		$plugin_public = new PeriodicalPress_Public( $this->get_plugin_name(), $this->get_version() );
 
 		/*
 		 * Public-facing CSS and JavaScript
@@ -403,17 +378,6 @@ class PeriodicalPress {
 	 */
 	public function get_version() {
 		return $this->version;
-	}
-
-	/**
-	 * Retrieve the Issues taxonomy name for this plugin.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return string The taxonomy name for use in register_taxonomy().
-	 */
-	public function get_taxonomy_name() {
-		return $this->taxonomy_name;
 	}
 
 }
