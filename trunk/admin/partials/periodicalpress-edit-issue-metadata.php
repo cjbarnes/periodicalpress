@@ -8,15 +8,18 @@
  * @package PeriodicalPress\Admin
  */
 
+$domain = $this->plugin->get_plugin_name();
+$tax_name = $this->plugin->get_taxonomy_name();
+
 // Load all existing metadata for this Issue, for use within the form.
-$metadata = get_metadata( 'pp_issue', $issue->term_id );
+$metadata = get_metadata( $tax_name, $issue->term_id );
 
 // Output a nonce field for security.
 wp_nonce_field( 'set-issue-metadata', 'periodicalpress-set-issue-metadata-nonce' );
 ?>
 <tr class="form-field">
 	<th scope="row" valign="top">
-		<label for="pp-issue-status"><?php esc_html_e( 'Status', 'periodicalpress' ); ?></label>
+		<label for="pp-issue-status"><?php esc_html_e( 'Status', $domain ); ?></label>
 	</th>
 	<td>
 		<select name="pp_issue_status" id="pp-issue-status">

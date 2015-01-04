@@ -8,11 +8,13 @@
  * @package PeriodicalPress\Admin
  */
 
+$domain = $this->plugin->get_plugin_name();
+
 // Output a nonce field for security.
 wp_nonce_field( 'set-issue-metadata', 'periodicalpress-set-issue-metadata-nonce' );
 ?>
 <div class="form-field">
-	<label for="pp-issue-status"><?php esc_html_e( 'Status', 'periodicalpress' ); ?></label>
+	<label for="pp-issue-status"><?php esc_html_e( 'Status', $domain ); ?></label>
 
 	<select name="pp_issue_status" id="pp-issue-status">
 		<?php

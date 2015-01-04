@@ -8,11 +8,14 @@
  * @package PeriodicalPress\Admin
  */
 
+$domain = $this->plugin->get_plugin_name();
+$tax_name = $this->plugin->get_taxonomy_name();
+
 // Output a nonce field for security.
 wp_nonce_field( 'set-post-issue', 'periodicalpress-post-issue-nonce' );
 ?>
 <label class="screen-reader-text" for="pp-issue">
-	<?php esc_html_e( 'Issue', 'periodicalpress' );?>
+	<?php esc_html_e( 'Issue', $domain );?>
 </label>
 <p>
 	<?php
@@ -27,7 +30,7 @@ wp_nonce_field( 'set-post-issue', 'periodicalpress-post-issue-nonce' );
 		$get_args = array(
 			'fields' => 'ids'
 		);
-		$post_issue_ids = wp_get_post_terms( $post->ID, 'pp_issue', $get_args );
+		$post_issue_ids = wp_get_post_terms( $post->ID, $tax_name, $get_args );
 		if ( 1 === count( $post_issue_ids ) ) {
 			$selected_issue = $post_issue_ids[0];
 		} else {
@@ -42,7 +45,7 @@ wp_nonce_field( 'set-post-issue', 'periodicalpress-post-issue-nonce' );
 		'order'            => 'DESC',
 		'name'             => 'pp_issue',
 		'id'               => 'pp-issue',
-		'taxonomy'         => 'pp_issue',
+		'taxonomy'         => $tax_name,
 		'hide_empty'       => 0,
 		'selected'         => $selected_issue
 	);

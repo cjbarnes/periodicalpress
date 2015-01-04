@@ -10,12 +10,13 @@
  *
  * @package PeriodicalPress\Admin
  */
+
+// Get the main plugin class variables.
+$domain = $this->plugin->get_plugin_name();
 ?>
-
 <div class="wrap">
-	<h2><?php _e( 'Issues Home', 'periodicalpress' ); ?></h2>
-
-<?php
+	<h2><?php _e( 'Issues Home', $domain ); ?></h2>
+	<?php
 	/**
 	 * Hook for before the content on every plugin page in the admin area.
 	 *
@@ -34,6 +35,5 @@
 	 * @since 1.0.0
 	 */
 	do_action( 'periodicalpress_admin_bottom' );
-?>
-
+	?>
 </div>

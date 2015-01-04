@@ -18,6 +18,15 @@
 class PeriodicalPress_Admin {
 
 	/**
+	 * The plugin's main class.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 * @var PeriodicalPress $plugin
+	 */
+	protected $plugin;
+
+	/**
 	 * Returns the instance of this class.
 	 *
 	 * The key method that enables the Singleton pattern for this class. Calls
@@ -25,13 +34,14 @@ class PeriodicalPress_Admin {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return PeriodicalPress Instance of this class.
+	 * @param PeriodicalPress $plugin The main plugin class instance.
+	 * @return PeriodicalPress_Admin Instance of this class.
 	 */
-	public static function get_instance() {
+	public static function get_instance( $plugin ) {
 
 		static $instance = null;
 		if ( null === $instance ) {
-			$instance = new static();
+			$instance = new static( $plugin );
 		}
 
 		return $instance;
@@ -45,8 +55,12 @@ class PeriodicalPress_Admin {
 	 *
 	 * @since 1.0.0
 	 * @access protected
+	 *
+	 * @var PeriodicalPress $plugin The main plugin class instance.
 	 */
-	protected function __construct() {
+	protected function __construct( $plugin ) {
+
+		$this->plugin = $plugin;
 
 		$this->load_dependencies();
 
@@ -88,7 +102,7 @@ class PeriodicalPress_Admin {
 		 * The base class that assembles and displays admin list tables.
 		 * Duplicate of {@see WP_List_Table} in Core.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-periodicalpress-list-table.php';
+		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-list-table.php';
 
 	}
 
@@ -101,13 +115,11 @@ class PeriodicalPress_Admin {
 	 */
 	public function enqueue_styles() {
 
-		$plugin = PeriodicalPress::get_instance();
-
 		wp_enqueue_style(
-			$plugin->get_plugin_name(),
+			$this->plugin->get_plugin_name(),
 			plugin_dir_url( __FILE__ ) . 'css/periodicalpress-admin.css',
 			array(),
-			$plugin->get_version(),
+			$this->plugin->get_version(),
 			'all'
 		);
 
@@ -122,13 +134,11 @@ class PeriodicalPress_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		$plugin = PeriodicalPress::get_instance();
-
 		wp_enqueue_script(
-			$plugin->get_plugin_name(),
+			$this->plugin->get_plugin_name(),
 			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-admin.js',
 			array( 'jquery' ),
-			$plugin->get_version(),
+			$this->plugin->get_version(),
 			false
 		);
 
@@ -141,8 +151,11 @@ class PeriodicalPress_Admin {
 	 */
 	public function admin_menu_setup() {
 
+		$domain = $this->plugin->get_plugin_name();
+		$tax_name = $this->plugin->get_taxonomy_name();
+
 		// Get Issues taxonomy labels for use by menu pages/subpages.
-		$tax_labels = get_taxonomy( 'pp_issue' )->labels;
+		$tax_labels = get_taxonomy( $tax_name )->labels;
 
 		/*
 		 * Main Issues menu, containing the Issues taxonomy page and some
@@ -161,8 +174,8 @@ class PeriodicalPress_Admin {
 		// Issues submenu: repeat of top-level menu page.
 		add_submenu_page(
 			'pp_issues_home',
-			__( 'Issues Home', 'periodicalpress' ),
-			__( 'Issues Home', 'periodicalpress' ),
+			__( 'Issues Home', $domain ),
+			__( 'Issues Home', $domain ),
 			'manage_pp_issues',
 			'pp_issues_home'
 		);
@@ -173,7 +186,7 @@ class PeriodicalPress_Admin {
 			$tax_labels->name,
 			$tax_labels->all_items,
 			'manage_pp_issues', // cap required
-			'edit-tags.php?taxonomy=pp_issue'
+			"edit-tags.php?taxonomy=$tax_name"
 		);
 
 	}
@@ -197,7 +210,7 @@ class PeriodicalPress_Admin {
 		// Get WP_Screen object
 		$screen = get_current_screen();
 
-		if ( 'pp_issue' === $screen->taxonomy )  {
+		if ( $this->plugin->get_taxonomy_name() === $screen->taxonomy )  {
 			$parent_file = 'pp_issues_home';
 		}
 
@@ -214,7 +227,7 @@ class PeriodicalPress_Admin {
 		/**
 		 * Output the Issue Settings page.
 		 */
-		$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+		$path = $this->plugin->get_partials_path( 'admin' );
 		require $path . 'periodicalpress-issues-home.php';
 
 	}
@@ -228,12 +241,14 @@ class PeriodicalPress_Admin {
 	 */
 	public function current_issue_field() {
 
-		if ( current_user_can( 'manage_pp_issues' ) ) {
+		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
+
+		if ( current_user_can( $tax->cap->manage_terms ) ) {
 
 			/**
 			 * Output the Current Issue form.
 			 */
-			$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+			$path = $this->plugin->get_partials_path( 'admin' );
 			require $path . 'periodicalpress-current-issue-form.php';
 
 		}
@@ -246,7 +261,9 @@ class PeriodicalPress_Admin {
 	 * @since 1.0.0
 	 */
 	public function save_current_issue_field() {
-		write_log( $_POST );
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+		$tax = get_taxonomy( $tax_name );
 
 		// Check that the Current Issue form was submitted.
 		if ( isset( $_POST['action'] )
@@ -259,7 +276,7 @@ class PeriodicalPress_Admin {
 			}
 
 			// Check current user has sufficient permissions.
-			if ( ! current_user_can( 'manage_pp_issues' ) ) {
+			if ( ! current_user_can( $tax->cap->manage_terms ) ) {
 				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
 			}
 
@@ -273,7 +290,7 @@ class PeriodicalPress_Admin {
 			 * term_exists() because the POST data contains a term ID, not a
 			 * term slug.
 			 */
-			$new_current_issue = get_term( +$new_current_issue_id, 'pp_issue' );
+			$new_current_issue = get_term( +$new_current_issue_id, $tax_name );
 
 			if ( ! is_null( $new_current_issue ) ) {
 				update_option( 'pp_current_issue', $new_current_issue_id );
@@ -290,7 +307,7 @@ class PeriodicalPress_Admin {
 	 */
 	public function display_add_issue_metadata_fields() {
 
-		$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+		$path = $this->plugin->get_partials_path( 'admin' );
 		require $path . 'periodicalpress-add-issue-metadata.php';
 
 	}
@@ -304,7 +321,7 @@ class PeriodicalPress_Admin {
 	 */
 	public function display_edit_issue_metadata_fields( $issue ) {
 
-		$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+		$path = $this->plugin->get_partials_path( 'admin' );
 		require $path . 'periodicalpress-edit-issue-metadata.php';
 
 	}
@@ -319,15 +336,18 @@ class PeriodicalPress_Admin {
 	 */
 	public function add_remove_metaboxes() {
 
+		$domain = $this->plugin->get_plugin_name();
+		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
+
 		// Remove old, multi-selecting Issues metabox
 		remove_meta_box( 'pp_issuediv', 'post', 'side' );
 
 		// Add a new, bespoke Issue metabox
-		if ( current_user_can( 'assign_pp_issue' ) ) {
+		if ( current_user_can( $tax->cap->assign_terms ) ) {
 
 			add_meta_box(
 				'pp_issuediv',
-				__( 'Issue', 'periodicalpress' ),
+				__( 'Issue', $domain ),
 				array( $this, 'render_issue_metabox' ),
 				'post',
 				'side',
@@ -347,7 +367,7 @@ class PeriodicalPress_Admin {
 	 */
 	public function render_issue_metabox( $post ) {
 
-		$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+		$path = $this->plugin->get_partials_path( 'admin' );
 		require $path . 'periodicalpress-issue-metabox.php';
 
 	}
@@ -362,6 +382,9 @@ class PeriodicalPress_Admin {
 	 * @return int ID of the post being saved.
 	 */
 	public function save_issue_metabox( $post_id ) {
+
+		$tax_name = $this->plugin->$get_taxonomy_name();
+		$tax = get_taxonomy( $tax_name );
 
 		/*
 		 * If this is an autosave, our form has not been submitted, so we don't
@@ -384,7 +407,7 @@ class PeriodicalPress_Admin {
 		}
 
 		// Check permissions.
-		if ( ! current_user_can( 'assign_pp_issue' ) ) {
+		if ( ! current_user_can( $tax->cap->assign_terms ) ) {
 			return $post_id;
 		}
 
@@ -400,11 +423,11 @@ class PeriodicalPress_Admin {
 
 		if ( -1 === $new_issue ) {
 
-			wp_delete_object_term_relationships( $post_id, 'pp_issue' );
+			wp_delete_object_term_relationships( $post_id, $tax_name );
 
-		} elseif ( ! is_null( get_term( $new_issue, 'pp_issue' ) ) ) {
+		} elseif ( ! is_null( get_term( $new_issue, $tax_name ) ) ) {
 
-			wp_set_post_terms( $post_id, $new_issue, 'pp_issue' );
+			wp_set_post_terms( $post_id, $new_issue, $tax_name );
 
 		} else {
 			return $post_id;

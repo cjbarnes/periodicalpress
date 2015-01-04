@@ -39,6 +39,8 @@ class PeriodicalPress {
 	/**
 	 * The unique identifier of this plugin.
 	 *
+	 * Also used for the translations text domain.
+	 *
 	 * @since 1.0.0
 	 * @access protected
 	 * @var string $plugin_name
@@ -80,6 +82,15 @@ class PeriodicalPress {
 	 * @var string $partials_path_admin
 	 */
 	protected $partials_path_admin;
+
+	/**
+	 * The name the Issues taxonomy is registered under.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 * @var string $taxonomy_name
+	 */
+	protected $taxonomy_name;
 
 	/**
 	 * Returns the instance of this class.
@@ -126,6 +137,8 @@ class PeriodicalPress {
 		$this->plugin_path = plugin_dir_path( dirname( __FILE__ ) );
 		$this->partials_path_public = $this->plugin_path . 'public/partials/';
 		$this->partials_path_admin = $this->plugin_path . 'admin/partials/';
+
+		$this->taxonomy_name = 'pp_issue';
 
 		/*
 		 * Call plugin init methods
@@ -259,7 +272,7 @@ class PeriodicalPress {
 	 */
 	private function define_common_hooks() {
 
-		$plugin_common = PeriodicalPress_Common::get_instance();
+		$plugin_common = PeriodicalPress_Common::get_instance( $this );
 
 		/*
 		 * Setup custom taxonomies, including the main pp_issue taxonomy
@@ -282,7 +295,7 @@ class PeriodicalPress {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = PeriodicalPress_Admin::get_instance();
+		$plugin_admin = PeriodicalPress_Admin::get_instance( $this );
 
 		/*
 		 * Admin CSS and JavaScript.
@@ -360,7 +373,7 @@ class PeriodicalPress {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = PeriodicalPress_Public::get_instance();
+		$plugin_public = PeriodicalPress_Public::get_instance( $this );
 
 		/*
 		 * Public-facing CSS and JavaScript
@@ -456,6 +469,17 @@ class PeriodicalPress {
 
 		}
 
+	}
+
+	/**
+	 * Retrieve the name the Issues taxonomy is registered under.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string The taxonomy name.
+	 */
+	public function get_taxonomy_name() {
+		return $this->taxonomy_name;
 	}
 
 }

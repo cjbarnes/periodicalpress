@@ -21,6 +21,15 @@
 class PeriodicalPress_Public {
 
 	/**
+	 * The plugin's main class.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 * @var PeriodicalPress $plugin
+	 */
+	protected $plugin;
+
+	/**
 	 * Returns the instance of this class.
 	 *
 	 * The key method that enables the Singleton pattern for this class. Calls
@@ -28,13 +37,14 @@ class PeriodicalPress_Public {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return PeriodicalPress Instance of this class.
+	 * @param PeriodicalPress $plugin The main plugin class instance.
+	 * @return PeriodicalPress_Public Instance of this class.
 	 */
-	public static function get_instance() {
+	public static function get_instance( $plugin ) {
 
 		static $instance = null;
 		if ( null === $instance ) {
-			$instance = new static();
+			$instance = new static( $plugin );
 		}
 
 		return $instance;
@@ -48,8 +58,12 @@ class PeriodicalPress_Public {
 	 *
 	 * @since 1.0.0
 	 * @access protected
+	 *
+	 * @var PeriodicalPress $plugin The main plugin class instance.
 	 */
-	protected function __construct() {
+	protected function __construct( $plugin ) {
+
+		$this->plugin = $plugin;
 
 		$this->load_dependencies();
 
@@ -98,13 +112,11 @@ class PeriodicalPress_Public {
 	 */
 	public function enqueue_styles() {
 
-		$plugin = PeriodicalPress::get_instance();
-
 		wp_enqueue_style(
-			$plugin->get_plugin_name(),
+			$this->plugin->get_plugin_name(),
 			plugin_dir_url( __FILE__ ) . 'css/periodicalpress-public.css',
 			array(),
-			$plugin->get_version(),
+			$this->plugin->get_version(),
 			'all'
 		);
 
@@ -119,13 +131,11 @@ class PeriodicalPress_Public {
 	 */
 	public function enqueue_scripts() {
 
-		$plugin = PeriodicalPress::get_instance();
-
 		wp_enqueue_script(
-			$plugin->get_plugin_name(),
+			$this->plugin->get_plugin_name(),
 			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-public.js',
 			array( 'jquery' ),
-			$plugin->get_version(),
+			$this->plugin->get_version(),
 			false
 		);
 
