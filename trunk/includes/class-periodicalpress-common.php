@@ -49,6 +49,22 @@ class PeriodicalPress_Common {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+		$this->load_dependencies();
+
+	}
+
+	/**
+	 * Load the required dependencies for the admin area.
+	 *
+	 * Include the following files:
+	 *
+	 * - (None)
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function load_dependencies() {
+
 	}
 
 	/**
