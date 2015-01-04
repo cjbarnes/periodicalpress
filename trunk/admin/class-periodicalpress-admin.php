@@ -137,9 +137,13 @@ class PeriodicalPress_Admin {
 		wp_enqueue_script(
 			$this->plugin->get_plugin_name(),
 			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-admin.js',
-			array( 'jquery' ),
+			array(
+				'jquery',
+				'jquery-ui-core',
+				'jquery-ui-datepicker'
+			),
 			$this->plugin->get_version(),
-			false
+			true
 		);
 
 	}
