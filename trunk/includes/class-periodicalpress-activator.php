@@ -132,8 +132,8 @@ class PeriodicalPress_Activator {
 		 * Load the class that creates custom post types and taxonomies, so
 		 * their URL rules can be applied using flush_rewrite_rules.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-common.php';
-		PeriodicalPress_Common::register_taxonomies();
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-taxonomy.php';
+		PeriodicalPress_Taxonomy::register_taxonomy();
 
 		flush_rewrite_rules();
 

@@ -183,6 +183,9 @@ class PeriodicalPress {
 	 *
 	 * - PeriodicalPress_Loader. Orchestrates the hooks of the plugin.
 	 * - PeriodicalPress_i18n. Defines internationalization functionality.
+	 * - PeriodicalPress_Taxonomy. Defines the Issues taxonomy.
+	 * - PeriodicalPress_Common. Defines all hooks shared by the dashboard and
+	 *   the public side of the site.
 	 * - PeriodicalPress_Admin. Defines all hooks for the dashboard.
 	 * - PeriodicalPress_Public. Defines all hooks for the public side of the
 	 *   site.
@@ -206,6 +209,11 @@ class PeriodicalPress {
 		 * of the plugin.
 		 */
 		require_once $this->plugin_path . 'includes/class-periodicalpress-i18n.php';
+
+		/**
+		 * The class responsible for registering the main plugin taxonomy.
+		 */
+		require_once $this->plugin_path . 'includes/class-periodicalpress-taxonomy.php';
 
 		/**
 		 * The class responsible for defining all actions that are common to
@@ -273,14 +281,15 @@ class PeriodicalPress {
 	private function define_common_hooks() {
 
 		$plugin_common = PeriodicalPress_Common::get_instance( $this );
+		$plugin_taxonomy = PeriodicalPress_Taxonomy::get_instance( $this );
 
 		/*
 		 * Setup custom taxonomies, including the main pp_issue taxonomy
 		 */
 		$this->loader->add_action(
 			'init',
-			$plugin_common,
-			'register_taxonomies',
+			$plugin_taxonomy,
+			'register_taxonomy',
 			0
 		);
 
