@@ -14,18 +14,64 @@
  *
  * Defines the plugin name, version, and custom post types.
  *
+ * Uses the Singleton pattern.
+ *
  * @since 1.0.0
  */
 class PeriodicalPress_Common {
 
 	/**
-	 * Initialize the class and set its properties.
+	 * Returns the instance of this class.
+	 *
+	 * The key method that enables the Singleton pattern for this class. Calls
+	 * __construct() to create the class instance if it doesn't exist yet.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @return PeriodicalPress Instance of this class.
 	 */
-	public function __construct() {
+	public static function get_instance() {
+
+		static $instance = null;
+		if ( null === $instance ) {
+			$instance = new static();
+		}
+
+		return $instance;
+	}
+
+	/**
+	 * Initialize the class and set its properties.
+	 *
+	 * Access `protected` enforces the Singleton pattern by disabling the `new`
+	 * operator.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 */
+	protected function __construct() {
 
 		$this->load_dependencies();
+
+	}
+
+	/**
+	 * Private clone method to enforce the Singleton pattern.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function __clone() {
+
+	}
+
+	/**
+	 * Private unserialize method to enforce the Singleton pattern.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function __wakeup() {
 
 	}
 

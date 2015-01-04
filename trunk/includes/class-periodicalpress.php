@@ -20,6 +20,8 @@
  * Also maintains the unique identifier of this plugin as well as the current
  * version of the plugin.
  *
+ * Uses the Singleton pattern.
+ *
  * @since 1.0.0
  */
 class PeriodicalPress {
@@ -220,7 +222,7 @@ class PeriodicalPress {
 		 * All plugin template tags. These will be registered as methods of
 		 * PeriodicalPress (this class).
 		 */
-		require $this->plugin_path . 'includes/periodicalpress-template-tags.php';
+		require_once $this->plugin_path . 'includes/periodicalpress-template-tags.php';
 
 		$this->loader = new PeriodicalPress_Loader();
 
@@ -257,7 +259,7 @@ class PeriodicalPress {
 	 */
 	private function define_common_hooks() {
 
-		$plugin_common = new PeriodicalPress_Common();
+		$plugin_common = PeriodicalPress_Common::get_instance();
 
 		/*
 		 * Setup custom taxonomies, including the main pp_issue taxonomy
@@ -280,7 +282,7 @@ class PeriodicalPress {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new PeriodicalPress_Admin();
+		$plugin_admin = PeriodicalPress_Admin::get_instance();
 
 		/*
 		 * Admin CSS and JavaScript.
@@ -358,7 +360,7 @@ class PeriodicalPress {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new PeriodicalPress_Public();
+		$plugin_public = PeriodicalPress_Public::get_instance();
 
 		/*
 		 * Public-facing CSS and JavaScript
