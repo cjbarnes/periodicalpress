@@ -73,6 +73,12 @@ class PeriodicalPress_Admin {
 	 */
 	private function load_dependencies() {
 
+		/**
+		 * The base class that assembles and displays admin list tables.
+		 * Duplicate of {@see WP_List_Table} in Core.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-periodicalpress-list-table.php';
+
 	}
 
 	/**
