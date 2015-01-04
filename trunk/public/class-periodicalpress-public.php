@@ -19,22 +19,11 @@
 class PeriodicalPress_Public {
 
 	/**
-	 * The path for including HTML partials.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @var string $partials_path
-	 */
-	private $partials_path;
-
-	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-
-		$this->partials_path = plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/periodicalpress-';
 
 		$this->load_dependencies();
 

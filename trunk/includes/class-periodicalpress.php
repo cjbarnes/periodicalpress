@@ -53,6 +53,33 @@ class PeriodicalPress {
 	protected $version;
 
 	/**
+	 * The path to the plugin (used for includes and requires).
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 * @var string $plugin_path
+	 */
+	protected $plugin_path;
+
+	/**
+	 * The path to HTML partials used in the public-facing side of this plugin.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 * @var string $partials_path_public
+	 */
+	protected $partials_path_public;
+
+	/**
+	 * The path to HTML partials used in the admin area of this plugin.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 * @var string $partials_path_admin
+	 */
+	protected $partials_path_admin;
+
+	/**
 	 * Returns the instance of this class.
 	 *
 	 * The key method that enables the Singleton pattern for this class. Calls
@@ -87,8 +114,20 @@ class PeriodicalPress {
 	 */
 	protected function __construct() {
 
+		/*
+		 * Init class properties
+		 */
+
 		$this->plugin_name = 'periodicalpress';
 		$this->version = '1.0.0';
+
+		$this->plugin_path = plugin_dir_path( dirname( __FILE__ ) );
+		$this->partials_path_public = $this->plugin_path . 'public/partials/';
+		$this->partials_path_admin = $this->plugin_path . 'admin/partials/';
+
+		/*
+		 * Call plugin init methods
+		 */
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -145,19 +184,19 @@ class PeriodicalPress {
 		 * The class responsible for orchestrating the actions and filters of
 		 * the core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-loader.php';
+		require_once $this->plugin_path . 'includes/class-periodicalpress-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-i18n.php';
+		require_once $this->plugin_path . 'includes/class-periodicalpress-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that are common to
 		 * both Dashboard and public-facing pages.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-common.php';
+		require_once $this->plugin_path . 'includes/class-periodicalpress-common.php';
 
 		if ( is_admin() ) {
 
@@ -165,7 +204,7 @@ class PeriodicalPress {
 			 * The class responsible for defining all actions that occur in the
 			 * Dashboard.
 			 */
-			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-periodicalpress-admin.php';
+			require_once $this->plugin_path . 'admin/class-periodicalpress-admin.php';
 
 		} else {
 
@@ -173,7 +212,7 @@ class PeriodicalPress {
 			 * The class responsible for defining all actions that occur in the
 			 * public-facing side of the site.
 			 */
-			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-periodicalpress-public.php';
+			require_once $this->plugin_path . 'public/class-periodicalpress-public.php';
 
 		}
 
@@ -181,7 +220,7 @@ class PeriodicalPress {
 		 * All plugin template tags. These will be registered as methods of
 		 * PeriodicalPress (this class).
 		 */
-		require plugin_dir_path( dirname( __FILE__ ) ) . 'includes/periodicalpress-template-tags.php';
+		require $this->plugin_path . 'includes/periodicalpress-template-tags.php';
 
 		$this->loader = new PeriodicalPress_Loader();
 
@@ -378,6 +417,43 @@ class PeriodicalPress {
 	 */
 	public function get_version() {
 		return $this->version;
+	}
+
+	/**
+	 * Retrieve the path to this plugin's root directory.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string The path to use in requires and includes.
+	 */
+	public function get_plugin_path() {
+		return $this->plugin_path;
+	}
+
+	/**
+	 * Retrieve the path to be used for including an HTML partial.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param  string $subpackage Default 'public'. Accepts 'public', 'admin'.
+	 *                            The area of the site this partial is used in.
+	 * @return string|false The path to the partials folder for this subpackage.
+	 */
+	public function get_partials_path( $subpackage = 'public' ) {
+
+		switch ( $subpackage ) {
+
+			case 'public':
+				return $this->partials_path_public;
+
+			case 'admin':
+				return $this->partials_path_admin;
+
+			default:
+				return false;
+
+		}
+
 	}
 
 }

@@ -16,22 +16,11 @@
 class PeriodicalPress_Admin {
 
 	/**
-	 * The path for including HTML partials.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @var string $partials_path
-	 */
-	private $partials_path;
-
-	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-
-		$this->partials_path = plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/periodicalpress-';
 
 		$this->load_dependencies();
 
@@ -179,7 +168,8 @@ class PeriodicalPress_Admin {
 		/**
 		 * Output the Issue Settings page.
 		 */
-		require $this->partials_path . 'issues-home.php';
+		$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+		require $path . 'periodicalpress-issues-home.php';
 
 	}
 
@@ -197,7 +187,8 @@ class PeriodicalPress_Admin {
 			/**
 			 * Output the Current Issue form.
 			 */
-			require $this->partials_path . 'current-issue-form.php';
+			$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+			require $path . 'periodicalpress-current-issue-form.php';
 
 		}
 
@@ -253,7 +244,8 @@ class PeriodicalPress_Admin {
 	 */
 	public function display_add_issue_metadata_fields() {
 
-		require $this->partials_path . 'add-issue-metadata.php';
+		$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+		require $path . 'periodicalpress-add-issue-metadata.php';
 
 	}
 
@@ -266,7 +258,8 @@ class PeriodicalPress_Admin {
 	 */
 	public function display_edit_issue_metadata_fields( $issue ) {
 
-		require $this->partials_path . 'edit-issue-metadata.php';
+		$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+		require $path . 'periodicalpress-edit-issue-metadata.php';
 
 	}
 
@@ -308,7 +301,8 @@ class PeriodicalPress_Admin {
 	 */
 	public function render_issue_metabox( $post ) {
 
-		require $this->partials_path . 'issue-metabox.php';
+		$path = PeriodicalPress::get_instance()->get_partials_path( 'admin' );
+		require $path . 'periodicalpress-issue-metabox.php';
 
 	}
 
