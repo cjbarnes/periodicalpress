@@ -136,7 +136,7 @@ class PeriodicalPress_Public {
 			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-public.js',
 			array( 'jquery' ),
 			$this->plugin->get_version(),
-			false
+			true
 		);
 
 	}
