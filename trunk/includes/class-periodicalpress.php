@@ -218,7 +218,7 @@ class PeriodicalPress {
 	 */
 	private function define_common_hooks() {
 
-		$plugin_common = new PeriodicalPress_Common( $this->get_plugin_name(), $this->get_version() );
+		$plugin_common = new PeriodicalPress_Common();
 
 		/*
 		 * Setup custom taxonomies, including the main pp_issue taxonomy
@@ -241,7 +241,7 @@ class PeriodicalPress {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new PeriodicalPress_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new PeriodicalPress_Admin();
 
 		/*
 		 * Admin CSS and JavaScript.
@@ -319,7 +319,7 @@ class PeriodicalPress {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new PeriodicalPress_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new PeriodicalPress_Public();
 
 		/*
 		 * Public-facing CSS and JavaScript

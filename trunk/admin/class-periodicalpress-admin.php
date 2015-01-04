@@ -16,24 +16,6 @@
 class PeriodicalPress_Admin {
 
 	/**
-	 * The ID of this plugin.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @var string $plugin_name
-	 */
-	private $plugin_name;
-
-	/**
-	 * The current version of this plugin.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @var string $version
-	 */
-	private $version;
-
-	/**
 	 * The path for including HTML partials.
 	 *
 	 * @since 1.0.0
@@ -46,16 +28,10 @@ class PeriodicalPress_Admin {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @var string $plugin_name The name of this plugin.
-	 * @var string $version     The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct() {
 
 		$this->partials_path = plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/periodicalpress-';
-
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
 
 		$this->load_dependencies();
 
@@ -85,14 +61,18 @@ class PeriodicalPress_Admin {
 	 * Register the stylesheets for the Dashboard.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @see PeriodicalPress
 	 */
 	public function enqueue_styles() {
 
+		$plugin = PeriodicalPress::get_instance();
+
 		wp_enqueue_style(
-			$this->plugin_name,
+			$plugin->get_plugin_name(),
 			plugin_dir_url( __FILE__ ) . 'css/periodicalpress-admin.css',
 			array(),
-			$this->version,
+			$plugin->get_version(),
 			'all'
 		);
 
@@ -102,14 +82,18 @@ class PeriodicalPress_Admin {
 	 * Register the JavaScript for the dashboard.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @see PeriodicalPress
 	 */
 	public function enqueue_scripts() {
 
+		$plugin = PeriodicalPress::get_instance();
+
 		wp_enqueue_script(
-			$this->plugin_name,
+			$plugin->get_plugin_name(),
 			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-admin.js',
 			array( 'jquery' ),
-			$this->version,
+			$plugin->get_version(),
 			false
 		);
 
