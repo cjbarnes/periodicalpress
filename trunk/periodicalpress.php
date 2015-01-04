@@ -33,7 +33,6 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-
 if ( ! function_exists( 'write_log' ) ) :
 /**
  * Error logging function.
