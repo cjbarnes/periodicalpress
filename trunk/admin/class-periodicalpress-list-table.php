@@ -14,7 +14,6 @@
  * @package PeriodicalPress\admin
  */
 
-
 /**
  * Base class for displaying a list of items in an ajaxified HTML table.
  *
@@ -818,6 +817,7 @@ class PeriodicalPress_List_Table {
 		}
 
 		foreach ( $columns as $column_key => $column_display_name ) {
+
 			$class = array( 'manage-column', "column-$column_key" );
 
 			$style = '';
@@ -998,6 +998,7 @@ class PeriodicalPress_List_Table {
 		list( $columns, $hidden ) = $this->get_column_info();
 
 		foreach ( $columns as $column_name => $column_display_name ) {
+
 			$class = "class='$column_name column-$column_name'";
 
 			$style = '';
@@ -1021,7 +1022,9 @@ class PeriodicalPress_List_Table {
 				echo $this->column_default( $item, $column_name );
 				echo "</td>";
 			}
+
 		}
+
 	}
 
 	/**
