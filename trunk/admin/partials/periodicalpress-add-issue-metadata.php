@@ -14,8 +14,16 @@ $domain = $this->plugin->get_plugin_name();
 wp_nonce_field( 'set-issue-metadata', 'periodicalpress-set-issue-metadata-nonce' );
 ?>
 <div class="form-field">
-	<label for="pp-issue-status"><?php esc_html_e( 'Status', $domain ); ?></label>
-
+	<label for="pp-issue-date"><?php echo esc_html_x( 'Date', 'Edit Issue', $domain ); ?></label>
+	<?php /* TODO: Inplement input type=month, input type=week, and a select for year - depending on Issues settings */ ?>
+	<input type="date" name="pp_issue_date" id="pp-issue-date" class="pp-datepicker" value="<?php echo date( 'd/m/Y' ); ?>" />
+</div>
+<div class="form-field">
+	<label for="pp-issue-title"><?php echo esc_html_x( 'Title', 'Edit Issue', $domain ); ?></label>
+	<input type="text" name="pp_issue_title" id="pp-issue-date" size="40" />
+</div>
+<div class="form-field">
+	<label for="pp-issue-status"><?php echo esc_html_x( 'Status', 'Edit Issue', $domain ); ?></label>
 	<select name="pp_issue_status" id="pp-issue-status">
 		<?php
 		// The list of possible Issue statuses (a subset of Core post statuses).

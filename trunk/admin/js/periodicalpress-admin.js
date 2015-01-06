@@ -1,3 +1,5 @@
+/* global l10n */
+
 (function( $ ) {
 	'use strict';
 
@@ -9,11 +11,21 @@
 	$( function initPeriodicalPress() {
 
 		/**
-		 * Initialize datepickers.
+		 * Initialize datepickers with options.
 		 *
-		 * @see {@link http://jqueryui.com/datepicker/}
+		 * @see {@link http://api.jqueryui.com/datepicker/}
 		 */
-		$( '.periodicalpress-datepicker' ).datepicker();
+		$( '.pp-datepicker' ).datepicker({
+			altFormat: 'yy-mm-dd',
+			changeMonth: true,
+			changeYear: true,
+			currentText: l10n.datepickerCurrentText,
+			dateFormat: l10n.datepickerDateFormat,
+			firstDay: 1,
+			hideIfNoPrevNext: true,
+			isRTL: ( 'true' === l10n.isRTL ? true : false ),
+			showButtonPanel: true
+		});
 
 	} );
 

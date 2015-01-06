@@ -134,6 +134,8 @@ class PeriodicalPress_Admin {
 	 */
 	public function enqueue_scripts() {
 
+		$domain = $this->plugin->get_plugin_name();
+
 		wp_enqueue_script(
 			$this->plugin->get_plugin_name(),
 			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-admin.js',
@@ -146,6 +148,18 @@ class PeriodicalPress_Admin {
 			true
 		);
 
+		// Translation of JavaScript strings
+		wp_localize_script(
+			$this->plugin->get_plugin_name(),
+			'l10n',
+			array(
+				'datepickerCurrentText' => _x( 'Today', 'Datepicker Button', $domain ),
+				'datepickerDateFormat' => _x( 'dd/mm/yy', 'Datepicker Date Format', $domain ),
+				'isRTL' => is_rtl() ? 'true' : 'false',
+
+			)
+		);
+
 	}
 
 	/**
@@ -156,21 +170,21 @@ class PeriodicalPress_Admin {
 	public function admin_menu_setup() {
 
 		$domain = $this->plugin->get_plugin_name();
-		$tax_name = $this->plugin->get_taxonomy_name();
+		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
 
 		// Get Issues taxonomy labels for use by menu pages/subpages.
-		$tax_labels = get_taxonomy( $tax_name )->labels;
+		$tax_labels = $tax->labels;
 
 		/*
 		 * Main Issues menu, containing the Issues taxonomy page and some
 		 * plugin settings.
 		 */
 		add_menu_page(
-			$tax_labels->name,
-			$tax_labels->menu_name,
-			'manage_pp_issues', // user capability required to show this menu
+			$tax->labels->name,
+			$tax->labels->menu_name,
+			$tax->cap->edit_terms, // user capability required to show this menu
 			'pp_issues_home',
-			array( $this, 'issues_home' ),
+			array( $this, 'issues_home_screen' ),
 			'dashicons-pressthis',
 			'4.44' // position in the menu (Posts is 5)
 		);
@@ -180,17 +194,27 @@ class PeriodicalPress_Admin {
 			'pp_issues_home',
 			__( 'Issues Home', $domain ),
 			__( 'Issues Home', $domain ),
-			'manage_pp_issues',
+			$tax->cap->edit_terms,
 			'pp_issues_home'
 		);
 
 		// Issues submenu: Add and edit the Issues taxonomy.
 		add_submenu_page(
 			'pp_issues_home',
-			$tax_labels->name,
-			$tax_labels->all_items,
+			$tax->labels->name,
+			$tax->labels->all_items,
 			'manage_pp_issues', // cap required
-			"edit-tags.php?taxonomy=$tax_name"
+			"edit-tags.php?taxonomy={$tax->name}"
+		);
+
+		// Issues submenu: Add and edit the Issues taxonomy. (TEST).
+		add_submenu_page(
+			'pp_issues_home',
+			$tax->labels->name,
+			$tax->labels->all_items,
+			$tax->cap->edit_terms,
+			'pp_edit_issues',
+			array( $this, 'edit_issues_screen' )
 		);
 
 	}
@@ -226,13 +250,29 @@ class PeriodicalPress_Admin {
 	 *
 	 * @since 1.0.0
 	 */
-	public function issues_home() {
+	public function issues_home_screen() {
 
 		/**
 		 * Output the Issue Settings page.
 		 */
 		$path = $this->plugin->get_partials_path( 'admin' );
 		require $path . 'periodicalpress-issues-home.php';
+
+	}
+
+	/**
+	 * Display the Edit Issues admin page. (TEST).
+	 *
+	 * @since 1.0.0
+	 */
+	public function edit_issues_screen() {
+
+		/**
+		 * Output the Edit Issues page.
+		 */
+		$path = $this->plugin->get_partials_path( 'admin' );
+		require $path . 'periodicalpress-edit-pp-issues.php';
+		//require $path . '../test.php';
 
 	}
 
