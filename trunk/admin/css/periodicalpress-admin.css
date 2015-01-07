@@ -1,4 +1,23 @@
 /**
- * All of the CSS for your dashboard-specific functionality should be included
- * in this file.
+ * All of the CSS for admin-specific functionality.
  */
+
+
+/**
+ * List tables
+ *
+ * Styles for WP_List_Table and PeriodicalPress_List_Table output.
+ */
+
+/* Column widths */
+.issues .column-date {
+	width: auto; /* Override Core's 10% width for Date columns */
+}
+.issues .column-number {
+	width: 74px;
+}
+
+/* Centred columns */
+.issues .column-number {
+	text-align: center;
+}

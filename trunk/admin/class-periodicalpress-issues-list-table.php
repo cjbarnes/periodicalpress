@@ -54,7 +54,8 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	public function __construct() {
 
 		// Get the main plugin class and taxonomy
-		$this->tax = get_taxonomy( PeriodicalPress::get_instance()->get_taxonomy_name() );
+		$this->plugin = PeriodicalPress::get_instance();
+		$this->tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
 
 		// Call the parent constructor and pass in the setup arguments.
 		parent::__construct( array(
@@ -94,7 +95,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 */
 	public function get_columns() {
 
-		$domain = 'periodicalpress';
+		$domain = $this->plugin->get_plugin_name();
 		$context = 'Issues Table';
 
 		$checkbox_header = current_user_can( $this->tax->cap->delete_terms )
@@ -104,9 +105,9 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		$columns = array(
 			'id'          => 'ID',
 			'cb'          => $checkbox_header,
-			'number'      => esc_html_x( 'Number', $context, $domain ),
-			'date'        => esc_html_x( 'Date', $context, $domain ),
 			'name'        => esc_html_x( 'Name', $context, $domain ),
+			'date'        => esc_html_x( 'Date', $context, $domain ),
+			'number'      => esc_html_x( 'Number', $context, $domain ),
 			'title'       => esc_html_x( 'Title', $context, $domain ),
 			'slug'        => esc_html_x( 'Slug', $context, $domain ),
 			'posts'       => esc_html_x( 'Posts', $context, $domain ),
@@ -129,7 +130,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		$hidden_columns = array(
 			'id',
-			'name',
 			'slug',
 			'ssid'
 		);
@@ -149,6 +149,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	public function get_sortable_columns() {
 
 		$sortable_columns = array(
+			'name'  => array( 'name', false ),
 			'posts' => array( 'posts', false )
 		);
 
@@ -170,7 +171,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		// Default sort order
 		$orderby = 'name';
-		$order = 'ASC';
+		$order = 'DESC';
 
 		// Get user-set sort column
 		if ( ! empty( $_GET['orderby'] ) ) {
@@ -222,7 +223,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				: '';
 			$title = ! empty( $meta['pp_issue_title'][0] )
 				? esc_html( $meta['pp_issue_title'][0] )
-				: '<em>' . esc_html( $issue->name ) . '</em>';
+				: '';
 			$status = ! empty( $meta['pp_issue_status'][0] )
 				? $meta['pp_issue_status'][0]
 				: '';
@@ -233,7 +234,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				'number'      => $number,
 				'name'        => esc_html( $issue->name ),
 				'date'        => $date,
-				'title'       => $title,
+				'title'       => "<em>$title</em>",
 				'slug'        => esc_html( $issue->slug ),
 				'posts'       => $issue->count,
 				'status'      => esc_html( $status ),
@@ -283,6 +284,16 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		switch ( $column_name ) {
 
+			case 'name':
+				$domain = $this->plugin->get_plugin_name();
+
+				$name = $item[ $column_name ];
+				$title = sprintf( __( 'Edit &lsquo;%s&rsquo;', $domain ), $name);
+
+				// TODO assemble the URL
+				return  "<strong><a class='row-title' href='#' title='$title'>$name</a></strong>";
+				break;
+
 			case 'date':
 				$date = DateTime::createFromFormat( 'Y-m-d', $item[ $column_name ] );
 				write_log($date);
@@ -312,7 +323,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			 */
 			case 'id':
 			case 'number':
-			case 'name':
 			case 'title':
 			case 'description':
 			case 'slug':
