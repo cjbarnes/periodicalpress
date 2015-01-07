@@ -101,14 +101,20 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			? '&nbsp;'
 			: '';
 
+		$number_text = esc_attr_x( 'N.', $context, $domain );
+		$number_title = esc_html_x( 'Number', $context, $domain );
+
 		$columns = array(
 			'id'          => 'ID',
 			'cb'          => $checkbox_header,
-			'name'        => _x( 'Name', $context, $domain ),
-			'description' => _x( 'Description', $context, $domain ),
-			'slug'        => _x( 'Slug', $context, $domain ),
-			'posts'       => _x( 'Posts', $context, $domain ),
-			'ssid'        => _x( 'ID', $context, $domain )
+			'number'      => "<abbr title='$number_title'>$number_text</abbr>",
+			'date'        => esc_html_x( 'Date', $context, $domain ),
+			'name'        => esc_html_x( 'Name', $context, $domain ),
+			'title'       => esc_html_x( 'Title', $context, $domain ),
+			'slug'        => esc_html_x( 'Slug', $context, $domain ),
+			'posts'       => esc_html_x( 'Posts', $context, $domain ),
+			'status'      => esc_html_x( 'Status', $context, $domain ),
+			'ssid'        => esc_html_x( 'ID', $context, $domain )
 		);
 
 		return $columns;
@@ -126,6 +132,8 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		$hidden_columns = array(
 			'id',
+			'name',
+			'slug',
 			'ssid'
 		);
 
@@ -144,7 +152,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	public function get_sortable_columns() {
 
 		$sortable_columns = array(
-			'name'  => array( 'name', true ),
 			'posts' => array( 'posts', false )
 		);
 
@@ -206,13 +213,33 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		// Add each term as a new row.
 		foreach ( $issues as $n => $issue ) {
 
+			// Get all metadata for this term.
+			$meta = get_metadata( 'pp_term', $issue->term_id );
+
+			// Prep metadata empty states.
+			$number = ! empty( $meta['pp_issue_number'][0] )
+				? $meta['pp_issue_number'][0]
+				: '';
+			$date = ! empty( $meta['pp_issue_date'][0] )
+				? $meta['pp_issue_date'][0]
+				: '';
+			$title = ! empty( $meta['pp_issue_title'][0] )
+				? esc_html( $meta['pp_issue_title'][0] )
+				: '<em>' . esc_html( $issue->name ) . '</em>';
+			$status = ! empty( $meta['pp_issue_status'][0] )
+				? $meta['pp_issue_status'][0]
+				: '';
+
 			$data[] = array(
 				'id'          => $n,
 				'cb'          => '',
+				'number'      => $number,
 				'name'        => esc_html( $issue->name ),
-				'description' => esc_html( $issue->description ),
+				'date'        => $date,
+				'title'       => $title,
 				'slug'        => esc_html( $issue->slug ),
 				'posts'       => $issue->count,
+				'status'      => esc_html( $status ),
 				'ssid'        => $issue->term_id
 			);
 
@@ -259,12 +286,37 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		switch ( $column_name ) {
 
+			case 'date':
+				$date = DateTime::createFromFormat( 'Y-m-d', $item[ $column_name ] );
+				write_log($date);
+				if ( $date ) {
+					$out = $date->format( 'Y/m/d' );
+				} else {
+					$out = '';
+				}
+				return $out;
+				break;
+
+			case 'status':
+				$tax_name = $this->tax->name;
+				/** This filter is documented in admin/class-periodicalpress-admin.php */
+				$statuses = apply_filters( "{$tax_name}_statuses", array() );
+
+				// Get the display name for this Issue's status.
+				$out = array_key_exists( $item[ $column_name ], $statuses )
+					? $statuses[ $item[ $column_name ] ]
+					: '';
+				return $out;
+				break;
+
 			/*
 			 * Handle all columns that don't require formatting - i.e. just send
 			 * the column's data straight to output.
 			 */
 			case 'id':
+			case 'number':
 			case 'name':
+			case 'title':
 			case 'description':
 			case 'slug':
 			case 'posts':
