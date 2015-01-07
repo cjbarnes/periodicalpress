@@ -197,7 +197,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			'orderby'      => $orderby,
 			'order'        => $order,
 
-			// TODO: number and offset will be used for pagination.
+			// TODO: check pagination is working properly
 			'number'       => $page_size,
 			'offset'       => ( $page_number - 1 ) * $page_size
 		);
