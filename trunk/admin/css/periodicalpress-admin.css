@@ -10,8 +10,9 @@
  */
 
 /* Column widths */
-.issues .column-date {
-	width: auto; /* Override Core's 10% width for Date columns */
+.issues .column-date,
+.issues .column-status {
+	width: 10%;
 }
 .issues .column-number {
 	width: 74px;
