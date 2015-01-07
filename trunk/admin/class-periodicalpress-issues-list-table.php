@@ -102,7 +102,14 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			? '&nbsp;'
 			: '';
 
-		$columns = array(
+		/**
+		 * Filters the column names and display names for the list table.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $columns Associative array of column names and labels.
+		 */
+		$columns = apply_filters( "manage_{$this->tax->name}_columns", array(
 			'id'          => 'ID',
 			'cb'          => $checkbox_header,
 			'name'        => esc_html_x( 'Name', $context, $domain ),
@@ -114,7 +121,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			'posts'       => esc_html_x( 'Posts', $context, $domain ),
 			'status'      => esc_html_x( 'Status', $context, $domain ),
 			'ssid'        => esc_html_x( 'ID', $context, $domain )
-		);
+		) );
 
 		return $columns;
 	}
@@ -129,11 +136,18 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 */
 	public function get_hidden_columns() {
 
-		$hidden_columns = array(
+		/**
+		 * Filters the columns that are hidden (via CSS) in the list table.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $hidden_columns Array of column names.
+		 */
+		$hidden_columns = apply_filters( "manage_{$this->tax->name}_hidden_columns", array(
 			'id',
 			'slug',
 			'ssid'
-		);
+		) );
 
 		return $hidden_columns;
 	}
@@ -144,15 +158,24 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return array Associative array ( name => label ) of table columns to
-	 *               allow sorting on.
+	 * @return array Associative array ( name => array( name, order ) ) of
+	 *               table columns to allow sorting on.
 	 */
 	public function get_sortable_columns() {
 
-		$sortable_columns = array(
+		/**
+		 * Filters the columns that are sortable and what their initial sort
+		 * orders are.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $sortable_columns Associative array of columns in form
+		 *                                ( name => array( name, order ) ).
+		 */
+		$sortable_columns = apply_filters( "manage_{$this->tax->name}_hidden_columns", array(
 			'name'  => array( 'name', false ),
 			'posts' => array( 'posts', false )
-		);
+		) );
 
 		return $sortable_columns;
 	}
@@ -251,7 +274,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	/**
 	 * Output the row checkbox.
 	 *
-	 * @param  array $issue The current row data (associative array).
+	 * @param  array $item The current row data (associative array).
 	 * @return string The checkbox output.
 	 */
 	public function column_cb( $item ) {
