@@ -305,8 +305,23 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				return $out;
 				break;
 
+			case 'posts':
+				$domain = $this->plugin->get_plugin_name();
+
+				$out = ( absint( $item[ $column_name ] ) )
+					? $item[ $column_name ]
+					: '0';
+
+				$title = sprintf( __( 'Show posts in &lsquo;%s$rsquo;', $domain ), esc_attr( $item['name'] ) );
+				$tax_query = $this->tax->query_var;
+				$term = $item['slug'];
+
+				return "<a href='edit.php?$tax_query=$term' title='$title'>$out</a>";
+				break;
+
 			case 'status':
 				$tax_name = $this->tax->name;
+
 				/** This filter is documented in admin/class-periodicalpress-admin.php */
 				$statuses = apply_filters( "{$tax_name}_statuses", array() );
 
@@ -314,7 +329,10 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				$out = array_key_exists( $item[ $column_name ], $statuses )
 					? $statuses[ $item[ $column_name ] ]
 					: '';
-				return $out;
+
+				$class = esc_attr( $item[ $column_name ] );
+
+				return "<strong class='issue-status issue-status-$class'>$out</strong>";
 				break;
 
 			/*
@@ -326,7 +344,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			case 'title':
 			case 'description':
 			case 'slug':
-			case 'posts':
 			case 'ssid':
 				return $item[ $column_name ];
 				break;

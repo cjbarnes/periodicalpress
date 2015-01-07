@@ -145,63 +145,32 @@ if ( isset( $_REQUEST['message'] )
 	<?php endif; ?>
 	<div id="ajax-response"></div>
 	<br class="clear" />
-	<div id="col-container">
-		<div id="col-right">
-			<div class="col-wrap">
-				<form id="post-filter" action="" method="post">
-					<input type="hidden" name="taxonomy" value="<?php echo esc_attr($tax_name); ?>" />
-					<input type="hidden" name="post_type" value="post" />
-					<?php
-					/*
-					 * Output the list table.
-					 */
-					$list_table->display();
-					?>
-					<br class="clear" />
-				</form>
-				<?php
-				/**
-				 * Fires after the Issues list table.
-				 *
-				 * The hook name includes the taxonomy name. By default, the
-				 * actual hook to add_action to is:
-				 *
-				 *     after-pp_issue-table
-				 *
-				 * @since 1.0.0
-				 *
-				 * @param string $tax_name The Issues taxonomy name.
-				 */
-				do_action( "after-{$tax_name}-table", $tax_name );
-				?>
-			</div><!-- /col-wrap -->
-		</div><!-- /col-right -->
-		<div id="col-left">
-			<div class="col-wrap">
-				<?php
-				if ( current_user_can( $tax->cap->edit_terms ) ) :
-					/**
-					 * Fires before the Add Issue form.
-					 *
-					 * The hook name includes the taxonomy name. By default, the
-					 * actual hook to add_action to is:
-					 *
-					 *     pp_issue_pre_add_form
-					 *
-					 * @since 1.0.0
-					 *
-					 * @param string $tax_name The Issues taxonomy name.
-					 */
-					do_action( "{$tax_name}_pre_add_form", $tax_name );
-					?>
-					<div class="form-wrap">
-						<h3><?php echo $tax->labels->add_new_item; ?></h3>
-						<?php /* TODO: import Add Issue form partial. Probably include the div.form_wrap within the partial. */ ?>
-					</div>
-				<?php endif; ?>
-			</div><!-- /col-wrap -->
-		</div><!-- /col-left -->
-	</div><!-- /col-container -->
+	<form id="post-filter" action="" method="post">
+		<input type="hidden" name="taxonomy" value="<?php echo esc_attr($tax_name); ?>" />
+		<input type="hidden" name="post_type" value="post" />
+		<?php
+		/*
+		 * Output the list table.
+		 */
+		$list_table->display();
+		?>
+		<br class="clear" />
+	</form>
+	<?php
+	/**
+	 * Fires after the Issues list table.
+	 *
+	 * The hook name includes the taxonomy name. By default, the
+	 * actual hook to add_action to is:
+	 *
+	 *     after-pp_issue-table
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $tax_name The Issues taxonomy name.
+	 */
+	do_action( "after-{$tax_name}-table", $tax_name );
+	?>
 </div><!-- /wrap -->
 <?php if ( ! wp_is_mobile() ) : ?>
 	<script type="text/javascript">

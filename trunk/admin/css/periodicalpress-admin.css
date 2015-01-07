@@ -21,3 +21,11 @@
 .issues .column-number {
 	text-align: center;
 }
+
+/* Issue statuses */
+.issue-status-draft {
+	color: #0aa;
+}
+.issue-status-trash {
+	color: #a00;
+}
