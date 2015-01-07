@@ -441,14 +441,14 @@ class PeriodicalPress_Admin {
 			}
 
 			if ( $date ) {
-				update_metadata( 'pp_term', $issue_id, "{$tax_name}_date", date( 'Y-m-d', $date ) );
+				update_metadata( 'pp_term', $issue_id, "{$tax_name}_date", $date->format( 'Y-m-d' ) );
 			}
 
 		}
 
 		// Issue Title
 		if ( isset( $_POST["{$tax_name}_title"] ) ) {
-			update_metadata( 'pp_term', $issue_id, "{$tax_name}_title", $_POST["{$tax_name}_title"] );
+			update_metadata( 'pp_term', $issue_id, "{$tax_name}_title", trim( $_POST["{$tax_name}_title"] ) );
 		}
 
 		// Issue Status
