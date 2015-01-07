@@ -101,13 +101,10 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			? '&nbsp;'
 			: '';
 
-		$number_text = esc_attr_x( 'N.', $context, $domain );
-		$number_title = esc_html_x( 'Number', $context, $domain );
-
 		$columns = array(
 			'id'          => 'ID',
 			'cb'          => $checkbox_header,
-			'number'      => "<abbr title='$number_title'>$number_text</abbr>",
+			'number'      => esc_html_x( 'Number', $context, $domain ),
 			'date'        => esc_html_x( 'Date', $context, $domain ),
 			'name'        => esc_html_x( 'Name', $context, $domain ),
 			'title'       => esc_html_x( 'Title', $context, $domain ),
