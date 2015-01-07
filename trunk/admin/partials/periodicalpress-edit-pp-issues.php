@@ -37,12 +37,6 @@ $list_table = new PeriodicalPress_Issues_List_Table();
 
 $pagenum = $list_table->get_pagenum();
 
-add_screen_option( 'per_page', array(
-	'label' => $title,
-	'default' => 20,
-	'option' => 'edit_' . $tax_name . '_per_page'
-) );
-
 /**
  * Handle redirects caused by user actions.
  */
