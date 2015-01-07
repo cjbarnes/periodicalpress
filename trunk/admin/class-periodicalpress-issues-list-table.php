@@ -131,7 +131,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		$hidden_columns = array(
 			'id',
-			'description',
 			'slug',
 			'ssid'
 		);
@@ -224,7 +223,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				? $meta['pp_issue_date'][0]
 				: '';
 			$title = ! empty( $meta['pp_issue_title'][0] )
-				? esc_html( $meta['pp_issue_title'][0] )
+				? $meta['pp_issue_title'][0]
 				: '';
 			$status = ! empty( $meta['pp_issue_status'][0] )
 				? $meta['pp_issue_status'][0]
@@ -234,13 +233,13 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				'id'          => $n,
 				'cb'          => '',
 				'number'      => $number,
-				'name'        => esc_html( $issue->name ),
+				'name'        => $issue->name,
 				'date'        => $date,
-				'title'       => "<em>$title</em>",
-				'description' => esc_html( $issue->description ),
-				'slug'        => esc_html( $issue->slug ),
+				'title'       => $title,
+				'description' => $issue->description,
+				'slug'        => $issue->slug,
 				'posts'       => $issue->count,
-				'status'      => esc_html( $status ),
+				'status'      => $status,
 				'ssid'        => $issue->term_id
 			);
 
@@ -267,7 +266,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		} else {
 
-			$checkbox = $nbsp;
+			$checkbox = '&nbsp;';
 
 		}
 
@@ -289,21 +288,46 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 			case 'name':
 				$domain = $this->plugin->get_plugin_name();
+				$can_edit = current_user_can( $this->tax->cap->edit_terms );
 
 				$name = $item[ $column_name ];
-				$title = sprintf( __( 'Edit &lsquo;%s&rsquo;', $domain ), $name);
+				$edit_title = sprintf( __( 'Edit &lsquo;%s&rsquo;', $domain ), esc_attr( $name ) );
 
-				// TODO assemble the URL
-				return  "<strong><a class='row-title' href='#' title='$title'>$name</a></strong>";
+				// The row of action links (appears on hover)
+				$row_actions = "<div class='row-actions'>";
+				if ( $can_edit ) {
+					$edit_label = _x( 'Edit', $domain );
+					$row_actions .= "<span class='edit'><a href='#'>$edit_label</a></span> | ";
+				}
+				if ( current_user_can( $this->tax->cap->delete_terms ) ) {
+					$delete_label = _x( 'Delete', $domain );
+					$row_actions .= "<span class='delete'><a class='delete-tag' href='#'>$delete_label</a></span> | ";
+				}
+				$row_actions .= "<span class='view'><a href='#'>View</a></span>";
+				$row_actions .= '</div>';
+
+				// Assemble the output
+				$out = '<strong>';
+				if ( $can_edit ) {
+					$out .= "<a class='row-title' href='#' title='$edit_title'>";
+					$out .= esc_html( $name );
+					$out .= '</a>';
+				} else {
+					$out .= esc_html( $name );
+				}
+				$out .= '</strong>';
+				$out .= $row_actions;
+
+				return $out;
 				break;
 
 			case 'date':
 				$date = DateTime::createFromFormat( 'Y-m-d', $item[ $column_name ] );
 				write_log($date);
 				if ( $date ) {
-					$out = $date->format( 'Y/m/d' );
+					$out = esc_html( $date->format( 'Y/m/d' ) );
 				} else {
-					$out = '';
+					$out = '&mdash;';
 				}
 				return $out;
 				break;
@@ -312,7 +336,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				$domain = $this->plugin->get_plugin_name();
 
 				$out = ( absint( $item[ $column_name ] ) )
-					? $item[ $column_name ]
+					? absint( $item[ $column_name ] )
 					: '0';
 
 				$title = sprintf( __( 'Show posts in &lsquo;%s$rsquo;', $domain ), esc_attr( $item['name'] ) );
@@ -330,12 +354,21 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 				// Get the display name for this Issue's status.
 				$out = array_key_exists( $item[ $column_name ], $statuses )
-					? $statuses[ $item[ $column_name ] ]
+					? esc_html( $statuses[ $item[ $column_name ] ] )
 					: '';
 
 				$class = esc_attr( $item[ $column_name ] );
 
 				return "<strong class='issue-status issue-status-$class'>$out</strong>";
+				break;
+
+			case 'title':
+				if ( ! empty( $item[ $column_name ] ) ) {
+					$out = '<em>' . esc_html( $item[ $column_name ] ) . '</em>';
+				} else {
+					$out = '&mdash;';
+				}
+				return $out;
 				break;
 
 			/*
@@ -348,7 +381,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			case 'description':
 			case 'slug':
 			case 'ssid':
-				return $item[ $column_name ];
+				if ( ! empty ( $item[ $column_name ] ) ) {
+					$out = esc_html( $item[ $column_name ] );
+				} else {
+					$out = '&mdash;';
+				}
+				return $out;
 				break;
 
 			/*
