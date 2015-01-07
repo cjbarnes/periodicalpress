@@ -362,15 +362,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				return "<strong class='issue-status issue-status-$class'>$out</strong>";
 				break;
 
-			case 'title':
-				if ( ! empty( $item[ $column_name ] ) ) {
-					$out = '<em>' . esc_html( $item[ $column_name ] ) . '</em>';
-				} else {
-					$out = '&mdash;';
-				}
-				return $out;
-				break;
-
 			/*
 			 * Handle all columns that don't require formatting - i.e. just send
 			 * the column's data straight to output.
