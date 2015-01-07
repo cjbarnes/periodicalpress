@@ -20,7 +20,7 @@ wp_nonce_field( 'set-issue-metadata', 'periodicalpress-set-issue-metadata-nonce'
 </div>
 <div class="form-field">
 	<label for="pp-issue-title"><?php echo esc_html_x( 'Title', 'Edit Issue', $domain ); ?></label>
-	<input type="text" name="pp_issue_title" id="pp-issue-date" size="40" />
+	<input type="text" name="pp_issue_title" id="pp-issue-title" size="40" />
 </div>
 <div class="form-field">
 	<label for="pp-issue-status"><?php echo esc_html_x( 'Status', 'Edit Issue', $domain ); ?></label>
