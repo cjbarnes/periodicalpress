@@ -9,6 +9,7 @@
  */
 
 $domain = $this->plugin->get_plugin_name();
+$tax_name = $this->plugin->get_taxonomy_name();
 
 // Output a nonce field for security.
 wp_nonce_field( 'set-issue-metadata', 'periodicalpress-set-issue-metadata-nonce' );
@@ -26,12 +27,8 @@ wp_nonce_field( 'set-issue-metadata', 'periodicalpress-set-issue-metadata-nonce'
 	<label for="pp-issue-status"><?php echo esc_html_x( 'Status', 'Edit Issue', $domain ); ?></label>
 	<select name="pp_issue_status" id="pp-issue-status">
 		<?php
-		// The list of possible Issue statuses (a subset of Core post statuses).
-		$statuses = array(
-			'publish' => 'Published',
-			'draft' => 'Draft',
-			'trash' => 'Trash'
-		);
+		/** This filter is documented in admin/class-periodicalpress-admin.php */
+		$statuses = apply_filters( "{$tax_name}_statuses", array() );
 
 		// For new Issues, Draft is the default status.
 		$selected_status = 'draft';

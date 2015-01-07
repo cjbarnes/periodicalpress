@@ -293,6 +293,15 @@ class PeriodicalPress {
 			0
 		);
 
+		/*
+		 * Register custom taxonomy metadata table with $wpdb database object.
+		 */
+		$this->loader->add_action(
+			'init',
+			$plugin_common,
+			'register_metadata_table'
+		);
+
 	}
 
 	/**
@@ -305,6 +314,8 @@ class PeriodicalPress {
 	private function define_admin_hooks() {
 
 		$plugin_admin = PeriodicalPress_Admin::get_instance( $this );
+
+		$tax_name = $this->taxonomy_name;
 
 		/*
 		 * Admin CSS and JavaScript.
@@ -335,6 +346,17 @@ class PeriodicalPress {
 		);
 
 		/*
+		 * Set allowed Issue publication statuses.
+		 */
+		$this->loader->add_filter(
+			"{$tax_name}_statuses",
+			$plugin_admin,
+			'set_issue_statuses_list',
+			1,
+			1
+		);
+
+		/*
 		 * Display extra metadata boxes in Issues area.
 		 */
 		$this->loader->add_action(
@@ -346,6 +368,20 @@ class PeriodicalPress {
 			'pp_issue_edit_form_fields',
 			$plugin_admin,
 			'display_edit_issue_metadata_fields'
+		);
+
+		/*
+		 * Save submitted metadata boxes in Issues area.
+		 */
+		$this->loader->add_action(
+			'created_pp_issue',
+			$plugin_admin,
+			'save_issue_metadata_fields'
+		);
+		$this->loader->add_action(
+			'edited_pp_issue',
+			$plugin_admin,
+			'save_issue_metadata_fields'
 		);
 
 		/*

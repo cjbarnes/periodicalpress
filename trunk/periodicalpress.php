@@ -54,6 +54,24 @@ function write_log( $log )  {
 }
 endif;
 
+if ( ! function_exists( 'uk_strtotime' ) ) :
+/**
+ * Version of strtotime() that doesn't expect American date order.
+ *
+ * strtotime() interprets a date with slashes as American - i.e. M/D/Y. So we
+ * replace all slashes with dashes, to stop it from doing this.
+ *
+ * @since 1.0.0
+ *
+ * @param string $str The date/time string
+ * @return string The strtotime() output
+ */
+function uk_strtotime( $str ) {
+	$str = preg_replace( '/\//', '-', $str );
+	return strtotime( $str );
+}
+endif;
+
 /**
  * The code that runs during plugin activation.
  *

@@ -246,6 +246,26 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
+	 * Returns an associative array of allowed publication statuses for Issues.
+	 *
+	 * Called first by the filter {@see {$tax_name}_statuses}.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $statuses The allowed statuses.
+	 * @return array The statuses array, in form ( name => display name ).
+	 */
+	public function set_issue_statuses_list( $statuses ) {
+		return array(
+			'publish' => 'Published',
+			'draft' => 'Draft',
+			'trash' => 'Trash'
+		);
+	}
+
+
+
+	/**
 	 * Display the main Issues admin page.
 	 *
 	 * @since 1.0.0
@@ -367,6 +387,102 @@ class PeriodicalPress_Admin {
 
 		$path = $this->plugin->get_partials_path( 'admin' );
 		require $path . 'periodicalpress-edit-issue-metadata.php';
+
+	}
+
+	/**
+	 * Save submitted metadata form fields on the Add/Edit Issue pages.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb The WordPress database class.
+	 *
+	 * @param int $issue_id The object ID for this Issue taxonomy term.
+	 */
+	public function save_issue_metadata_fields( $issue_id ) {
+		global $wpdb;
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+		$tax = get_taxonomy( $tax_name );
+
+		// Check form nonce was properly set.
+		if ( empty( $_POST['periodicalpress-set-issue-metadata-nonce'] )
+			|| ( 1 !== wp_verify_nonce( $_POST['periodicalpress-set-issue-metadata-nonce'], 'set-issue-metadata' ) ) ) {
+			return;
+		}
+
+		// Check current user has sufficient permissions.
+		if ( ! current_user_can( $tax->cap->edit_terms ) ) {
+			return;
+		}
+
+		// Validate the Issue ID by trying to fetch an associated term object.
+		$issue = get_term( $issue_id, $tax_name );
+		if ( is_null( $issue ) || is_wp_error( $issue ) ) {
+			return;
+		}
+
+		/*
+		 * Run through the metadata fields in turn.
+		 */
+
+		// Issue Date
+		if ( isset( $_POST["{$tax_name}_date"] ) ) {
+
+			/*
+			 * First try creating a Date using the jQuery UI datepicker's date
+			 * format.
+			 */
+			$date = DateTime::createFromFormat( 'd/m/y', $_POST["{$tax_name}_date"] );
+
+			// Try interpreting a user-inputted date that isn't in the correct format.
+			if ( ! $date ) {
+				$date = uk_strtotime( $_POST["{$tax_name}_date"] );
+			}
+
+			write_log($date);
+
+			if ( $date ) {
+				update_metadata( 'pp_term', $issue_id, "{$tax_name}_date", date( 'Y-m-d', $date ) );
+			}
+
+		}
+
+		// Issue Title
+		if ( isset( $_POST["{$tax_name}_title"] ) ) {
+			update_metadata( 'pp_term', $issue_id, "{$tax_name}_title", $_POST["{$tax_name}_title"] );
+		}
+
+		// Issue Status
+		if ( isset( $_POST["{$tax_name}_status"] )
+			&& ( (string) $_POST["{$tax_name}_status"] ) ) {
+
+			$new_value = $_POST["{$tax_name}_status"];
+
+			/**
+			 * Filter for allowed Issue publication statuses.
+			 *
+			 * The filter name is generated from the Issues taxonomy name. By
+			 * default it is:
+			 *
+			 *     pp_issue_statuses
+			 *
+			 * The returned value should be an associative array of statuses in
+			 * the form ( name => display name ).
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param array $statuses Array of allowed statuses.
+			 */
+			$statuses = apply_filters( "{$tax_name}_statuses", array() );
+
+			// Check this is an allowed status for Issues.
+			if ( array_key_exists( $new_value, $statuses ) ) {
+				update_metadata( 'pp_term', $issue_id, "{$tax_name}_status", $new_value );
+			}
+
+
+		}
 
 	}
 
