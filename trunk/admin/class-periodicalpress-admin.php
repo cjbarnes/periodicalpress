@@ -440,8 +440,6 @@ class PeriodicalPress_Admin {
 				$date = uk_strtotime( $_POST["{$tax_name}_date"] );
 			}
 
-			write_log($date);
-
 			if ( $date ) {
 				update_metadata( 'pp_term', $issue_id, "{$tax_name}_date", date( 'Y-m-d', $date ) );
 			}
