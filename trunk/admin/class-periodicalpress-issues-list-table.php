@@ -274,7 +274,133 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	}
 
 	/**
+	 * Formats the data for cells in the Name column.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $item The current row as an associative array.
+	 * @return string The output for this cell.
+	 */
+	public function column_name( $item ) {
+
+		$domain = $this->plugin->get_plugin_name();
+
+		$can_edit = current_user_can( $this->tax->cap->edit_terms );
+
+		// Assemble name and the title attribute.
+		$name = $item['name'];
+		$edit_title = sprintf( __( 'Edit &lsquo;%s&rsquo;', $domain ), esc_attr( $name ) );
+
+		/*
+		 * The row of action links (appears on hover).
+		 */
+		$row_actions = "<div class='row-actions'>";
+
+		// Edit action link
+		if ( $can_edit ) {
+			$edit_label = _x( 'Edit', $domain );
+			$row_actions .= "<span class='edit'><a href='#'>$edit_label</a></span> | ";
+		}
+
+		// Delete action link
+		if ( current_user_can( $this->tax->cap->delete_terms ) ) {
+			$delete_label = _x( 'Delete', $domain );
+			$row_actions .= "<span class='delete'><a class='delete-tag' href='#'>$delete_label</a></span> | ";
+		}
+
+		$row_actions .= "<span class='view'><a href='#'>View</a></span>";
+		$row_actions .= '</div>';
+
+		// Assemble the output
+		$out = '<strong>';
+		if ( $can_edit ) {
+			$out .= "<a class='row-title' href='#' title='$edit_title'>";
+			$out .= esc_html( $name );
+			$out .= '</a>';
+		} else {
+			$out .= esc_html( $name );
+		}
+		$out .= '</strong>';
+		$out .= $row_actions;
+
+		return $out;
+	}
+
+	/**
+	 * Formats the data for cells in the Date column.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $item The current row as an associative array.
+	 * @return string The output for this cell.
+	 */
+	public function column_date( $item ) {
+
+		$date = DateTime::createFromFormat( 'Y-m-d', $item['date'] );
+
+		if ( $date ) {
+			$out = esc_html( $date->format( 'Y/m/d' ) );
+		} else {
+			$out = '&mdash;';
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Formats the data for cells in the Posts column.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $item The current row as an associative array.
+	 * @return string The output for this cell.
+	 */
+	public function column_posts( $item ) {
+
+		$domain = $this->plugin->get_plugin_name();
+
+		// Number of posts
+		$out = ( absint( $item['posts'] ) )
+			? absint( $item['posts'] )
+			: '0';
+
+		$title = sprintf( __( 'Show posts in &lsquo;%s$rsquo;', $domain ), esc_attr( $item['name'] ) );
+		$tax_query = $this->tax->query_var;
+		$term = $item['slug'];
+
+		return "<a href='edit.php?$tax_query=$term' title='$title'>$out</a>";
+	}
+
+	/**
+	 * Formats the data for cells in the Status column.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $item The current row as an associative array.
+	 * @return string The output for this cell.
+	 */
+	public function column_status( $item ) {
+
+		$tax_name = $this->tax->name;
+
+		/** This filter is documented in admin/class-periodicalpress-admin.php */
+		$statuses = apply_filters( "{$tax_name}_statuses", array() );
+
+		// Get the display name for this Issue's status.
+		$out = array_key_exists( $item['status'], $statuses )
+			? esc_html( $statuses[ $item['status'] ] )
+			: '';
+
+		$class = esc_attr( $item['status'] );
+
+		return "<strong class='issue-status issue-status-$class'>$out</strong>";
+	}
+
+	/**
 	 * Formats the data for each individual cell of the table.
+	 *
+	 * Handle all columns that don't require formatting - i.e. just send
+     * the column's data straight to output.
 	 *
 	 * @since 1.0.0
 	 *
@@ -284,111 +410,13 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 */
 	public function column_default( $item, $column_name ) {
 
-		switch ( $column_name ) {
-
-			case 'name':
-				$domain = $this->plugin->get_plugin_name();
-				$can_edit = current_user_can( $this->tax->cap->edit_terms );
-
-				$name = $item[ $column_name ];
-				$edit_title = sprintf( __( 'Edit &lsquo;%s&rsquo;', $domain ), esc_attr( $name ) );
-
-				// The row of action links (appears on hover)
-				$row_actions = "<div class='row-actions'>";
-				if ( $can_edit ) {
-					$edit_label = _x( 'Edit', $domain );
-					$row_actions .= "<span class='edit'><a href='#'>$edit_label</a></span> | ";
-				}
-				if ( current_user_can( $this->tax->cap->delete_terms ) ) {
-					$delete_label = _x( 'Delete', $domain );
-					$row_actions .= "<span class='delete'><a class='delete-tag' href='#'>$delete_label</a></span> | ";
-				}
-				$row_actions .= "<span class='view'><a href='#'>View</a></span>";
-				$row_actions .= '</div>';
-
-				// Assemble the output
-				$out = '<strong>';
-				if ( $can_edit ) {
-					$out .= "<a class='row-title' href='#' title='$edit_title'>";
-					$out .= esc_html( $name );
-					$out .= '</a>';
-				} else {
-					$out .= esc_html( $name );
-				}
-				$out .= '</strong>';
-				$out .= $row_actions;
-
-				return $out;
-				break;
-
-			case 'date':
-				$date = DateTime::createFromFormat( 'Y-m-d', $item[ $column_name ] );
-				write_log($date);
-				if ( $date ) {
-					$out = esc_html( $date->format( 'Y/m/d' ) );
-				} else {
-					$out = '&mdash;';
-				}
-				return $out;
-				break;
-
-			case 'posts':
-				$domain = $this->plugin->get_plugin_name();
-
-				$out = ( absint( $item[ $column_name ] ) )
-					? absint( $item[ $column_name ] )
-					: '0';
-
-				$title = sprintf( __( 'Show posts in &lsquo;%s$rsquo;', $domain ), esc_attr( $item['name'] ) );
-				$tax_query = $this->tax->query_var;
-				$term = $item['slug'];
-
-				return "<a href='edit.php?$tax_query=$term' title='$title'>$out</a>";
-				break;
-
-			case 'status':
-				$tax_name = $this->tax->name;
-
-				/** This filter is documented in admin/class-periodicalpress-admin.php */
-				$statuses = apply_filters( "{$tax_name}_statuses", array() );
-
-				// Get the display name for this Issue's status.
-				$out = array_key_exists( $item[ $column_name ], $statuses )
-					? esc_html( $statuses[ $item[ $column_name ] ] )
-					: '';
-
-				$class = esc_attr( $item[ $column_name ] );
-
-				return "<strong class='issue-status issue-status-$class'>$out</strong>";
-				break;
-
-			/*
-			 * Handle all columns that don't require formatting - i.e. just send
-			 * the column's data straight to output.
-			 */
-			case 'id':
-			case 'number':
-			case 'title':
-			case 'description':
-			case 'slug':
-			case 'ssid':
-				if ( ! empty ( $item[ $column_name ] ) ) {
-					$out = esc_html( $item[ $column_name ] );
-				} else {
-					$out = '&mdash;';
-				}
-				return $out;
-				break;
-
-			/*
-			 * If this column is unknown, just dump the whole row array into the
-			 * page.
-			 */
-			default:
-				return print_r( $item, true );
-
+		if ( ! empty ( $item[ $column_name ] ) ) {
+			$out = esc_html( $item[ $column_name ] );
+		} else {
+			$out = '&mdash;';
 		}
 
+		return $out;
 	}
 
 }
