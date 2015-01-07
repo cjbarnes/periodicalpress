@@ -105,6 +105,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			'id'          => 'ID',
 			'cb'          => $checkbox_header,
 			'name'        => _x( 'Name', $context, $domain ),
+			'title'       => _z( 'Title', $content, $domain ),
 			'description' => _x( 'Description', $context, $domain ),
 			'slug'        => _x( 'Slug', $context, $domain ),
 			'posts'       => _x( 'Posts', $context, $domain ),
@@ -126,6 +127,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		$hidden_columns = array(
 			'id',
+			'name',
 			'ssid'
 		);
 
@@ -144,7 +146,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	public function get_sortable_columns() {
 
 		$sortable_columns = array(
-			'name'  => array( 'name', true ),
 			'posts' => array( 'posts', false )
 		);
 
@@ -206,10 +207,14 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		// Add each term as a new row.
 		foreach ( $issues as $n => $issue ) {
 
+			// Get all metadata for this term.
+			$meta = get_metadata( 'pp_term', $issue->term_id );
+
 			$data[] = array(
 				'id'          => $n,
 				'cb'          => '',
 				'name'        => esc_html( $issue->name ),
+				'title'       => esc_html( $meta['pp_issue_title'] ),
 				'description' => esc_html( $issue->description ),
 				'slug'        => esc_html( $issue->slug ),
 				'posts'       => $issue->count,

@@ -479,7 +479,6 @@ class PeriodicalPress_Admin {
 				update_metadata( 'pp_term', $issue_id, "{$tax_name}_status", $new_value );
 			}
 
-
 		}
 
 	}
