@@ -436,12 +436,15 @@ class PeriodicalPress_Admin {
 			$date = DateTime::createFromFormat( 'd/m/y', $_POST["{$tax_name}_date"] );
 
 			// Try interpreting a user-inputted date that isn't in the correct format.
-			if ( ! $date ) {
+			if ( $date ) {
+				$date = $date->format( 'U' );
+			} else {
 				$date = uk_strtotime( $_POST["{$tax_name}_date"] );
 			}
 
 			if ( $date ) {
-				update_metadata( 'pp_term', $issue_id, "{$tax_name}_date", $date->format( 'Y-m-d' ) );
+				$output_date = date( 'Y-m-d', $date );
+				update_metadata( 'pp_term', $issue_id, "{$tax_name}_date", $output_date );
 			}
 
 		}
@@ -540,7 +543,7 @@ class PeriodicalPress_Admin {
 	 */
 	public function save_issue_metabox( $post_id ) {
 
-		$tax_name = $this->plugin->$get_taxonomy_name();
+		$tax_name = $this->plugin->get_taxonomy_name();
 		$tax = get_taxonomy( $tax_name );
 
 		/*
