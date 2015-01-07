@@ -104,7 +104,7 @@ class PeriodicalPress_Activator {
 
 		$sql = "CREATE TABLE IF NOT EXISTS `$table_name` (
 			`meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-			`term_id` bigint(20) unsigned NOT NULL DEFAULT '0',
+			`pp_term_id` bigint(20) unsigned NOT NULL DEFAULT '0',
 			`meta_key` varchar(255) DEFAULT NULL,
 			`meta_value` longtext,
 			PRIMARY KEY (`meta_id`),

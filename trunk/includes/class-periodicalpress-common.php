@@ -103,4 +103,22 @@ class PeriodicalPress_Common {
 
 	}
 
+	/**
+	 * Add the Issues metadata table to $wpdb object.
+	 *
+	 * Required for get_metadata(), update_metadata(), and delete_metadata() to
+	 * work.
+	 *
+	 * @global wpdb $wpdb The WordPress database object.
+	 *
+	 * @since 1.0.0
+	 */
+	public function register_metadata_table() {
+		global $wpdb;
+
+		if ( empty( $wpdb->pp_termmeta ) ) {
+			$wpdb->pp_termmeta = $wpdb->prefix . 'pp_termmeta';
+		}
+	}
+
 }
