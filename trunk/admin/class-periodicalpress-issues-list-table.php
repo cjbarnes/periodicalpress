@@ -109,6 +109,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			'date'        => esc_html_x( 'Date', $context, $domain ),
 			'number'      => esc_html_x( 'Number', $context, $domain ),
 			'title'       => esc_html_x( 'Title', $context, $domain ),
+			'description' => esc_html_x( 'Description', $context, $domain ),
 			'slug'        => esc_html_x( 'Slug', $context, $domain ),
 			'posts'       => esc_html_x( 'Posts', $context, $domain ),
 			'status'      => esc_html_x( 'Status', $context, $domain ),
@@ -130,6 +131,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		$hidden_columns = array(
 			'id',
+			'description',
 			'slug',
 			'ssid'
 		);
@@ -235,6 +237,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				'name'        => esc_html( $issue->name ),
 				'date'        => $date,
 				'title'       => "<em>$title</em>",
+				'description' => esc_html( $issue->description ),
 				'slug'        => esc_html( $issue->slug ),
 				'posts'       => $issue->count,
 				'status'      => esc_html( $status ),
