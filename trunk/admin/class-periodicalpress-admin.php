@@ -256,10 +256,11 @@ class PeriodicalPress_Admin {
 	 * @return array The statuses array, in form ( name => display name ).
 	 */
 	public function set_issue_statuses_list( $statuses ) {
+		$domain = $this->plugin->get_taxonomy_name();
+
 		return array(
-			'publish' => 'Published',
-			'draft' => 'Draft',
-			'trash' => 'Trash'
+			'publish' => __( 'Published', $domain ),
+			'draft' => __( 'Draft', $domain )
 		);
 	}
 
@@ -292,7 +293,6 @@ class PeriodicalPress_Admin {
 		 */
 		$path = $this->plugin->get_partials_path( 'admin' );
 		require $path . 'periodicalpress-edit-pp-issues.php';
-		//require $path . '../test.php';
 
 	}
 
