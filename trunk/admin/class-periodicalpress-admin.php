@@ -676,15 +676,16 @@ class PeriodicalPress_Admin {
 			$name .= ' (' . $copy . ')';
 		}
 
-		// Term record changes.
+		// Make the DB changes.
 		$term_updates = array(
 			'name' => $name,
 			'slug' => $new_slug
 		);
 		wp_update_term( $term_id, $tax_name, $term_updates );
-
-		// Metadata changes.
 		delete_metadata( 'pp_term', $term_id, "{$tax_name}_number" );
+
+		// Delete the cached highest issue number.
+		delete_transient( 'periodicalpress_highest_issue_num' );
 
 		return $result;
 	}
@@ -692,31 +693,46 @@ class PeriodicalPress_Admin {
 	/**
 	 * Returns the next Issue number.
 	 *
+	 * Uses the transient `periodicalpress_highest_issue_num` for caching, so
+	 * this should be invalidated whenever an Issue number is changed elsewhere
+	 * (e.g. if an Issue is unpublished or manually edited).
+	 *
 	 * @since 1.0.0
 	 *
 	 * @return int The next free Issue number.
 	 */
 	public function create_issue_number() {
 
+		$transient = 'periodicalpress_highest_issue_num';
 		$tax_name = $this->plugin->get_taxonomy_name();
 
-		$existing_issues = $this->get_issues_metadata_column( 'pp_issue_number' );
-		if ( ! is_array( $existing_issues ) ) {
-			return false;
+		// Get the highest existing Issue number.
+		$highest_num = (int) get_transient( $transient );
+		if ( empty( $highest_num ) ) {
+
+			$existing_issues = $this->get_issues_metadata_column( 'pp_issue_number' );
+			if ( ! is_array( $existing_issues ) ) {
+				return false;
+			}
+
+			// Empty array returned, so this is Issue 1.
+			if ( ! $existing_issues ) {
+				return 1;
+			}
+
+			$highest_num = (int) max( $existing_issues );
+
 		}
 
-		// Empty array returned, so this is Issue 1.
-		if ( ! $existing_issues ) {
-			return 1;
-		}
-
-		$highest_num = (int) max( $existing_issues );
 		$new_issue_num = $highest_num + 1;
 
 		// Get the next number that is not taken.
 		while ( get_term_by( 'slug', "$new_issue_num", $tax_name ) ) {
 			$new_issue_num++;
 		}
+
+		// Cache new highest issue number for later.
+		set_transient( $transient, $new_issue_num, DAY_IN_SECONDS );
 
 		return $new_issue_num;
 	}
