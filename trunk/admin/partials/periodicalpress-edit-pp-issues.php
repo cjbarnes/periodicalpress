@@ -38,12 +38,49 @@ $list_table = new PeriodicalPress_Issues_List_Table( 'admin.php?page=pp_edit_iss
 $pagenum = $list_table->get_pagenum();
 
 /**
- * Handle redirects caused by user actions.
+ * Handle user actions from the list table form.
  */
 
 $location = false;
 
 switch ( $list_table->current_action() ) {
+
+	case 'edit':
+
+		/*
+		 * Check the Issue ID has been correctly passed via URL. Nonce is not
+		 * used, since we want to be able to link to this Edit Issue page from
+		 * elsewhere.
+		 */
+		if ( ! isset( $_REQUEST['tag_id'] ) ) {
+			break;
+		}
+		$term_id = (int) $_REQUEST['tag_id'];
+		if ( ! $term_id ) {
+			break;
+		};
+
+		// Check permissions.
+		if ( ! current_user_can( $tax->cap->edit_terms ) ) {
+			wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+		}
+
+		// If this Issue doesn't exist, show error message.
+		if ( ! get_term( $term_id, $tax_name ) ) {
+			$location = 'admin.php?page=pp_edit_issues';
+			$location = add_query_arg( 'message', 90, $location );
+		}
+
+		/**
+		 * Show the Edit Issue form instead of the issues page.
+		 */
+		include $this->plugin->get_plugin_path() . 'admin/partials/periodicalpress-edit-issue.php';
+
+		exit;
+
+	case 'edited':
+
+		break;
 
 	case 'delete':
 	case 'publish':

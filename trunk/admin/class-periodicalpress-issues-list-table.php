@@ -310,7 +310,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		// Edit action link
 		if ( $can_edit ) {
-			$edit_url = get_edit_term_link( $term_id, $this->tax->name );
+			$edit_url = $this->url . "&amp;action=edit&amp;tag_id=$term_id";
 			$edit_label = _x( 'Edit', $domain );
 
 			$actions['edit'] = "<a href='$edit_url'>$edit_label</a>";
@@ -329,6 +329,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				$action_label = 'Publish';
 			}
 			$action_url = wp_nonce_url( $this->url . "&amp;action=$action&amp;tag_id=$term_id&amp;$action-tag_$term_id", "$action-tag_$term_id" );
+
 			$actions[ $action ] = "<a class='$action-tag' href='$action_url'>$action_label</a>";
 		}
 
