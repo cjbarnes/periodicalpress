@@ -203,7 +203,7 @@ class PeriodicalPress_Admin {
 			'pp_issues_home',
 			$tax->labels->name,
 			$tax->labels->all_items,
-			'manage_pp_issues', // cap required
+			$tax->cap->edit_terms,
 			"edit-tags.php?taxonomy={$tax->name}"
 		);
 
@@ -484,6 +484,61 @@ class PeriodicalPress_Admin {
 
 		}
 
+	}
+
+	/**
+	 * Delete an Issue from the plugin taxonomy.
+	 *
+	 * Includes deletion of metadata. Note that the returned success/failure/
+	 * error value is *not* affected by success or failure of metadata deletion,
+	 * since the crucial part of the deletion is the Issue taxonomy term itself.
+	 * The worst that can happen is some orphaned metadata rows remain in the
+	 * pp_termmeta table.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int|object $term Either the Issue's term ID or its term object.
+	 * @return bool|WP_Error Success/failure of term deletion, or error object.
+	 */
+	public function delete_issue( $term ) {
+
+		if ( empty( $term ) ) {
+			return false;
+		}
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		/*
+		 * Check this ID matches an existing Issue. If a term slug or object was
+		 * passed in (instead of an integer term_id), get the term_id.
+		 */
+		$term_object = get_term( $term, $tax_name );
+
+		// Return FALSE if Issue doesn't exist, WP_Error if error.
+		if ( is_null( $term_object ) || is_wp_error( $term_object ) ) {
+			if ( is_null( $term_object ) ) {
+				$term_object = false;
+			}
+			return $term_object;
+		}
+
+		$term_id = $term_object->term_id;
+
+		// Returns boolean for success/failure or WP_Error on error.
+		$result = wp_delete_term( $term_id, $tax_name );
+
+		/*
+		 * Only proceed to delete metadata if the term it attaches to was first
+		 * deleted successfully.
+		 */
+		if ( ! is_wp_error( $result ) && $result ) {
+			$meta_to_delete = get_metadata( 'pp_term', $term_id );
+			foreach ( $meta_to_delete as $meta_key => $meta_values ) {
+				write_log( delete_metadata( 'pp_term', $term_id, $meta_key ) );
+			}
+		}
+
+		return $result;
 	}
 
 	/**

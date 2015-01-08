@@ -42,7 +42,7 @@ $pagenum = $list_table->get_pagenum();
  */
 
 $location = false;
-// TODO:
+
 switch ( $list_table->current_action() ) {
 
 	case 'add-tag':
@@ -50,6 +50,32 @@ switch ( $list_table->current_action() ) {
 		break;
 
 	case 'delete':
+		$location = 'admin.php?page=pp_edit_issues';
+
+		// Check the Issue ID and nonce have been correctly passed via URL.
+		if ( ! isset( $_REQUEST['tag_id'] ) ) {
+			break;
+		}
+		$term_id = (int) $_REQUEST['tag_id'];
+		check_admin_referer( 'delete-tag_' . $term_id );
+
+		if ( ! current_user_can( $tax->cap->delete_terms ) ) {
+			wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+		}
+
+		/*
+		 * Actually delete the Issue from the database using
+		 * {@see PeriodicalPressAdmin::delete_issue()}, and add result message
+		 * to the URL query string.
+		 */
+		$deletion = $this->delete_issue( $term_id );
+		write_log( $deletion );
+		if ( ! is_wp_error( $deletion ) && $deletion ) {
+			$msg_id = 2;
+		} else {
+			$msg_id = 82;
+		}
+		$location = add_query_arg( 'message', $msg_id, $location );
 
 		break;
 
@@ -67,15 +93,27 @@ switch ( $list_table->current_action() ) {
 
 }
 
+// If not redirecting, no need for referer or nonce.
 if ( ! $location && ! empty( $_REQUEST['_wp_http_referer'] ) ) {
 	$location = remove_query_arg( array( '_wp_http_referer', '_wpnonce' ), wp_unslash( $_SERVER['REQUEST_URI'] ) );
 }
 
+/**
+ * Handle redirections. Uses JavaScript instead of wp_redirect() because output
+ * has already started (and therefore headers can no longer be set).
+ */
 if ( $location ) {
+
+	// Preserve place in pagination.
 	if ( ! empty( $_REQUEST['paged'] ) ) {
 		$location = add_query_arg( 'paged', (int) $_REQUEST['paged'], $location );
 	}
-	wp_redirect( $location );
+
+	$location = wp_sanitize_redirect( $location );
+
+	echo "<script>window.location='$location';</script>";
+	echo "<noscript><a href='$location'>Click here to continue.</a></noscript>";
+
 	exit;
 }
 
@@ -104,13 +142,14 @@ if ( ! current_user_can( $tax->cap->edit_terms ) ) {
 
 // The term-updated messages.
 $messages = array(
-	0 => '', // Unused. Messages start at index 1.
-	1 => __( 'Issue added.' ),
-	2 => __( 'Issue deleted.' ),
-	3 => __( 'Issue updated.' ),
-	4 => __( 'Issue not added.' ),
-	5 => __( 'Issue not updated.' ),
-	6 => __( 'Issues deleted.' )
+	0  => '', // Unused. Messages start at index 1.
+	1  => __( 'Issue added.' ),
+	2  => __( 'Issue deleted.' ),
+	3  => __( 'Issue updated.' ),
+	4  => __( 'Issue not added.' ),
+	5  => __( 'Issue not updated.' ),
+	6  => __( 'Issues deleted.' ),
+	82 => __( 'Issue not deleted.' ) // Plugin messages start at index 81.
 );
 
 /**

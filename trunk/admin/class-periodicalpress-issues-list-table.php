@@ -307,44 +307,48 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	public function column_name( $item ) {
 
 		$domain = $this->plugin->get_plugin_name();
+		$the_url = admin_url( 'admin.php?page=pp_edit_issues' );
+
+		$name = $item['name'];
 		$term_id = +$item['ssid'];
 
 		$can_edit = current_user_can( $this->tax->cap->edit_terms );
 
-		// Assemble name and the title attribute.
-		$name = $item['name'];
+		// Assemble the title attribute.
 		$edit_title = sprintf( __( 'Edit &lsquo;%s&rsquo;', $domain ), esc_attr( $name ) );
 
 		/*
 		 * The row of action links (appears on hover).
 		 */
-		$row_actions = "<div class='row-actions'>";
+		$actions = array();
 
 		// Edit action link
 		if ( $can_edit ) {
 			$edit_url = get_edit_term_link( $term_id, $this->tax->name );
 			$edit_label = _x( 'Edit', $domain );
-			$row_actions .= "<span class='edit'><a href='$edit_url'>$edit_label</a></span> | ";
+
+			$actions['edit'] = "<a href='$edit_url'>$edit_label</a>";
 		}
 
 		// Delete action link
 		if ( current_user_can( $this->tax->cap->delete_terms ) ) {
-			$delete_url = '#';
+			$delete_url = wp_nonce_url( $the_url . "&amp;action=delete&amp;tag_id=$term_id&amp;delete-tag_$term_id", "delete-tag_$term_id" );
 			$delete_label = _x( 'Delete', $domain );
-			$row_actions .= "<span class='delete'><a class='delete-tag' href='$delete_url'>$delete_label</a></span> | ";
+
+			$actions['delete'] = "<a class='delete-tag' href='$delete_url'>$delete_label</a>";
 		}
 
-		/**
+		/*
 		 * View link. The term ID is passed to get_term_link() as an integer to
 		 * avoid it being confused with the term slug.
 		 */
 		$view_url = get_term_link( $term_id, $this->tax->name );
 		if ( ! is_wp_error( $view_url ) ) {
 			$view_label = _x( 'View', $domain );
-			$row_actions .= "<span class='view'><a href='$view_url'>$view_label</a></span>";
+			$actions['view'] = "<a href='$view_url'>$view_label</a>";
 		}
 
-		$row_actions .= '</div>';
+		$row_actions = $this->row_actions( $actions );
 
 		// Assemble the output
 		$out = '<strong>';
