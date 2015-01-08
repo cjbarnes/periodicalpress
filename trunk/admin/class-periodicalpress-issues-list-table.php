@@ -111,7 +111,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 */
 		$columns = apply_filters( "manage_{$this->tax->name}_columns", array(
 			'id'          => 'ID',
-			'cb'          => $checkbox_header,
 			'name'        => esc_html_x( 'Name', $context, $domain ),
 			'date'        => esc_html_x( 'Date', $context, $domain ),
 			'number'      => esc_html_x( 'Number', $context, $domain ),
@@ -254,7 +253,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 			$data[] = array(
 				'id'          => $n,
-				'cb'          => '',
 				'number'      => $number,
 				'name'        => $issue->name,
 				'date'        => $date,
@@ -269,31 +267,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Output the row checkbox.
-	 *
-	 * @param  array $item The current row data (associative array).
-	 * @return string The checkbox output.
-	 */
-	public function column_cb( $item ) {
-
-		if ( current_user_can( $this->tax->cap->delete_terms ) ) {
-
-			$id = $item['id'];
-			$checkbox = "<label class='screen-reader-text' for='cb-select-$id'>";
-			$checkbox .= sprintf( __( 'Select %s' ), esc_html( $item['name'] ) );
-			$checkbox .= '</label>';
-			$checkbox .= "<input type='checkbox' name='delete_tags[]' value='$id' id='cb-select-$id' />";
-
-		} else {
-
-			$checkbox = '&nbsp;';
-
-		}
-
-		return $checkbox;
 	}
 
 	/**
