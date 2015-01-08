@@ -24,6 +24,9 @@
 }
 
 /* Issue statuses */
+.issue-status {
+	font-size: 14px !important;
+}
 .issue-status-draft {
 	color: #0aa;
 }
