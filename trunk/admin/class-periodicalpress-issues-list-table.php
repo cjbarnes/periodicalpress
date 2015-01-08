@@ -307,6 +307,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	public function column_name( $item ) {
 
 		$domain = $this->plugin->get_plugin_name();
+		$term_id = +$item['ssid'];
 
 		$can_edit = current_user_can( $this->tax->cap->edit_terms );
 
@@ -321,23 +322,34 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		// Edit action link
 		if ( $can_edit ) {
+			$edit_url = get_edit_term_link( $term_id, $this->tax->name );
 			$edit_label = _x( 'Edit', $domain );
-			$row_actions .= "<span class='edit'><a href='#'>$edit_label</a></span> | ";
+			$row_actions .= "<span class='edit'><a href='$edit_url'>$edit_label</a></span> | ";
 		}
 
 		// Delete action link
 		if ( current_user_can( $this->tax->cap->delete_terms ) ) {
+			$delete_url = '#';
 			$delete_label = _x( 'Delete', $domain );
-			$row_actions .= "<span class='delete'><a class='delete-tag' href='#'>$delete_label</a></span> | ";
+			$row_actions .= "<span class='delete'><a class='delete-tag' href='$delete_url'>$delete_label</a></span> | ";
 		}
 
-		$row_actions .= "<span class='view'><a href='#'>View</a></span>";
+		/**
+		 * View link. The term ID is passed to get_term_link() as an integer to
+		 * avoid it being confused with the term slug.
+		 */
+		$view_url = get_term_link( $term_id, $this->tax->name );
+		if ( ! is_wp_error( $view_url ) ) {
+			$view_label = _x( 'View', $domain );
+			$row_actions .= "<span class='view'><a href='$view_url'>$view_label</a></span>";
+		}
+
 		$row_actions .= '</div>';
 
 		// Assemble the output
 		$out = '<strong>';
 		if ( $can_edit ) {
-			$out .= "<a class='row-title' href='#' title='$edit_title'>";
+			$out .= "<a class='row-title' href='$edit_url' title='$edit_title'>";
 			$out .= esc_html( $name );
 			$out .= '</a>';
 		} else {
