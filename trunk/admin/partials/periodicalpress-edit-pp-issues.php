@@ -33,7 +33,7 @@ if ( ! current_user_can( $tax->cap->manage_terms ) ) {
  * duplicate of Core's {@see WP_List_Table}).
  */
 require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-issues-list-table.php';
-$list_table = new PeriodicalPress_Issues_List_Table();
+$list_table = new PeriodicalPress_Issues_List_Table( 'admin.php?page=pp_edit_issues' );
 
 $pagenum = $list_table->get_pagenum();
 
@@ -45,11 +45,11 @@ $location = false;
 
 switch ( $list_table->current_action() ) {
 
-	case 'add-tag':
-
-		break;
-
 	case 'delete':
+	case 'publish':
+	case 'unpublish':
+		$action = $list_table->current_action();
+
 		$location = 'admin.php?page=pp_edit_issues';
 
 		// Check the Issue ID and nonce have been correctly passed via URL.
@@ -57,37 +57,54 @@ switch ( $list_table->current_action() ) {
 			break;
 		}
 		$term_id = (int) $_REQUEST['tag_id'];
-		check_admin_referer( 'delete-tag_' . $term_id );
+		check_admin_referer( "$action-tag_" . $term_id );
 
-		if ( ! current_user_can( $tax->cap->delete_terms ) ) {
-			wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+		// Check permissions
+		if ( 'delete' === $action ) {
+			if ( ! current_user_can( $tax->cap->delete_terms ) ) {
+				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+			}
+		} else {
+			if ( ! current_user_can( $tax->cap->manage_terms ) ) {
+				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+			}
 		}
 
 		/*
-		 * Actually delete the Issue from the database using
-		 * {@see PeriodicalPressAdmin::delete_issue()}, and add result message
-		 * to the URL query string.
+		 * Actually change the Issue in the database using the appropriate
+		 * method on {@see PeriodicalPress_Admin}, and add result message to the
+		 * URL query string.
 		 */
-		$deletion = $this->delete_issue( $term_id );
-		write_log( $deletion );
-		if ( ! is_wp_error( $deletion ) && $deletion ) {
-			$msg_id = 2;
+		$do_it = $action . '_issue';
+		$result = $this->$do_it( $term_id );
+
+		// Determine which success/failure message should be displayed.
+		if ( ! is_wp_error( $result ) && $result ) {
+			switch ( $action ) {
+				case 'delete':
+					$msg_id = 2;
+					break;
+				case 'publish':
+					$msg_id = 86;
+					break;
+				case 'unpublish':
+					$msg_id = 88;
+					break;
+			}
 		} else {
-			$msg_id = 82;
+			switch ( $action ) {
+				case 'delete':
+					$msg_id = 82;
+					break;
+				case 'publish':
+					$msg_id = 87;
+					break;
+				case 'unpublish':
+					$msg_id = 89;
+					break;
+			}
 		}
 		$location = add_query_arg( 'message', $msg_id, $location );
-
-		break;
-
-	case 'bulk_delete':
-
-		break;
-
-	case 'edit':
-
-		break;
-
-	case 'editedtag':
 
 		break;
 
@@ -149,7 +166,11 @@ $messages = array(
 	4  => __( 'Issue not added.' ),
 	5  => __( 'Issue not updated.' ),
 	6  => __( 'Issues deleted.' ),
-	82 => __( 'Issue not deleted.' ) // Plugin messages start at index 81.
+	82 => __( 'Issue not deleted.' ), // Plugin messages start at index 81.
+	86 => __( 'Issue published.' ),
+	87 => __( 'Issue not published.' ),
+	88 => __( 'Issue unpublished.' ),
+	89 => __( 'Issue not unpublished.' )
 );
 
 /**

@@ -534,11 +534,218 @@ class PeriodicalPress_Admin {
 		if ( ! is_wp_error( $result ) && $result ) {
 			$meta_to_delete = get_metadata( 'pp_term', $term_id );
 			foreach ( $meta_to_delete as $meta_key => $meta_values ) {
-				write_log( delete_metadata( 'pp_term', $term_id, $meta_key ) );
+				delete_metadata( 'pp_term', $term_id, $meta_key );
 			}
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Publish a draft Issue.
+	 *
+	 * Includes setting the Issue's status, slug, number, name, and date (if
+	 * empty), and publishing all associated Posts as well.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int|object $term Either the Issue's term ID or its term object.
+	 * @return bool|WP_Error Success/failure of publish, or error object.
+	 */
+	public function publish_issue( $term ) {
+
+		if ( empty( $term ) ) {
+			return false;
+		}
+
+		$domain = $this->plugin->get_plugin_name();
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		/*
+		 * Check this ID matches an existing Issue. If a term slug or object was
+		 * passed in (instead of an integer term_id), get the term_id.
+		 */
+		$term_object = get_term( $term, $tax_name );
+
+		// Return FALSE if Issue doesn't exist, WP_Error if error.
+		if ( is_null( $term_object ) || is_wp_error( $term_object ) ) {
+			if ( is_null( $term_object ) ) {
+				$term_object = false;
+			}
+			return $term_object;
+		}
+
+		$term_id = $term_object->term_id;
+
+		// Get a free issue number if there isn't one yet.
+		$issue_num = get_metadata( 'pp_term', $term_id, "{$tax_name}_number" );
+		if ( ! is_int( $issue_num ) ) {
+			$issue_num = $this->create_issue_number();
+		}
+
+		$results = array();
+
+		// Term object changes.
+		$term_updates = array(
+			'name' => sprintf( __( 'Issue %d', $domain ), $issue_num ),
+			'slug' => "$issue_num"
+		);
+		$temp_result = wp_update_term( $term_id, $tax_name, $term_updates );
+		$results[] = is_wp_error( $temp_result )
+			? $temp_result
+			: false;
+
+		// Metadata changes.
+		$results[] = update_metadata( 'pp_term', $term_id, "{$tax_name}_number", $issue_num );
+
+
+		/*
+		 * TODO post changes.
+		 */
+
+
+		// Only set status to Published if all other changes were successful.
+		if ( in_array( false, $results ) ) {
+			$result = update_metadata( 'pp_term', $term_id, "{$tax_name}_status", 'publish' );
+		} else {
+			$result = false;
+		}
+		return $result;
+	}
+
+	/**
+	 * Set a published Issue as a draft.
+	 *
+	 * Hides the Issue and its posts from the public website. Includes setting
+	 * the Issue's status, slug, number, and name, and unpublishing all
+	 * associated Posts as well.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int|object $term Either the Issue's term ID or its term object.
+	 * @return bool|WP_Error Success/failure of publish, or error object.
+	 */
+	public function unpublish_issue( $term ) {
+
+		if ( empty( $term ) ) {
+			return false;
+		}
+
+		$domain = $this->plugin->get_plugin_name();
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		/*
+		 * Check this ID matches an existing Issue. If a term slug or object was
+		 * passed in (instead of an integer term_id), get the term_id.
+		 */
+		$term_object = get_term( $term, $tax_name );
+
+		// Return FALSE if Issue doesn't exist, WP_Error if error.
+		if ( is_null( $term_object ) || is_wp_error( $term_object ) ) {
+			if ( is_null( $term_object ) ) {
+				$term_object = false;
+			}
+			return $term_object;
+		}
+
+		$term_id = $term_object->term_id;
+
+		// Metadata changes.
+		$result = update_metadata( 'pp_term', $term_id, "{$tax_name}_status", 'draft' );
+
+
+		/*
+		 * TODO post changes.
+		 */
+
+
+		$created = time();
+
+		// Create a unique slug for this draft Issue.
+		$slug = sprintf( 'draft-%s', date( 'Y-m-d', $created ) );
+		$new_slug = $slug;
+		$copy = 1;
+		while ( get_term_by( 'slug', $new_slug, $tax_name ) ) {
+			$new_slug = $slug . '_' . ++$copy;
+			write_log( $new_slug );
+		}
+
+		// Create a unique name.
+		$name = sprintf( __( 'Unpublished Issue (created&nbsp;%s)', $domain ), date( 'Y/m/d', $created ) );
+		if ( $copy > 1 ) {
+			$name .= ' (' . $copy . ')';
+		}
+
+		// Term record changes.
+		$term_updates = array(
+			'name' => $name,
+			'slug' => $new_slug
+		);
+		wp_update_term( $term_id, $tax_name, $term_updates );
+
+		// Metadata changes.
+		delete_metadata( 'pp_term', $term_id, "{$tax_name}_number" );
+
+		return $result;
+	}
+
+	/**
+	 * Returns the next Issue number.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return int The next free Issue number.
+	 */
+	public function create_issue_number() {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		$existing_issues = $this->get_issues_metadata_column( 'pp_issue_number' );
+		if ( ! is_array( $existing_issues ) ) {
+			return false;
+		}
+
+		// Empty array returned, so this is Issue 1.
+		if ( ! $existing_issues ) {
+			return 1;
+		}
+
+		$highest_num = (int) max( $existing_issues );
+		$new_issue_num = $highest_num + 1;
+
+		// Get the next number that is not taken.
+		while ( get_term_by( 'slug', "$new_issue_num", $tax_name ) ) {
+			$new_issue_num++;
+		}
+
+		return $new_issue_num;
+	}
+
+	/**
+	 * Retrieves a list of all unique meta values for a set meta key in Issues.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb The WordPress database class.
+	 *
+	 * @param string $key The meta key to retrieve values for.
+	 * @return array|false An array of meta values, or false if unsuccessful. If
+	 *                     there are no values, an empty array will be returned.
+	 */
+	public function get_issues_metadata_column( $key ) {
+		global $wpdb;
+
+		if ( empty( $key ) ) {
+			return false;
+		}
+
+		$sql = $wpdb->prepare( "
+			SELECT DISTINCT meta_value FROM {$wpdb->pp_termmeta}
+			WHERE meta_key = '$key'
+		", $key );
+		$values = $wpdb->get_col( $sql );
+
+		return $values;
 	}
 
 	/**

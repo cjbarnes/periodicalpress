@@ -42,6 +42,15 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	protected $tax;
 
 	/**
+	 * The URL of this list table page.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 * @var object $url
+	 */
+	protected $url;
+
+	/**
 	 * Constructor.
 	 *
 	 * Calls the parent class's constructor with arguments specific to this
@@ -50,8 +59,13 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * @since 1.0.0
 	 *
 	 * @see PeriodicalPress_List_Table::__construct()
+	 *
+	 * @param string $url The URL of this list table page, for use in action
+	 *                    links.
 	 */
-	public function __construct() {
+	public function __construct( $url ) {
+
+		$this->url = admin_url( $url );
 
 		// Get the main plugin class and taxonomy
 		$this->plugin = PeriodicalPress::get_instance();
@@ -280,7 +294,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	public function column_name( $item ) {
 
 		$domain = $this->plugin->get_plugin_name();
-		$the_url = admin_url( 'admin.php?page=pp_edit_issues' );
 
 		$name = $item['name'];
 		$term_id = +$item['ssid'];
@@ -303,9 +316,25 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			$actions['edit'] = "<a href='$edit_url'>$edit_label</a>";
 		}
 
+		/*
+		 * Toggle post status (publish/unpublish). Which link is shown depends
+		 * on the $item['status'].
+		 */
+		if ( current_user_can( $this->tax->cap->manage_terms ) ) {
+			if ( 'publish' === $item['status'] ) {
+				$action = 'unpublish';
+				$action_label = 'Unpublish';
+			} else {
+				$action = 'publish';
+				$action_label = 'Publish';
+			}
+			$action_url = wp_nonce_url( $this->url . "&amp;action=$action&amp;tag_id=$term_id&amp;$action-tag_$term_id", "$action-tag_$term_id" );
+			$actions[ $action ] = "<a class='$action-tag' href='$action_url'>$action_label</a>";
+		}
+
 		// Delete action link
 		if ( current_user_can( $this->tax->cap->delete_terms ) ) {
-			$delete_url = wp_nonce_url( $the_url . "&amp;action=delete&amp;tag_id=$term_id&amp;delete-tag_$term_id", "delete-tag_$term_id" );
+			$delete_url = wp_nonce_url( $this->url . "&amp;action=delete&amp;tag_id=$term_id&amp;delete-tag_$term_id", "delete-tag_$term_id" );
 			$delete_label = _x( 'Delete', $domain );
 
 			$actions['delete'] = "<a class='delete-tag' href='$delete_url'>$delete_label</a>";
@@ -394,18 +423,22 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	public function column_status( $item ) {
 
 		$tax_name = $this->tax->name;
+		$term_id = +$item['ssid'];
 
 		/** This filter is documented in admin/class-periodicalpress-admin.php */
 		$statuses = apply_filters( "{$tax_name}_statuses", array() );
 
-		// Get the display name for this Issue's status.
-		$out = array_key_exists( $item['status'], $statuses )
-			? esc_html( $statuses[ $item['status'] ] )
-			: '';
+		// Check that a valid status has been passed in.
+		if ( ! array_key_exists( $item['status'], $statuses ) ) {
+			return '&mdash;';
+		}
 
+		$display_name = esc_html( $statuses[ $item['status'] ] );
 		$class = esc_attr( $item['status'] );
 
-		return "<strong class='issue-status issue-status-$class'>$out</strong>";
+		$out = "<strong class='issue-status issue-status-$class'>$display_name</strong>";
+
+		return $out;
 	}
 
 	/**
