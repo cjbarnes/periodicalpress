@@ -191,12 +191,7 @@ if ( isset( $_REQUEST['message'] )
 }
 ?>
 <div class="wrap nosubsub">
-	<h2>
-		<?php echo esc_html( $title ); ?>
-		<?php if ( ! empty( $_REQUEST['s'] ) ) : ?>
-			<span class="subtitle"><?php printf( __( 'Search results for &#8220;%s&#8221;' ), esc_html( wp_unslash( $_REQUEST['s'] ) ) ); ?></span>
-		<?php endif; ?>
-	</h2>
+	<h2><?php echo esc_html( $title ); ?></h2>
 	<?php if ( $message ) : ?>
 		<div id="message" class="updated">
 			<p><?php echo $message; ?></p>
@@ -232,9 +227,4 @@ if ( isset( $_REQUEST['message'] )
 	do_action( "after-{$tax_name}-table", $tax_name );
 	?>
 </div><!-- /wrap -->
-<?php if ( ! wp_is_mobile() ) : ?>
-	<script type="text/javascript">
-		try{document.forms.addtag['tag-name'].focus();}catch(e){}
-	</script>
-<?php endif; ?>
 <?php
