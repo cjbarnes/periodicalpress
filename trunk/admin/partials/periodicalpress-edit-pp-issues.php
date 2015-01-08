@@ -160,17 +160,18 @@ if ( ! current_user_can( $tax->cap->edit_terms ) ) {
 // The term-updated messages.
 $messages = array(
 	0  => '', // Unused. Messages start at index 1.
-	1  => __( 'Issue added.' ),
-	2  => __( 'Issue deleted.' ),
-	3  => __( 'Issue updated.' ),
-	4  => __( 'Issue not added.' ),
-	5  => __( 'Issue not updated.' ),
-	6  => __( 'Issues deleted.' ),
-	82 => __( 'Issue not deleted.' ), // Plugin messages start at index 81.
-	86 => __( 'Issue published.' ),
-	87 => __( 'Issue not published.' ),
-	88 => __( 'Issue unpublished.' ),
-	89 => __( 'Issue not unpublished.' )
+	1  => __( 'Issue added.', $domain ),
+	2  => __( 'Issue deleted.', $domain ),
+	3  => __( 'Issue updated.', $domain ),
+	4  => __( 'Issue not added.', $domain ),
+	5  => __( 'Issue not updated.', $domain ),
+	6  => __( 'Issues deleted.', $domain ),
+	82 => __( 'Issue not deleted.', $domain ), // Plugin messages start here.
+	86 => __( 'Issue published.', $domain ),
+	87 => __( 'Issue not published.', $domain ),
+	88 => __( 'Issue unpublished.', $domain ),
+	89 => __( 'Issue not unpublished.', $domain ),
+	90 => __( 'You attempted to edit an item that doesn&#8217;t exist. Perhaps it was deleted?', $domain ),
 );
 
 /**
