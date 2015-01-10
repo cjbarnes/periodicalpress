@@ -143,11 +143,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * Define which table columns should be hidden.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @return array Associative array ( name => label ) of table columns to
 	 *               hide.
 	 */
-	public function get_hidden_columns() {
+	protected function get_hidden_columns() {
 
 		/**
 		 * Filters the columns that are hidden (via CSS) in the list table.
@@ -170,11 +171,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * first load.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @return array Associative array ( name => array( name, order ) ) of
 	 *               table columns to allow sorting on.
 	 */
-	public function get_sortable_columns() {
+	protected function get_sortable_columns() {
 
 		/**
 		 * Filters the columns that are sortable and what their initial sort
@@ -197,20 +199,21 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * Get the table data.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @return array The complete table data as an array of arrays (each sub-
 	 *               array contains a single row, arranged as an associative
 	 *               array ( column-name => data ) ).
 	 */
-	private function table_data() {
+	protected function table_data() {
 
 		$data = array();
 
-		// Default sort order
+		// Default sort order.
 		$orderby = 'name';
 		$order = 'DESC';
 
-		// Get user-set sort column
+		// Get user-set sort column.
 		if ( ! empty( $_GET['orderby'] ) ) {
 
 			switch ( $_GET['orderby'] ) {
@@ -221,7 +224,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		}
 
-		// Get ascending or descending sort order
+		// Get ascending or descending sort order.
 		if ( ! empty( $_GET['order'] )
 		&& ( ( 'asc' === $_GET['order'] ) || ( 'desc' === $_GET['order'] ) ) ) {
 			$order = strtoupper( $_GET['order'] );
@@ -326,13 +329,14 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * Generates the default sort order of the Issues list table.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @param  object $obj1 Term object to compare.
 	 * @param  object $obj2 Term object to compare.
 	 * @return int The comparison result: -1 = greater than, 1 = lesser than,
 	 *             0 = equal to.
 	 */
-	private function descending_sort_term_names( $obj1, $obj2 ) {
+	protected function descending_sort_term_names( $obj1, $obj2 ) {
 
 		$str1 = isset( $obj1->name ) ? $obj1->name : '';
 		$str2 = isset( $obj2->name ) ? $obj2->name : '';
@@ -350,13 +354,14 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * `name` properties.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @param  object $obj1 Term object to compare.
 	 * @param  object $obj2 Term object to compare.
 	 * @return int The comparison result: -1 = greater than, 1 = lesser than,
 	 *             0 = equal to.
 	 */
-	private function ascending_sort_term_names( $obj1, $obj2 ) {
+	protected function ascending_sort_term_names( $obj1, $obj2 ) {
 
 		$str1 = isset( $obj1->name ) ? $obj1->name : '';
 		$str2 = isset( $obj2->name ) ? $obj2->name : '';
@@ -368,11 +373,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * Formats the data for cells in the Name column.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @param array $item The current row as an associative array.
 	 * @return string The output for this cell.
 	 */
-	public function column_name( $item ) {
+	protected function column_name( $item ) {
 
 		$domain = $this->plugin->get_plugin_name();
 
@@ -453,11 +459,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * Formats the data for cells in the Date column.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @param array $item The current row as an associative array.
 	 * @return string The output for this cell.
 	 */
-	public function column_date( $item ) {
+	protected function column_date( $item ) {
 
 		$date = DateTime::createFromFormat( 'Y-m-d', $item['date'] );
 
@@ -474,11 +481,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * Formats the data for cells in the Posts column.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @param array $item The current row as an associative array.
 	 * @return string The output for this cell.
 	 */
-	public function column_posts( $item ) {
+	protected function column_posts( $item ) {
 
 		$domain = $this->plugin->get_plugin_name();
 
@@ -498,11 +506,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * Formats the data for cells in the Status column.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @param array $item The current row as an associative array.
 	 * @return string The output for this cell.
 	 */
-	public function column_status( $item ) {
+	protected function column_status( $item ) {
 
 		$tax_name = $this->tax->name;
 		$term_id = +$item['ssid'];
@@ -530,12 +539,13 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
      * the column's data straight to output.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 *
 	 * @param array  $item        The current row as an associative array.
 	 * @param string $column_name The array key of the current column.
 	 * @return string The output for this cell.
 	 */
-	public function column_default( $item, $column_name ) {
+	protected function column_default( $item, $column_name ) {
 
 		if ( ! empty ( $item[ $column_name ] ) ) {
 			$out = esc_html( $item[ $column_name ] );
