@@ -228,8 +228,9 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		}
 
 		// Get pagination numbers
-		$page_size = 20;
+		$page_size = 5; // TODO CHANGE
 		$page_number = $this->get_pagenum();
+		$offset = ( $page_number - 1 ) * $page_size;
 
 
 		// Get the term object for each Issue to display.
@@ -237,13 +238,42 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			'hide_empty'   => 0,
 			'cache_domain' => 'periodicalpress',
 			'orderby'      => $orderby,
-			'order'        => $order,
-
-			// TODO: check pagination is working properly
-			'number'       => $page_size,
-			'offset'       => ( $page_number - 1 ) * $page_size
+			'order'        => $order
 		);
+
+		/*
+		 * Only paginate the Issues list using the get_terms() args list if we
+		 * don't need to use a 'natural' sort order. If we do need natural sort,
+		 * load the complete list of Issues from the DB.
+		 */
+		if ( 'name' !== $orderby ) {
+			$args = array_merge( $args, array(
+				'number'       => $page_size,
+				'offset'       => $offset
+			) );
+		}
+
 		$issues = get_terms( $this->tax->name, $args );
+		if ( is_wp_error( $issues ) ) {
+			return array();
+		}
+
+		/*
+		 * Sort Issues data if 'name' (the default) is the orderby choice.
+		 * Although get_terms() allows ordering by name, we need to order
+		 * manually so we can do a natural sort on Issue numbers - e.g.
+		 * 'Issue 10' > 'Issue 2'.
+		 */
+		if ( 'name' === $orderby ) {
+			if ( 'DESC' === $order ) {
+				usort( $issues, array( $this, 'descending_sort_term_names' ) );
+			} else {
+				usort( $issues, array( $this, 'ascending_sort_term_names' ) );
+			}
+		}
+
+		// Discard all Issue terms not needed for this pagination page.
+		$issues = array_slice( $issues, $offset, $page_size );
 
 		// Add each term as a new row.
 		foreach ( $issues as $n => $issue ) {
@@ -281,6 +311,52 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Reversed natural sorting function for terms.
+	 *
+	 * The opposite of {@see ascending_sort_term_names}.
+	 *
+	 * Generates the default sort order of the Issues list table.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param  object $obj1 Term object to compare.
+	 * @param  object $obj2 Term object to compare.
+	 * @return int The comparison result: -1 = greater than, 1 = lesser than,
+	 *             0 = equal to.
+	 */
+	private function descending_sort_term_names( $obj1, $obj2 ) {
+
+		$str1 = isset( $obj1->name ) ? $obj1->name : '';
+		$str2 = isset( $obj2->name ) ? $obj2->name : '';
+
+		return strnatcasecmp( $str2, $str1 );
+	}
+
+	/**
+	 * Natural sorting function for terms.
+	 *
+	 * Basically an array-of-objects extension of PHP's strnatcasecmp()
+	 * {@link http://php.net/manual/en/function.strnatcasecmp.php}. Called by
+	 * usort() to carry out an ascending order 'natural sort' - e.g.
+	 * "Issue 10" > "Issue 2" - of an array of taxonomy terms based on their
+	 * `name` properties.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param  object $obj1 Term object to compare.
+	 * @param  object $obj2 Term object to compare.
+	 * @return int The comparison result: -1 = greater than, 1 = lesser than,
+	 *             0 = equal to.
+	 */
+	private function ascending_sort_term_names( $obj1, $obj2 ) {
+
+		$str1 = isset( $obj1->name ) ? $obj1->name : '';
+		$str2 = isset( $obj2->name ) ? $obj2->name : '';
+
+		return strnatcasecmp( $str1, $str2 );
 	}
 
 	/**
