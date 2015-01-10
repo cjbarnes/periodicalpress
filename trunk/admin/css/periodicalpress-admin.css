@@ -9,6 +9,17 @@
  * Styles for WP_List_Table and PeriodicalPress_List_Table output.
  */
 
+/* Issue row borders */
+.issues tr td:first-child {
+	border-left: 4px solid #fff;
+}
+.issues tr.alternate td:first-child {
+	border-left-color: #f9f9f9;
+}
+.issues tr.issue-current td:first-child {
+	border-left-color: #555;
+}
+
 /* Column widths */
 .issues .column-date,
 .issues .column-status {
@@ -32,4 +43,7 @@
 }
 .issue-status-trash {
 	color: #a00;
+}
+.issue-status-current-issue {
+	/* color: #7ad03a; */
 }

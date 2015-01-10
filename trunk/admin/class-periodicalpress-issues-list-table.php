@@ -124,7 +124,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 * @param array $columns Associative array of column names and labels.
 		 */
 		$columns = apply_filters( "manage_{$this->tax->name}_columns", array(
-			'id'          => 'ID',
 			'name'        => esc_html_x( 'Name', $context, $domain ),
 			'date'        => esc_html_x( 'Date', $context, $domain ),
 			'number'      => esc_html_x( 'Number', $context, $domain ),
@@ -158,7 +157,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 * @param array $hidden_columns Array of column names.
 		 */
 		$hidden_columns = apply_filters( "manage_{$this->tax->name}_hidden_columns", array(
-			'id',
+			'number',
 			'slug',
 			'ssid'
 		) );
@@ -283,6 +282,9 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		// Discard all Issue terms not needed for this pagination page.
 		$issues = array_slice( $issues, $offset, $page_size );
 
+		// Get the current issue from the database.
+		$current_issue = (int) get_option( 'pp_current_issue', 0 );
+
 		// Add each term as a new row.
 		foreach ( $issues as $n => $issue ) {
 
@@ -303,17 +305,20 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				? $meta['pp_issue_status'][0]
 				: '';
 
+			// Prep current issue boolean.
+			$current = ( (int) $issue->term_id === $current_issue );
+
 			$data[] = array(
-				'id'          => $n,
-				'number'      => $number,
-				'name'        => $issue->name,
-				'date'        => $date,
-				'title'       => $title,
-				'description' => $issue->description,
-				'slug'        => $issue->slug,
-				'posts'       => $issue->count,
-				'status'      => $status,
-				'ssid'        => $issue->term_id
+				'number'        => $number,
+				'name'          => $issue->name,
+				'date'          => $date,
+				'title'         => $title,
+				'description'   => $issue->description,
+				'slug'          => $issue->slug,
+				'posts'         => $issue->count,
+				'status'        => $status,
+				'ssid'          => $issue->term_id,
+				'current_issue' => $current
 			);
 
 		}
@@ -368,6 +373,46 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		return strnatcasecmp( $str1, $str2 );
 	}
+
+	/**
+	 * Generates content for a single row of the table.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param object $item The current item.
+	 */
+	public function single_row( $item ) {
+
+		// Get the alternate-rows class.
+		static $row_class = '';
+		$row_class = ( $row_class == '' ? 'alternate' : '' );
+
+		$classes = array();
+		if ( $row_class ) {
+			$classes[] = $row_class;
+		}
+
+		// Hook for styling the Current Issue's row.
+		if ( ! empty( $item['current_issue'] ) ) {
+			$classes[] = 'issue-current';
+		}
+
+		/**
+		 * Filter for classes to be applied to each Issues list table row.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $classes The classnames to apply to the tr element.
+		 * @param array $item    All data for this row.
+		 */
+		$classes = apply_filters( "{$this->tax->name}_row_classes", $classes, $item );
+
+		echo '<tr class="' . implode( ' ', $classes ) . '"">';
+		$this->single_row_columns( $item );
+		echo '</tr>';
+
+	}
+
 
 	/**
 	 * Formats the data for cells in the Name column.
@@ -449,7 +494,14 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		} else {
 			$out .= esc_html( $name );
 		}
+
+		// Flag the current issue.
+		if ( ! empty( $item['current_issue'] ) ) {
+			$current_label = _x( 'Current', $domain );
+			$out .= " <span class='issue-status-current-issue post-state'>- $current_label</span>";
+		}
 		$out .= '</strong>';
+
 		$out .= $row_actions;
 
 		return $out;
@@ -512,6 +564,9 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * @return string The output for this cell.
 	 */
 	protected function column_status( $item ) {
+
+		$domain = $this->plugin->get_plugin_name();
+		$context = 'Issues Table';
 
 		$tax_name = $this->tax->name;
 		$term_id = +$item['ssid'];
