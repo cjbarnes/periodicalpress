@@ -258,6 +258,11 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			return array();
 		}
 
+		$this->set_pagination_args( array(
+			'total_items' => count( $issues ),
+			'per_page' => $page_size
+		) );
+
 		/*
 		 * Sort Issues data if 'name' (the default) is the orderby choice.
 		 * Although get_terms() allows ordering by name, we need to order
