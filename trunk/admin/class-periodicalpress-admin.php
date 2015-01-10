@@ -735,7 +735,7 @@ class PeriodicalPress_Admin {
 		}
 
 		// Cache new highest issue number for later.
-		set_transient( $transient, $new_issue_num, DAY_IN_SECONDS );
+		set_transient( $transient, $new_issue_num, 2 * HOUR_IN_SECONDS );
 
 		return $new_issue_num;
 	}
