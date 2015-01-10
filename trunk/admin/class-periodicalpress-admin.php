@@ -527,6 +527,9 @@ class PeriodicalPress_Admin {
 		// Returns boolean for success/failure or WP_Error on error.
 		$result = wp_delete_term( $term_id, $tax_name );
 
+		// Delete the cached highest issue number.
+		delete_transient( 'periodicalpress_highest_issue_num' );
+
 		/*
 		 * Only proceed to delete metadata if the term it attaches to was first
 		 * deleted successfully.
