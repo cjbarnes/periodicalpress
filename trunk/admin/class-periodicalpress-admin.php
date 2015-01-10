@@ -176,46 +176,40 @@ class PeriodicalPress_Admin {
 		$tax_labels = $tax->labels;
 
 		/*
-		 * Main Issues menu, containing the Issues taxonomy page and some
-		 * plugin settings.
+		 * Main Issues menu, containing the Issues list table.
 		 */
 		add_menu_page(
 			$tax->labels->name,
 			$tax->labels->menu_name,
 			$tax->cap->edit_terms, // user capability required to show this menu
-			'pp_issues_home',
-			array( $this, 'issues_home_screen' ),
+			'pp_edit_issues',
+			array( $this, 'edit_issues_screen' ),
 			'dashicons-pressthis',
 			'4.44' // position in the menu (Posts is 5)
 		);
 
 		// Issues submenu: repeat of top-level menu page.
 		add_submenu_page(
-			'pp_issues_home',
-			__( 'Issues Home', $domain ),
-			__( 'Issues Home', $domain ),
-			$tax->cap->edit_terms,
-			'pp_issues_home'
-		);
-
-		// Issues submenu: Add and edit the Issues taxonomy.
-		add_submenu_page(
-			'pp_issues_home',
-			$tax->labels->name,
-			$tax->labels->all_items,
-			$tax->cap->edit_terms,
-			"edit-tags.php?taxonomy={$tax->name}"
-		);
-
-		// Issues submenu: Add and edit the Issues taxonomy.
-		add_submenu_page(
-			'pp_issues_home',
-			$tax->labels->name,
-			$tax->labels->all_items,
-			$tax->cap->edit_terms,
 			'pp_edit_issues',
-			array( $this, 'edit_issues_screen' )
+			$tax->labels->name,
+			$tax->labels->all_items,
+			$tax->cap->edit_terms,
+			'pp_edit_issues'
 		);
+
+		/*
+		 * Issues submenu: Add and edit the Issues taxonomy - old version for
+		 * debugging purposes.
+		 */
+		if ( WP_DEBUG ) {
+			add_submenu_page(
+				'pp_edit_issues',
+				$tax->labels->name,
+				sprintf( _x( '%s (debugging)', 'Admin menu', $domain ), $tax->labels->all_items ),
+				$tax->cap->edit_terms,
+				"edit-tags.php?taxonomy={$tax->name}"
+			);
+		}
 
 	}
 
