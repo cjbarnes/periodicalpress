@@ -227,8 +227,8 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			$order = strtoupper( $_GET['order'] );
 		}
 
-		// Get pagination numbers
-		$page_size = 5; // TODO CHANGE
+		// Get Issues-per-page setting.
+		$page_size = $this->get_items_per_page( 'edit_pp_issue_per_page' );
 		$page_number = $this->get_pagenum();
 		$offset = ( $page_number - 1 ) * $page_size;
 

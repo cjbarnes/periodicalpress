@@ -207,7 +207,7 @@ class PeriodicalPress_Admin {
 			"edit-tags.php?taxonomy={$tax->name}"
 		);
 
-		// Issues submenu: Add and edit the Issues taxonomy. (TEST).
+		// Issues submenu: Add and edit the Issues taxonomy.
 		add_submenu_page(
 			'pp_issues_home',
 			$tax->labels->name,
@@ -282,7 +282,7 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
-	 * Display the Edit Issues admin page. (TEST).
+	 * Display the Edit Issues admin page.
 	 *
 	 * @since 1.0.0
 	 */
@@ -293,6 +293,23 @@ class PeriodicalPress_Admin {
 		 */
 		$path = $this->plugin->get_partials_path( 'admin' );
 		require $path . 'periodicalpress-edit-pp-issues.php';
+
+	}
+
+	/**
+	 * Registers the Screen Options for the Edit Issues admin page.
+	 *
+	 * @since 1.0.0
+	 */
+	public function edit_issues_screen_options() {
+
+		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
+
+		add_screen_option( 'per_page', array(
+			'label' => $tax->labels->name,
+			'default' => 20,
+			'option' => 'edit_' . $tax->name . '_per_page'
+		) );
 
 	}
 
