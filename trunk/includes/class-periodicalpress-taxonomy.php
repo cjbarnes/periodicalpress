@@ -118,19 +118,60 @@ class PeriodicalPress_Taxonomy {
 			'assign_terms' => 'assign_pp_issue',
 		);
 		$args = array(
-			'labels'            => $labels,
-			'hierarchical'      => true,
-			'public'            => true,
-			'show_ui'           => true,
-			'show_admin_column' => true,
-			'show_in_nav_menus' => true,
-			'show_tagcloud'     => false,
-			'query_var'         => 'issue',
-			'rewrite'           => $rewrite,
-			'capabilities'      => $capabilities,
+			'labels'                => $labels,
+			'hierarchical'          => true,
+			'public'                => true,
+			'show_ui'               => true,
+			'show_admin_column'     => true,
+			'show_in_nav_menus'     => true,
+			'show_tagcloud'         => false,
+			'query_var'             => 'issue',
+			'rewrite'               => $rewrite,
+			'capabilities'          => $capabilities,
+			'update_count_callback' => array( self::get_instance(), 'update_issue_post_count' )
 		);
 		register_taxonomy( $tax_name, array( 'post' ), $args );
 
+	}
+
+	/**
+	 * Callback for updating Issues' post counts in the DB.
+	 *
+	 * A modified version of Core {@see _update_generic_term_count()}. The
+	 * original's main query has been extended to restrict counted post statuses
+	 * to 'publish', 'pending', and 'future' only. Borrows from
+	 * {@see _update_post_term_count()}.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb The WordPress database class.
+	 *
+	 * @param int|array $terms    The IDs of the Issues being updated.
+	 * @param string    $taxonomy The Issues taxonomy name.
+	 */
+	public function update_issue_post_count( $terms, $taxonomy ) {
+		global $wpdb;
+
+		foreach ( (array) $terms as $term ) {
+
+			$sql = $wpdb->prepare( "
+				SELECT COUNT(*)
+				FROM {$wpdb->term_relationships}, {$wpdb->posts} p1
+				WHERE p1.ID = {$wpdb->term_relationships}.object_id
+				AND post_status IN ('publish','pending','future')
+				AND term_taxonomy_id = %d
+			", $term );
+			$count = (int) $wpdb->get_var( $sql );
+
+			/** This action is documented in wp-includes/taxonomy.php */
+			do_action( 'edit_term_taxonomy', $term, $taxonomy );
+
+			$wpdb->update( $wpdb->term_taxonomy, compact( 'count' ), array( 'term_taxonomy_id' => $term ) );
+
+			/** This action is documented in wp-includes/taxonomy.php */
+			do_action( 'edited_term_taxonomy', $term, $taxonomy );
+
+		}
 	}
 
 }
