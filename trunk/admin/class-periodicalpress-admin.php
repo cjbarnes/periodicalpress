@@ -721,11 +721,8 @@ class PeriodicalPress_Admin {
 			wp_update_post( $new_post_data );
 		}
 
-
-		/*
-		 * TODO check/change the current issue.
-		 */
-
+		// Set this as the current issue.
+		update_option( 'pp_current_issue', $term_id );
 
 		/**
 		 * Action for whenever an Issue status changes.
@@ -743,106 +740,6 @@ class PeriodicalPress_Admin {
 		} else {
 			$result = false;
 		}
-		return $result;
-	}
-
-	/**
-	 * Set a published Issue as a draft.
-	 *
-	 * Hides the Issue and its posts from the public website. Includes setting
-	 * the Issue's status, slug, number, and name, and unpublishing all
-	 * associated Posts as well.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param int|object $term Either the Issue's term ID or its term object.
-	 * @return bool|WP_Error Success/failure of publish, or error object.
-	 */
-	public function unpublish_issue( $term ) {
-
-		if ( empty( $term ) ) {
-			return false;
-		}
-
-		$domain = $this->plugin->get_plugin_name();
-		$tax_name = $this->plugin->get_taxonomy_name();
-
-		/*
-		 * Check this ID matches an existing Issue. If a term slug or object was
-		 * passed in (instead of an integer term_id), get the term_id.
-		 */
-		$term_object = get_term( $term, $tax_name );
-
-		// Return FALSE if Issue doesn't exist, WP_Error if error.
-		if ( is_null( $term_object ) || is_wp_error( $term_object ) ) {
-			if ( is_null( $term_object ) ) {
-				$term_object = false;
-			}
-			return $term_object;
-		}
-
-		$term_id = $term_object->term_id;
-
-		// End here if the issue is unpublished already.
-		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status", true );
-		write_log( $old_status );
-
-		if ( 'publish' !== $old_status ) {
-			return true;
-		}
-
-		// Metadata changes.
-		$result = update_metadata( 'pp_term', $term_id, "{$tax_name}_status", 'draft' );
-
-		// Get the already published posts attached to this Issue.
-		$term_posts = $this->get_issue_posts( $term_id, 'publish' );
-
-		// Send them back to Pending.
-		foreach ( $term_posts as $post ) {
-			$new_post_data = array(
-				'ID'          => $post->ID,
-				'post_status' => 'pending'
-			);
-			wp_update_post( $new_post_data );
-		}
-
-
-		/*
-		 * TODO check/change the current issue.
-		 */
-
-
-		$created = time();
-
-		// Create a unique slug for this draft Issue.
-		$slug = sprintf( 'draft-%s', date( 'Y-m-d', $created ) );
-		$new_slug = $slug;
-		$copy = 1;
-		while ( get_term_by( 'slug', $new_slug, $tax_name ) ) {
-			$new_slug = $slug . '_' . ++$copy;
-			write_log( $new_slug );
-		}
-
-		// Create a unique name.
-		$name = sprintf( __( 'New Issue (unpublished&nbsp;%s)', $domain ), date( 'Y/m/d', $created ) );
-		if ( $copy > 1 ) {
-			$name .= ' (' . $copy . ')';
-		}
-
-		// Make the DB changes.
-		$term_updates = array(
-			'name' => $name,
-			'slug' => $new_slug
-		);
-		wp_update_term( $term_id, $tax_name, $term_updates );
-		delete_metadata( 'pp_term', $term_id, "{$tax_name}_number" );
-
-		/** This action is documented in admin/class-periodicalpress-admin.php */
-		do_action( 'periodicalpress_transition_issue_status', 'draft', $old_status, $term_id );
-
-		// Delete the cached highest issue number.
-		delete_transient( 'periodicalpress_highest_issue_num' );
-
 		return $result;
 	}
 
@@ -920,11 +817,161 @@ class PeriodicalPress_Admin {
 
 		$sql = $wpdb->prepare( "
 			SELECT DISTINCT meta_value FROM {$wpdb->pp_termmeta}
-			WHERE meta_key = '$key'
+			WHERE meta_key = '%s'
 		", $key );
 		$values = $wpdb->get_col( $sql );
 
 		return $values;
+	}
+
+	/**
+	 * Set a published Issue as a draft.
+	 *
+	 * Hides the Issue and its posts from the public website. Includes setting
+	 * the Issue's status, slug, number, and name, and unpublishing all
+	 * associated Posts as well.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int|object $term Either the Issue's term ID or its term object.
+	 * @return bool|WP_Error Success/failure of publish, or error object.
+	 */
+	public function unpublish_issue( $term ) {
+
+		if ( empty( $term ) ) {
+			return false;
+		}
+
+		$domain = $this->plugin->get_plugin_name();
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		/*
+		 * Check this ID matches an existing Issue. If a term slug or object was
+		 * passed in (instead of an integer term_id), get the term_id.
+		 */
+		$term_object = get_term( $term, $tax_name );
+
+		// Return FALSE if Issue doesn't exist, WP_Error if error.
+		if ( is_null( $term_object ) || is_wp_error( $term_object ) ) {
+			if ( is_null( $term_object ) ) {
+				$term_object = false;
+			}
+			return $term_object;
+		}
+
+		$term_id = $term_object->term_id;
+
+		// End here if the issue is unpublished already.
+		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status", true );
+
+		if ( 'publish' !== $old_status ) {
+			return true;
+		}
+
+		// Metadata changes.
+		$result = update_metadata( 'pp_term', $term_id, "{$tax_name}_status", 'draft' );
+
+		// Get the already published posts attached to this Issue.
+		$term_posts = $this->get_issue_posts( $term_id, 'publish' );
+
+		// Send them back to Pending.
+		foreach ( $term_posts as $post ) {
+			$new_post_data = array(
+				'ID'          => $post->ID,
+				'post_status' => 'pending'
+			);
+			wp_update_post( $new_post_data );
+		}
+
+		// If this is the current issue, change it to the most recent issue.
+		if ( (int) get_option( 'pp_current_issue' ) === $term_id ) {
+
+			$new_current_issue = $this->get_newest_issue( array( $term_id ) );
+
+			if ( is_object( $new_current_issue )
+			&& ! empty( $new_current_issue->term_id ) ) {
+				update_option( 'pp_current_issue', $new_current_issue->term_id );
+			} else {
+				delete_option( 'pp_current_issue' );
+			}
+
+		}
+
+		$created = time();
+
+		// Create a unique slug for this draft Issue.
+		$slug = sprintf( 'draft-%s', date( 'Y-m-d', $created ) );
+		$new_slug = $slug;
+		$copy = 1;
+		while ( get_term_by( 'slug', $new_slug, $tax_name ) ) {
+			$new_slug = $slug . '_' . ++$copy;
+			$new_slug;
+		}
+
+		// Create a unique name.
+		$name = sprintf( __( 'New Issue (unpublished&nbsp;%s)', $domain ), date( 'Y/m/d', $created ) );
+		if ( $copy > 1 ) {
+			$name .= ' (' . $copy . ')';
+		}
+
+		// Make the DB changes.
+		$term_updates = array(
+			'name' => $name,
+			'slug' => $new_slug
+		);
+		wp_update_term( $term_id, $tax_name, $term_updates );
+		delete_metadata( 'pp_term', $term_id, "{$tax_name}_number" );
+
+		/** This action is documented in admin/class-periodicalpress-admin.php */
+		do_action( 'periodicalpress_transition_issue_status', 'draft', $old_status, $term_id );
+
+		// Delete the cached highest issue number.
+		delete_transient( 'periodicalpress_highest_issue_num' );
+
+		return $result;
+	}
+
+	/**
+	 * Retrieves the newest (i.e. highest-numbered) published Issue.
+	 *
+	 * Used for setting a new Current Issue when the previous one is removed.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb The WordPress database class.
+	 *
+	 * @param array $excludes Term IDs that shouldn't count.
+	 * @return object The newest Issue's term object.
+	 */
+	public function get_newest_issue( $excludes ) {
+		global $wpdb;
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		// Escape the $excludes strings since we're not using wpdb::prepare().
+		$excludes = array_map( 'esc_sql', (array) $excludes );
+
+		// Query the DB for the term_id of the highest issue number.
+		$sql = "
+			SELECT m1.pp_term_id
+			FROM {$wpdb->pp_termmeta} m1, {$wpdb->pp_termmeta} m2
+			WHERE m1.meta_key = 'pp_issue_number'
+			AND m2.meta_key = 'pp_issue_status'
+			AND m1.pp_term_id = m2.pp_term_id
+		";
+		if ( ! empty( $excludes ) ) {
+			$sql .= "
+				AND m1.pp_term_id NOT IN ('" . implode( $excludes, "','" ) . "')
+			";
+		}
+		$sql .= '
+			ORDER BY LENGTH(m1.pp_term_id) DESC, m1.pp_term_id DESC
+			LIMIT 1
+		';
+		$term_id = $wpdb->get_var( $sql );
+
+		// Retrieve the term object and return.
+		return get_term( (int) $term_id, $tax_name );
 	}
 
 	/**
