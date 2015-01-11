@@ -554,19 +554,7 @@ class PeriodicalPress_Admin {
 			'future',
 			'private'
 		);
-		$args = array(
-			'posts_per_page' => -1,
-			'orderby'        => 'none',
-			'post_status'    => $post_statuses,
-			'tax_query'      => array(
-				array(
-					'taxonomy' => $tax_name,
-					'field'    => 'term_id',
-					'terms'    => $term_id
-				)
-			)
-		);
-		$term_posts = get_posts( $args );
+		$term_posts = $this->get_issue_posts( $term_id, $post_statuses );
 
 		/*
 		 * Update posts in this Issue. The Issue term is removed and the post is
@@ -613,6 +601,48 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
+	 * Retrieve an array of the posts objects associated with a single Issue.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @param int          $term_id The Issue term ID to get posts for.
+	 * @param array|string $status  Which post statuses to return.
+	 * @return array The post objects {@see WP_Post}.
+	 */
+	private function get_issue_posts( $term_id, $status ) {
+
+		// Sanitize and prep the post statuses passed in.
+		$allowed_statuses = get_post_stati();
+		if ( is_array( $status ) ) {
+			$statuses = array_intersect( $status, $allowed_statuses );
+		} else {
+			if ( in_array( $status, $allowed_statuses ) ) {
+				$statuses = $status;
+			}
+		}
+
+		if ( empty( $statuses ) ) {
+			return false;
+		}
+
+		// Get the post objects.
+		$args = array(
+			'posts_per_page' => -1,
+			'orderby'        => 'none',
+			'post_status'    => $statuses,
+			'tax_query'      => array(
+				array(
+					'taxonomy' => $this->plugin->get_taxonomy_name(),
+					'field'    => 'term_id',
+					'terms'    => (int) $term_id
+				)
+			)
+		);
+		return get_posts( $args );
+	}
+
+	/**
 	 * Publish a draft Issue.
 	 *
 	 * Includes setting the Issue's status, slug, number, name, and date (if
@@ -649,13 +679,13 @@ class PeriodicalPress_Admin {
 		$term_id = $term_object->term_id;
 
 		// End here if the issue is published already.
-		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status" );
+		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status", true );
 		if ( 'publish' === $old_status ) {
 			return true;
 		}
 
 		// Get a free issue number if there isn't one yet.
-		$issue_num = get_metadata( 'pp_term', $term_id, "{$tax_name}_number" );
+		$issue_num = get_metadata( 'pp_term', $term_id, "{$tax_name}_number", true );
 		if ( ! is_int( $issue_num ) ) {
 			$issue_num = $this->create_issue_number();
 		}
@@ -675,10 +705,27 @@ class PeriodicalPress_Admin {
 		// Metadata changes.
 		$results[] = update_metadata( 'pp_term', $term_id, "{$tax_name}_number", $issue_num );
 
+		// Get the ready-to-publish posts attached to this Issue.
+		$post_statuses = array(
+			'pending',
+			'future'
+		);
+		$term_posts = $this->get_issue_posts( $term_id, $post_statuses );
+
+		// Publish the waiting Issues.
+		foreach ( $term_posts as $post ) {
+			$new_post_data = array(
+				'ID'          => $post->ID,
+				'post_status' => 'publish'
+			);
+			wp_update_post( $new_post_data );
+		}
+
 
 		/*
-		 * TODO post changes.
+		 * TODO check/change the current issue.
 		 */
+
 
 		/**
 		 * Action for whenever an Issue status changes.
@@ -737,7 +784,9 @@ class PeriodicalPress_Admin {
 		$term_id = $term_object->term_id;
 
 		// End here if the issue is unpublished already.
-		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status" );
+		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status", true );
+		write_log( $old_status );
+
 		if ( 'publish' !== $old_status ) {
 			return true;
 		}
@@ -745,9 +794,21 @@ class PeriodicalPress_Admin {
 		// Metadata changes.
 		$result = update_metadata( 'pp_term', $term_id, "{$tax_name}_status", 'draft' );
 
+		// Get the already published posts attached to this Issue.
+		$term_posts = $this->get_issue_posts( $term_id, 'publish' );
+
+		// Send them back to Pending.
+		foreach ( $term_posts as $post ) {
+			$new_post_data = array(
+				'ID'          => $post->ID,
+				'post_status' => 'pending'
+			);
+			wp_update_post( $new_post_data );
+		}
+
 
 		/*
-		 * TODO post changes.
+		 * TODO check/change the current issue.
 		 */
 
 
@@ -763,7 +824,7 @@ class PeriodicalPress_Admin {
 		}
 
 		// Create a unique name.
-		$name = sprintf( __( 'Unpublished Issue (created&nbsp;%s)', $domain ), date( 'Y/m/d', $created ) );
+		$name = sprintf( __( 'New Issue (unpublished&nbsp;%s)', $domain ), date( 'Y/m/d', $created ) );
 		if ( $copy > 1 ) {
 			$name .= ' (' . $copy . ')';
 		}
