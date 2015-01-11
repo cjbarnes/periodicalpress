@@ -572,7 +572,7 @@ class PeriodicalPress_Admin {
 		 *                            deleted.
 		 * @param object $term_object The complete term object for the Issue.
 		 */
-		do_action( 'periodicalpress_delete_post', $term_id, $term_object );
+		do_action( 'periodicalpress_delete_issue', $term_id, $term_object );
 
 		return $result;
 	}
