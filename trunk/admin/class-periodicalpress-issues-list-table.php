@@ -466,9 +466,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 				$action = 'publish';
 				$action_label = 'Publish';
 			}
-			$action_url = wp_nonce_url( $this->url . "&amp;action=$action&amp;tag_id=$term_id&amp;$action-tag_$term_id", "$action-tag_$term_id" );
 
-			$actions[ $action ] = "<a class='$action-tag' href='$action_url'>$action_label</a>";
+			// Don't show Publish link if there are no posts.
+			if ( ( 'unpublish' === $action ) || ( 0 < (int) $item['posts'] ) ) {
+				$action_url = wp_nonce_url( $this->url . "&amp;action=$action&amp;tag_id=$term_id&amp;$action-tag_$term_id", "$action-tag_$term_id" );
+				$actions[ $action ] = "<a class='$action-tag' href='$action_url'>$action_label</a>";
+			}
 		}
 
 		// Delete action link
