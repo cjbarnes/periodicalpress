@@ -376,6 +376,40 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
+	 * Make sure a given Issue is not the Current Issue.
+	 *
+	 * Used when deleting or unpublishing Issues, to check that the Issue to be
+	 * removed is not the Current Issue. If it is, the Current Issue is
+	 * automatically set to the next best issue.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $excluded_id The Issue term_id that should not be the Current
+	 *                         Issue.
+	 * @return bool Result.
+	 */
+	public function set_not_current_issue( $excluded_id = 0 ) {
+
+		$excluded_id = (int) $excluded_id;
+
+		// Check whether the Issue passed in is the Current Issue.
+		if ( (int) get_option( 'pp_current_issue' ) === $excluded_id ) {
+
+			$new_current_issue = $this->get_newest_issue( array( $excluded_id ) );
+
+			if ( is_object( $new_current_issue )
+			&& ! empty( $new_current_issue->term_id ) ) {
+				update_option( 'pp_current_issue', $new_current_issue->term_id );
+			} else {
+				delete_option( 'pp_current_issue' );
+			}
+
+		}
+
+		return true;
+	}
+
+	/**
 	 * Outputs form fields on the Add Issue pages for metadata items.
 	 *
 	 * @since 1.0.0
@@ -545,6 +579,12 @@ class PeriodicalPress_Admin {
 		 * @param object $term_object The complete term object for the Issue.
 		 */
 		do_action( 'periodicalpress_before_delete_issue', $term_id, $term_object );
+
+		/*
+		 * If this is the current issue, change the current issue to the most
+		 * recent issue.
+		 */
+		$this->set_not_current_issue( $term_id );
 
 		// Get the posts attached to this Issue.
 		$post_statuses = array(
@@ -884,19 +924,11 @@ class PeriodicalPress_Admin {
 			wp_update_post( $new_post_data );
 		}
 
-		// If this is the current issue, change it to the most recent issue.
-		if ( (int) get_option( 'pp_current_issue' ) === $term_id ) {
-
-			$new_current_issue = $this->get_newest_issue( array( $term_id ) );
-
-			if ( is_object( $new_current_issue )
-			&& ! empty( $new_current_issue->term_id ) ) {
-				update_option( 'pp_current_issue', $new_current_issue->term_id );
-			} else {
-				delete_option( 'pp_current_issue' );
-			}
-
-		}
+		/*
+		 * If this is the current issue, change the current issue to the most
+		 * recent issue.
+		 */
+		$this->set_not_current_issue( $term_id );
 
 		$created = time();
 
@@ -981,25 +1013,36 @@ class PeriodicalPress_Admin {
 			 */
 			$excludes = array_map( 'esc_sql', (array) $excludes );
 
-			// Query the DB for the term_id of the highest issue number.
+			// Get the Current Issue for use in the query.
+			$current_issue = (int) get_option( 'pp_current_issue' , 0 );
+
+			// Assemble query for the term_ids of all published issues.
 			$sql = "
 				SELECT m1.pp_term_id
 				FROM {$wpdb->pp_termmeta} m1, {$wpdb->pp_termmeta} m2
 				WHERE m1.meta_key = 'pp_issue_number'
 				AND m2.meta_key = 'pp_issue_status'
 				AND m1.pp_term_id = m2.pp_term_id
+				AND m2.meta_value = 'publish'
 			";
+
+			// Which Issues to leave out of the results.
 			if ( ! empty( $excludes ) ) {
 				$sql .= "
 					AND m1.pp_term_id NOT IN ('" . implode( $excludes, "','" ) . "')
 				";
 			}
-			$sql .= '
-				ORDER BY LENGTH(m1.pp_term_id) DESC, m1.pp_term_id DESC
-			';
-			$term_id_strings = $wpdb->get_col( $sql );
 
-			// Cast the IDs to integers.
+			// Ordering. Current Issue comes first.
+			$sql_current_issue = ( $current_issue )
+				? " (m1.pp_term_id = $current_issue) DESC,"
+				: '';
+			$sql .= "
+				ORDER BY$sql_current_issue LENGTH(m1.meta_value) DESC, m1.meta_value DESC
+			";
+
+			// Run the query and cast results to integers.
+			$term_id_strings = $wpdb->get_col( $sql );
 			$term_ids = array_map( 'intval', $term_id_strings );
 
 			// Cache this result for later.
