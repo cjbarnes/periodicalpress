@@ -388,8 +388,14 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		$row_class = ( $row_class == '' ? 'alternate' : '' );
 
 		$classes = array();
+
 		if ( $row_class ) {
 			$classes[] = $row_class;
+		}
+
+		// Hook for styling different Issue statuses.
+		if ( ! empty( $item['status'] ) ) {
+			$classes[] = 'issue-' . esc_attr( $item['status'] );
 		}
 
 		// Hook for styling the Current Issue's row.
