@@ -615,7 +615,7 @@ class PeriodicalPress_Admin {
 
 		// End here if the issue is published already.
 		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status" );
-		if ( 'publish' === $old_status ) ) {
+		if ( 'publish' === $old_status ) {
 			return true;
 		}
 
@@ -703,7 +703,7 @@ class PeriodicalPress_Admin {
 
 		// End here if the issue is unpublished already.
 		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status" );
-		if ( 'publish' !== $old_status ) ) {
+		if ( 'publish' !== $old_status ) {
 			return true;
 		}
 
@@ -801,7 +801,7 @@ class PeriodicalPress_Admin {
 		 *
 		 * @param int $new_issue_num The Issue number that was created.
 		 */
-		return apply_filters( 'periodicalpress-new-issue-number' $new_issue_num );
+		return apply_filters( 'periodicalpress-new-issue-number', $new_issue_num );
 	}
 
 	/**
