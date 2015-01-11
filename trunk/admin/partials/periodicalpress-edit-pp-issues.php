@@ -109,11 +109,12 @@ switch ( $list_table->current_action() ) {
 
 		/*
 		 * Actually change the Issue in the database using the appropriate
-		 * method on {@see PeriodicalPress_Admin}, and add result message to the
-		 * URL query string.
+		 * method on {@see PeriodicalPress_Edit_Issues}, and add result message
+		 * to the URL query string.
 		 */
+		$plugin_edit_issues = PeriodicalPress_Edit_Issues::get_instance( $this->plugin );
 		$do_it = $action . '_issue';
-		$result = $this->$do_it( $term_id );
+		$result = $plugin_edit_issues->$do_it( $term_id );
 
 		// Determine which success/failure message should be displayed.
 		if ( ! is_wp_error( $result ) && $result ) {

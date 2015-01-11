@@ -283,6 +283,8 @@ class PeriodicalPress {
 		$plugin_common = PeriodicalPress_Common::get_instance( $this );
 		$plugin_taxonomy = PeriodicalPress_Taxonomy::get_instance( $this );
 
+		$tax_name = $this->taxonomy_name;
+
 		/*
 		 * Setup custom taxonomies, including the main pp_issue taxonomy
 		 */
@@ -302,6 +304,17 @@ class PeriodicalPress {
 			'register_metadata_table'
 		);
 
+		/*
+		 * Set allowed Issue publication statuses.
+		 */
+		$this->loader->add_filter(
+			"{$tax_name}_statuses",
+			$plugin_common,
+			'set_issue_statuses_list',
+			1,
+			1
+		);
+
 	}
 
 	/**
@@ -314,8 +327,7 @@ class PeriodicalPress {
 	private function define_admin_hooks() {
 
 		$plugin_admin = PeriodicalPress_Admin::get_instance( $this );
-
-		$tax_name = $this->taxonomy_name;
+		$plugin_post_metabox = new PeriodicalPress_Post_Metabox( $this );
 
 		/*
 		 * Admin CSS and JavaScript.
@@ -346,14 +358,13 @@ class PeriodicalPress {
 		);
 
 		/*
-		 * Set allowed Issue publication statuses.
+		 * Create hooks to set up screen options and help tabs for menus and
+		 * submenus.
 		 */
-		$this->loader->add_filter(
-			"{$tax_name}_statuses",
+		$this->loader->add_action(
+			"load-toplevel_page_pp_edit_issues",
 			$plugin_admin,
-			'set_issue_statuses_list',
-			1,
-			1
+			'edit_issues_screen_options'
 		);
 
 		/*
@@ -398,23 +409,13 @@ class PeriodicalPress {
 		 */
 		$this->loader->add_action(
 			'add_meta_boxes_post',
-			$plugin_admin,
+			$plugin_post_metabox,
 			'add_remove_metaboxes'
 		);
 		$this->loader->add_action(
 			'save_post',
-			$plugin_admin,
+			$plugin_post_metabox,
 			'save_issue_metabox'
-		);
-
-		/*
-		 * Create hooks to set up screen options and help tabs for menus and
-		 * submenus.
-		 */
-		$this->loader->add_action(
-			"load-toplevel_page_pp_edit_issues",
-			$plugin_admin,
-			'edit_issues_screen_options'
 		);
 
 	}
