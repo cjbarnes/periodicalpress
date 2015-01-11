@@ -535,6 +535,17 @@ class PeriodicalPress_Admin {
 
 		$term_id = $term_object->term_id;
 
+		/**
+		 * Hook for just before an Issue is deleted.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int    $term_id     The ID of the Issue taxonomy term to be
+		 *                            deleted.
+		 * @param object $term_object The complete term object for the Issue.
+		 */
+		do_action( 'periodicalpress_before_delete_issue', $term_id, $term_object );
+
 		// Returns boolean for success/failure or WP_Error on error.
 		$result = wp_delete_term( $term_id, $tax_name );
 
@@ -551,6 +562,17 @@ class PeriodicalPress_Admin {
 				delete_metadata( 'pp_term', $term_id, $meta_key );
 			}
 		}
+
+		/**
+		 * Hook for after an Issue is deleted.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int    $term_id     The ID of the Issue taxonomy term that was
+		 *                            deleted.
+		 * @param object $term_object The complete term object for the Issue.
+		 */
+		do_action( 'periodicalpress_delete_post', $term_id, $term_object );
 
 		return $result;
 	}
@@ -591,6 +613,12 @@ class PeriodicalPress_Admin {
 
 		$term_id = $term_object->term_id;
 
+		// End here if the issue is published already.
+		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status" );
+		if ( 'publish' === $old_status ) ) {
+			return true;
+		}
+
 		// Get a free issue number if there isn't one yet.
 		$issue_num = get_metadata( 'pp_term', $term_id, "{$tax_name}_number" );
 		if ( ! is_int( $issue_num ) ) {
@@ -617,6 +645,15 @@ class PeriodicalPress_Admin {
 		 * TODO post changes.
 		 */
 
+		/**
+		 * Action for whenever an Issue status changes.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $new_status The new Issue publication status.
+		 * @param string $old_status The previous Issue publication status.
+		 */
+		do_action( 'periodicalpress_transition_issue_status', 'publish', $old_status, $term_id );
 
 		// Only set status to Published if all other changes were successful.
 		if ( in_array( false, $results ) ) {
@@ -664,6 +701,12 @@ class PeriodicalPress_Admin {
 
 		$term_id = $term_object->term_id;
 
+		// End here if the issue is unpublished already.
+		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status" );
+		if ( 'publish' !== $old_status ) ) {
+			return true;
+		}
+
 		// Metadata changes.
 		$result = update_metadata( 'pp_term', $term_id, "{$tax_name}_status", 'draft' );
 
@@ -697,6 +740,9 @@ class PeriodicalPress_Admin {
 		);
 		wp_update_term( $term_id, $tax_name, $term_updates );
 		delete_metadata( 'pp_term', $term_id, "{$tax_name}_number" );
+
+		/** This action is documented in admin/class-periodicalpress-admin.php */
+		do_action( 'periodicalpress_transition_issue_status', 'draft', $old_status, $term_id );
 
 		// Delete the cached highest issue number.
 		delete_transient( 'periodicalpress_highest_issue_num' );
@@ -748,7 +794,14 @@ class PeriodicalPress_Admin {
 		// Cache new highest issue number for later.
 		set_transient( $transient, $new_issue_num, 2 * HOUR_IN_SECONDS );
 
-		return $new_issue_num;
+		/**
+		 * Filter for newly created Issue numbers.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int $new_issue_num The Issue number that was created.
+		 */
+		return apply_filters( 'periodicalpress-new-issue-number' $new_issue_num );
 	}
 
 	/**
