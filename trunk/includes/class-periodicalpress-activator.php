@@ -122,7 +122,7 @@ class PeriodicalPress_Activator {
 			`meta_key` varchar(255) DEFAULT NULL,
 			`meta_value` longtext,
 			PRIMARY KEY (`meta_id`),
-			KEY `term_id` (`term_id`),
+			KEY `pp_term_id` (`pp_term_id`),
 			KEY `meta_key` (`meta_key`)
 		) $charset_collate;";
 
