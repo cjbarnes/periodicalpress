@@ -259,22 +259,6 @@ class PeriodicalPress_Admin {
 	}
 
 
-
-	/**
-	 * Display the main Issues admin page.
-	 *
-	 * @since 1.0.0
-	 */
-	public function issues_home_screen() {
-
-		/**
-		 * Output the Issue Settings page.
-		 */
-		$path = $this->plugin->get_partials_path( 'admin' );
-		require $path . 'periodicalpress-issues-home.php';
-
-	}
-
 	/**
 	 * Display the Edit Issues admin page.
 	 *
