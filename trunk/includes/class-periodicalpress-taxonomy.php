@@ -85,6 +85,8 @@ class PeriodicalPress_Taxonomy {
 	public static function register_taxonomy() {
 
 		$plugin = PeriodicalPress::get_instance();
+		$plugin_admin = PeriodicalPress_Admin::get_instance( $plugin );
+
 		$domain = $plugin->get_plugin_name();
 		$tax_name = $plugin->get_taxonomy_name();
 
@@ -128,6 +130,7 @@ class PeriodicalPress_Taxonomy {
 			'query_var'             => 'issue',
 			'rewrite'               => $rewrite,
 			'capabilities'          => $capabilities,
+			'meta_box_cb'           => array( $plugin_admin, 'render_issue_metabox' ),
 			'update_count_callback' => array( self::get_instance(), 'update_issue_post_count' )
 		);
 		register_taxonomy( $tax_name, array( 'post' ), $args );

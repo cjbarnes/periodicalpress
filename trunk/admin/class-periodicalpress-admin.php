@@ -832,10 +832,7 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
-	 * Replaces Issues metabox on the Post Editor.
-	 *
-	 * Runs after all core metaboxes have been added. Removes the default
-	 * taxonomy metabox and declares a simpler, bespoke alternative.
+	 * Changes Issues metabox placement and title on the Post Editor.
 	 *
 	 * @since 1.0.0
 	 */
@@ -844,10 +841,10 @@ class PeriodicalPress_Admin {
 		$domain = $this->plugin->get_plugin_name();
 		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
 
-		// Remove old, multi-selecting Issues metabox
+		// Remove old Issues metabox.
 		remove_meta_box( 'pp_issuediv', 'post', 'side' );
 
-		// Add a new, bespoke Issue metabox
+		// Add an identical Issue metabox, further up the page.
 		if ( current_user_can( $tax->cap->assign_terms ) ) {
 
 			add_meta_box(
