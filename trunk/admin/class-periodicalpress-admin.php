@@ -572,8 +572,7 @@ class PeriodicalPress_Admin {
 		// Returns boolean for success/failure or WP_Error on error.
 		$result = wp_delete_term( $term_id, $tax_name );
 
-		// Delete the cached highest issue number.
-		delete_transient( 'periodicalpress_highest_issue_num' );
+		$this->delete_issue_transients();
 
 		/*
 		 * Only proceed to delete metadata if the term it attaches to was first
@@ -723,6 +722,8 @@ class PeriodicalPress_Admin {
 
 		// Set this as the current issue.
 		update_option( 'pp_current_issue', $term_id );
+
+		$this->delete_issue_transients();
 
 		/**
 		 * Action for whenever an Issue status changes.
@@ -925,8 +926,7 @@ class PeriodicalPress_Admin {
 		/** This action is documented in admin/class-periodicalpress-admin.php */
 		do_action( 'periodicalpress_transition_issue_status', 'draft', $old_status, $term_id );
 
-		// Delete the cached highest issue number.
-		delete_transient( 'periodicalpress_highest_issue_num' );
+		$this->delete_issue_transients();
 
 		return $result;
 	}
@@ -940,38 +940,92 @@ class PeriodicalPress_Admin {
 	 *
 	 * @global wpdb $wpdb The WordPress database class.
 	 *
-	 * @param array $excludes Term IDs that shouldn't count.
+	 * @param array $excludes Optional. Term IDs that shouldn't count. Default
+	 *                        array().
 	 * @return object The newest Issue's term object.
 	 */
-	public function get_newest_issue( $excludes ) {
-		global $wpdb;
+	public function get_newest_issue( $excludes = array() ) {
 
 		$tax_name = $this->plugin->get_taxonomy_name();
 
-		// Escape the $excludes strings since we're not using wpdb::prepare().
-		$excludes = array_map( 'esc_sql', (array) $excludes );
-
-		// Query the DB for the term_id of the highest issue number.
-		$sql = "
-			SELECT m1.pp_term_id
-			FROM {$wpdb->pp_termmeta} m1, {$wpdb->pp_termmeta} m2
-			WHERE m1.meta_key = 'pp_issue_number'
-			AND m2.meta_key = 'pp_issue_status'
-			AND m1.pp_term_id = m2.pp_term_id
-		";
-		if ( ! empty( $excludes ) ) {
-			$sql .= "
-				AND m1.pp_term_id NOT IN ('" . implode( $excludes, "','" ) . "')
-			";
-		}
-		$sql .= '
-			ORDER BY LENGTH(m1.pp_term_id) DESC, m1.pp_term_id DESC
-			LIMIT 1
-		';
-		$term_id = $wpdb->get_var( $sql );
+		$term_ids = $this->get_ordered_issue_IDs( $excludes );
+		$term_id = isset( $term_ids[0] ) ? $term_ids[0] : 0;
 
 		// Retrieve the term object and return.
 		return get_term( (int) $term_id, $tax_name );
+	}
+
+	/**
+	 * Retrieves the published Issues in descending order of issue.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb The WordPress database class.
+	 *
+	 * @param array $excludes Optional. Term IDs that shouldn't count. Default
+	 *                        array().
+	 * @return array An ordered array of Issue term IDs.
+	 */
+	public function get_ordered_issue_IDs( $excludes = array() ) {
+		global $wpdb;
+
+		// Try the cached values first.
+		$term_ids = get_transient( 'periodicalpress_ordered_issues' );
+		if ( ! $term_ids ) {
+
+			$tax_name = $this->plugin->get_taxonomy_name();
+
+			/*
+			 * Escape the $excludes strings since we're not using
+			 * wpdb::prepare().
+			 */
+			$excludes = array_map( 'esc_sql', (array) $excludes );
+
+			// Query the DB for the term_id of the highest issue number.
+			$sql = "
+				SELECT m1.pp_term_id
+				FROM {$wpdb->pp_termmeta} m1, {$wpdb->pp_termmeta} m2
+				WHERE m1.meta_key = 'pp_issue_number'
+				AND m2.meta_key = 'pp_issue_status'
+				AND m1.pp_term_id = m2.pp_term_id
+			";
+			if ( ! empty( $excludes ) ) {
+				$sql .= "
+					AND m1.pp_term_id NOT IN ('" . implode( $excludes, "','" ) . "')
+				";
+			}
+			$sql .= '
+				ORDER BY LENGTH(m1.pp_term_id) DESC, m1.pp_term_id DESC
+			';
+			$term_id_strings = $wpdb->get_col( $sql );
+
+			// Cast the IDs to integers.
+			$term_ids = array_map( 'intval', $term_id_strings );
+
+			// Cache this result for later.
+			set_transient( 'periodicalpress_ordered_issues', $term_ids, HOUR_IN_SECONDS );
+
+		}
+
+		return $term_ids;
+	}
+
+	/**
+	 * Delete all cached Issue-related values.
+	 *
+	 * Called whenever Issues are edited.
+	 *
+	 * @since 1.0.0
+	 */
+	public function delete_issue_transients() {
+
+		// The ordered list of Issue term_ids.
+		delete_transient( 'periodicalpress_ordered_issues' );
+
+		// The highest Issue number.
+		delete_transient( 'periodicalpress_highest_issue_num' );
+
+
 	}
 
 	/**
