@@ -501,7 +501,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			$out .= esc_html( $name );
 			$out .= '</a>';
 		} else {
-			$out .= esc_html( $name );
+			$out .= '<span class="row-title">' . esc_html( $name ) . '</span>';
 		}
 
 		// Flag the current issue.

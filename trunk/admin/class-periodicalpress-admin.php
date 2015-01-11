@@ -192,7 +192,7 @@ class PeriodicalPress_Admin {
 		add_menu_page(
 			$tax->labels->name,
 			$tax->labels->menu_name,
-			$tax->cap->edit_terms, // user capability required to show this menu
+			$tax->cap->assign_terms, // user capability required to show this menu
 			'pp_edit_issues',
 			array( $this, 'edit_issues_screen' ),
 			'dashicons-pressthis',
@@ -204,7 +204,7 @@ class PeriodicalPress_Admin {
 			'pp_edit_issues',
 			$tax->labels->name,
 			$tax->labels->all_items,
-			$tax->cap->edit_terms,
+			$tax->cap->assign_terms,
 			'pp_edit_issues'
 		);
 

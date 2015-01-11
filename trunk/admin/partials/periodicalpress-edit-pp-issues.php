@@ -24,7 +24,7 @@ if ( ! is_object( $tax ) ) {
 $title = $tax->labels->name;
 
 // Check security
-if ( ! current_user_can( $tax->cap->manage_terms ) ) {
+if ( ! current_user_can( $tax->cap->assign_terms ) ) {
 	wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
 }
 
@@ -174,9 +174,6 @@ if ( $location ) {
 
 // Add extra javascript just for list tables.
 wp_enqueue_script( 'admin_tags' );
-if ( current_user_can( $tax->cap->edit_terms ) ) {
-	wp_enqueue_script( 'inline-edit-tax' );
-}
 
 // Set up the List Table data and properties.
 $list_table->prepare_items();
@@ -189,10 +186,6 @@ $total_pages = $list_table->get_pagination_arg( 'total_pages' );
 if ( ( $pagenum > $total_pages ) && ( 0 < $total_pages ) ) {
 	wp_redirect( add_query_arg( 'paged', $total_pages ) );
 	exit;
-}
-
-if ( ! current_user_can( $tax->cap->edit_terms ) ) {
-	wp_die( __( 'You are not allowed to edit Issues.', $domain ) );
 }
 
 // The term-updated messages.
