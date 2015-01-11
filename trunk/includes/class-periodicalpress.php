@@ -412,7 +412,7 @@ class PeriodicalPress {
 		 * submenus.
 		 */
 		$this->loader->add_action(
-			"load-issues_page_pp_edit_issues",
+			"load-toplevel_page_pp_edit_issues",
 			$plugin_admin,
 			'edit_issues_screen_options'
 		);
