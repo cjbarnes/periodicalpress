@@ -124,7 +124,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 * @param array $columns Associative array of column names and labels.
 		 */
 		$columns = apply_filters( "manage_{$this->tax->name}_columns", array(
-			'name'        => esc_html_x( 'Name', $context, $domain ),
+			'name'        => esc_html_x( $this->tax->labels->singular_name, $context, $domain ),
 			'date'        => esc_html_x( 'Date', $context, $domain ),
 			'number'      => esc_html_x( 'Number', $context, $domain ),
 			'title'       => esc_html_x( 'Title', $context, $domain ),

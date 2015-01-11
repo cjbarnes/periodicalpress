@@ -884,7 +884,7 @@ class PeriodicalPress_Admin {
 
 			add_meta_box(
 				'pp_issuediv',
-				__( 'Issue', $domain ),
+				$tax->labels->singular_name,
 				array( $this, 'render_issue_metabox' ),
 				'post',
 				'side',
