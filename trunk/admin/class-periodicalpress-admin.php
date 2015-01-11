@@ -546,6 +546,41 @@ class PeriodicalPress_Admin {
 		 */
 		do_action( 'periodicalpress_before_delete_issue', $term_id, $term_object );
 
+		// Get the posts attached to this Issue.
+		$post_statuses = array(
+			'publish',
+			'pending',
+			'draft',
+			'future',
+			'private'
+		);
+		$args = array(
+			'posts_per_page' => -1,
+			'orderby'        => 'none',
+			'post_status'    => $post_statuses,
+			'tax_query'      => array(
+				array(
+					'taxonomy' => $tax_name,
+					'field'    => 'term_id',
+					'terms'    => $term_id
+				)
+			)
+		);
+		$term_posts = get_posts( $args );
+
+		/*
+		 * Update posts in this Issue. The Issue term is removed and the post is
+		 * moved to Trash.
+		 */
+		foreach ( $term_posts as $post ) {
+			wp_remove_object_terms( $post->ID, $term_id, $tax_name );
+			$new_post_data = array(
+				'ID'          => $post->ID,
+				'post_status' => 'trash'
+			);
+			wp_update_post( $new_post_data );
+		}
+
 		// Returns boolean for success/failure or WP_Error on error.
 		$result = wp_delete_term( $term_id, $tax_name );
 
