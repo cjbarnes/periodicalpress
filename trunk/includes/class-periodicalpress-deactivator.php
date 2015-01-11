@@ -44,14 +44,17 @@ class PeriodicalPress_Deactivator {
 		global $wp_roles;
 
 		$all_roles = $wp_roles->roles;
+		$old_publishers = get_option( 'pp_old_publishers', array() );
 
-		/*
-		 * Loop through each role in turn, removing the added capabilities.
-		 */
 		foreach ( $all_roles as $role_name => $role_contents ) {
 
 			$wp_roles->remove_cap( $role_name, 'assign_pp_issue' );
 			$wp_roles->remove_cap( $role_name, 'manage_pp_issues' );
+
+			// Restore `publish_post` capability to pre-activation state.
+			if ( in_array( $role_name, $old_publishers ) ) {
+				$wp_roles->add_cap( $role_name, 'publish_post' );
+			}
 
 		}
 

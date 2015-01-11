@@ -40,6 +40,9 @@ class PeriodicalPress_Activator {
 	 * - `assign_pp_issue`  - edit_posts        - allows per-post Issue choice
 	 * - `manage_pp_issues` - edit_others_posts - gives access to Issues admin
 	 *
+	 * Also removes `publish_post` capability across all roles, because post
+	 * publication is handled automatically by the plugin.
+	 *
 	 * @since 1.0.0
 	 * @access private
 	 *
@@ -49,6 +52,8 @@ class PeriodicalPress_Activator {
 		global $wp_roles;
 
 		$all_roles = $wp_roles->roles;
+
+		$publishers = array();
 
 		foreach ( $all_roles as $role_name => $role_contents ) {
 
@@ -70,7 +75,16 @@ class PeriodicalPress_Activator {
 				$wp_roles->add_cap( $role_name, 'manage_pp_issues' );
 			}
 
+			// Remove `publish_posts` capability from everyone.
+			if ( isset( $role_caps['publish_posts'] ) ) {
+				$wp_roles->remove_cap( $role_name, 'publish_posts' );
+				$publishers[] = $role_name;
+			}
+
 		}
+
+		// Save which roles had `publish_post` capability for later restoration.
+		add_option( 'pp_old_publishers', $publishers, '', 'no' );
 
 	}
 
