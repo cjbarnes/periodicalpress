@@ -122,7 +122,7 @@ class PeriodicalPress_Admin {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @see PeriodicalPress
+	 * @see PeriodicalPress_Loader
 	 */
 	public function enqueue_styles() {
 
@@ -141,7 +141,7 @@ class PeriodicalPress_Admin {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @see PeriodicalPress
+	 * @see PeriodicalPress_Loader
 	 */
 	public function enqueue_scripts() {
 
