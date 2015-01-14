@@ -122,6 +122,17 @@ class PeriodicalPress_Theme_Patching {
 		}
 
 		/*
+		 * Redirect the blog index page to the Current Issue permalink. (Also
+		 * ensures the taxonomy term layout is used.)
+		 */
+		$this->loader->add_action(
+			'parse_query',
+			$this,
+			'redirect_to_current_issue',
+			'1.5'
+		);
+
+		/*
 		 * CSS and JavaScript.
 		 */
 		$this->loader->add_action(
@@ -136,13 +147,12 @@ class PeriodicalPress_Theme_Patching {
 		);
 
 		/*
-		 * Modify the Loop to show the Current Issue on the blog index page, and
-		 * to paginate properly between Issues.
+		 * Modify the Loop to paginate properly between Issues.
 		 */
 		$this->loader->add_action(
 			'pre_get_posts',
 			$this,
-			'modify_home_query'
+			'modify_issue_query'
 		);
 		$this->loader->add_action(
 			'wp_head',
@@ -230,39 +240,58 @@ class PeriodicalPress_Theme_Patching {
 	}
 
 	/**
-	 * Configure the main Loop on the blog index page to load the entire current
-	 * issue and nothing else.
+	 * Configure the Loop on Issue pages to load the entire issue on one page,
+	 * and nothing else.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param WP_Query $query The query object for the forthcoming posts query.
 	 */
-	public function modify_home_query( $query ) {
+	public function modify_issue_query( $query ) {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
 
 		/*
 		 * The standard conditional function is_main_query() does not return the
 		 * right results within the pre_get_posts hook.
 		 */
-		if ( ! is_home() || ! $query->is_main_query() ) {
+		if ( ! $query->is_main_query()
+		|| ! $query->is_tax( $tax_name ) ) {
 			return;
 		}
 
-		$current_issue = (int) get_option( 'pp_current_issue' , 0 );
-		if ( ! $current_issue ) {
-			$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
-			$current_issue = $plugin_common->get_newest_issue_id();
-		}
-
-		$current_issue_query = array(
-			array(
-				'taxonomy' => $this->plugin->get_taxonomy_name(),
-				'field'    => 'id',
-				'terms'    => $current_issue
-			)
-		);
-
-		$query->set( 'tax_query', $current_issue_query );
+		// Remove default pagination posts-per-page setting.
 		$query->set( 'posts_per_page', -1 );
+
+	}
+
+	/**
+	 * Redirects the blog index page to the Current Issue page.
+	 *
+	 * @since 1.0.0
+	 */
+	public function redirect_to_current_issue() {
+
+		if ( is_home() ) {
+
+			$tax_name = $this->plugin->get_taxonomy_name();
+
+			// Get the current issue.
+			$current_issue = (int) get_option( 'pp_current_issue' , 0 );
+			if ( ! $current_issue ) {
+				$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+				$current_issue = $plugin_common->get_newest_issue_id();
+			}
+
+			/*
+			 * Do the redirect. A 302 (temporary) redirect is used, since when
+			 * the next issue is published the address being redirected to will
+			 * change.
+			 */
+			wp_redirect( get_term_link( $current_issue, $tax_name ), 302 );
+			exit();
+
+		}
 
 	}
 
@@ -369,6 +398,7 @@ class PeriodicalPress_Theme_Patching {
 			} else {
 
 				// Find the link to the blog index page.
+				// TODO: maybe replace with link straight to the first Issue.
 				$blog_index_url = ( 'page' === get_option( 'show_on_front' ) )
 					? get_permalink( get_option( 'page_for_posts', 0 ) )
 					: home_url();
