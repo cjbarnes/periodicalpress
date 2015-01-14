@@ -206,6 +206,21 @@ class PeriodicalPress_Theme_Patching {
 			return;
 		}
 
+		$current_issue = (int) get_option( 'pp_current_issue' , 0 );
+		if ( ! $current_issue ) {
+			$current_issue = PeriodicalPress_Common::get_instance()->get_newest_issue_id();
+		}
+
+		$current_issue_query = array(
+			array(
+				'taxonomy' => $this->plugin->get_taxonomy_name(),
+				'field'    => 'id',
+				'terms'    => $current_issue
+			)
+		);
+
+		$query->set( 'tax_query', $current_issue_query );
+
 	}
 
 	/**
