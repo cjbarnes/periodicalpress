@@ -310,12 +310,17 @@ class PeriodicalPress_Common {
 				ORDER BY$sql_current_issue LENGTH(m1.meta_value) DESC, m1.meta_value DESC
 			";
 
-			// Run the query and cast results to integers.
+			// Run the query.
 			$term_id_strings = $wpdb->get_col( $sql );
-			$term_ids = array_map( 'intval', $term_id_strings );
+			if ( ! empty( $term_id_strings ) ) {
 
-			// Cache this result for later.
-			set_transient( 'periodicalpress_ordered_issues', $term_ids, HOUR_IN_SECONDS );
+				// Cast results to integers.
+				$term_ids = array_map( 'intval', $term_id_strings );
+
+				// Save for reuse.
+				set_transient( 'periodicalpress_ordered_issues', $term_ids, HOUR_IN_SECONDS );
+
+			}
 
 		}
 
