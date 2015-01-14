@@ -136,12 +136,23 @@ class PeriodicalPress_Theme_Patching {
 		);
 
 		/*
-		 * Modify the blog index Loop.
+		 * Modify the Loop to show the Current Issue on the blog index page, and
+		 * to paginate properly between Issues.
 		 */
 		$this->loader->add_action(
 			'pre_get_posts',
 			$this,
 			'modify_home_query'
+		);
+		$this->loader->add_action(
+			'wp_head',
+			$this,
+			'override_number_of_pages'
+		);
+		$this->loader->add_filter(
+			'paginate_links',
+			$this,
+			'issue_pagination_link'
 		);
 
 		$this->loader->run();
@@ -202,13 +213,14 @@ class PeriodicalPress_Theme_Patching {
 		 * The standard conditional function is_main_query() does not return the
 		 * right results within the pre_get_posts hook.
 		 */
-		if ( ! $query->is_home() || ! $query->is_main_query() ) {
+		if ( ! is_home() || ! $query->is_main_query() ) {
 			return;
 		}
 
 		$current_issue = (int) get_option( 'pp_current_issue' , 0 );
 		if ( ! $current_issue ) {
-			$current_issue = PeriodicalPress_Common::get_instance()->get_newest_issue_id();
+			$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+			$current_issue = $plugin_common->get_newest_issue_id();
 		}
 
 		$current_issue_query = array(
@@ -222,6 +234,138 @@ class PeriodicalPress_Theme_Patching {
 		$query->set( 'tax_query', $current_issue_query );
 		$query->set( 'posts_per_page', -1 );
 
+	}
+
+	/**
+	 * Sets pagenum and number of pages for the main query, on blog index and
+	 * Issue pages.
+	 *
+	 * Changes the Core pagination output to page between Issues rather than
+	 * posts, in descending order of Issue number (Current Issue first), one
+	 * Issue per page.
+	 *
+	 * Sets the global WP_Query object's {@link WP_Query::max_num_pages}
+	 * property, since this is checked for by Core's
+	 * {@link get_the_posts_pagination()}.
+	 *
+	 * Hooks into the `wp_head` action. (Originally it was supposed to hook
+	 * onto `wp`, but this is too early - it causes a redirect when the page
+	 * number is set.)
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global WP_Query $wp_query The completed main query object.
+	 */
+	public function override_number_of_pages() {
+		global $wp_query;
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		/*
+		 * Remember, {@link is_tax()} doesn't check that a taxonomy exists; it
+		 * checks that the current page is a term page for that taxonomy.
+		 */
+		if ( ! is_home() && ! is_tax( $tax_name ) ) {
+			return;
+		}
+
+		// Get the ordered list of Issues currently published.
+		$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$issues = $plugin_common->get_ordered_issue_IDs();
+
+		// Set the total number of 'pages' (i.e. Issues).
+		$wp_query->max_num_pages = count( $issues );
+
+		// Set the 'page number' for this Issue page.
+		if ( is_tax( $tax_name ) ) {
+
+			// Get the current Issue taxonomy term.
+			$tax = get_taxonomy( $tax_name );
+			$issue_slug = $wp_query->query[ $tax->rewrite['slug'] ];
+			$issue = get_term_by( 'slug', $issue_slug, $tax_name );
+
+			if ( false !== $issue ) {
+				$pagenum = array_search( $issue->term_id, $issues ) + 1;
+			}
+
+			// Set the pagination page to match this page's Issue.
+			$pagenum = ! empty( $pagenum ) ? $pagenum : 1;
+			$wp_query->query_vars['paged'] = $pagenum;
+
+		}
+
+	}
+
+	/**
+	 * Filters pagination URLs on the blog index and Issue pages.
+	 *
+	 * Converts `/page/[n]` links in the standard public-area pagination into
+	 * `/issue/[slug]` links. This is almost the only control we can have over
+	 * the pagination output while still using the Core function.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $link The url of this pagination page.
+	 * @return string The Issue url for the linked pagination page.
+	 */
+	public function issue_pagination_link( $link ) {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		if ( is_home() || is_tax( $tax_name ) ) {
+
+			// Use regular expressions to extract this link's page number.
+			$pattern = $this->get_old_pagination_format();
+			$matches = array();
+
+			if ( preg_match( $pattern, $link, $matches ) ) {
+				$pagenum = intval( $matches[1] ) - 1;
+
+				/*
+				 * Get the Issue ID that matches this page number, by using the
+				 * page number as an index in the ordered-issues array.
+				 * {@link PeriodicalPress_Common::get_ordered_issue_IDs()} uses
+				 * transients to cache its results, so there is no need to cache
+				 * here as well.
+				 */
+				$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+				$issues = $plugin_common->get_ordered_issue_IDs();
+
+				if ( isset( $issues[ $pagenum ] ) ) {
+					// Get the new pagination link.
+					$link = get_term_link( $issues[ $pagenum ], $tax_name );
+				}
+
+			} else {
+
+				$blog_index_url = ( 'page' === get_option( 'show_on_front' ) )
+					? get_permalink( get_option( 'page_for_posts', 0 ) )
+					: home_url();
+				$link = $blog_index_url;
+
+			}
+
+		}
+
+		return $link;
+	}
+
+	/**
+	 * Retrieves the regular expression that will match the page number of a
+	 * paginated page.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global WP_Rewrite $wp_rewrite The WordPress rewrite options object.
+	 *
+	 * @return string A regular expression to return a url's page number.
+	 */
+	public function get_old_pagination_format() {
+		global $wp_rewrite;
+
+		return ( $wp_rewrite->using_permalinks() )
+        	? '/' . $wp_rewrite->pagination_base . '\/(\d+)/'
+			: '/[\?&]paged=(\d+)/';
 	}
 
 	/**
