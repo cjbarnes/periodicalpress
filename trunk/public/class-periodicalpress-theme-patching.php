@@ -220,6 +220,7 @@ class PeriodicalPress_Theme_Patching {
 		);
 
 		$query->set( 'tax_query', $current_issue_query );
+		$query->set( 'posts_per_page', -1 );
 
 	}
 
