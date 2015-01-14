@@ -279,7 +279,7 @@ class PeriodicalPress_Theme_Patching {
 		// Set the 'page number' for this Issue page.
 		if ( is_tax( $tax_name ) ) {
 
-			// Get the current Issue taxonomy term.
+			// Get this Issue taxonomy term.
 			$tax = get_taxonomy( $tax_name );
 			$issue_slug = $wp_query->query[ $tax->rewrite['slug'] ];
 			$issue = get_term_by( 'slug', $issue_slug, $tax_name );
@@ -338,6 +338,7 @@ class PeriodicalPress_Theme_Patching {
 
 			} else {
 
+				// Find the link to the blog index page.
 				$blog_index_url = ( 'page' === get_option( 'show_on_front' ) )
 					? get_permalink( get_option( 'page_for_posts', 0 ) )
 					: home_url();
