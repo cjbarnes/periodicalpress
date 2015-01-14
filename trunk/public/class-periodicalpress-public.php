@@ -101,6 +101,12 @@ class PeriodicalPress_Public {
 	 */
 	private function load_dependencies() {
 
+		/**
+		 * The class responsible for adapting the public site when the theme
+		 * does not explicitly support this plugin.
+		 */
+		require_once $this->plugin->get_plugin_path() . 'public/class-periodicalpress-theme-patching.php';
+
 	}
 
 	/**

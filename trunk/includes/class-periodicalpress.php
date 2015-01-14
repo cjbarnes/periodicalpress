@@ -430,6 +430,7 @@ class PeriodicalPress {
 	private function define_public_hooks() {
 
 		$plugin_public = PeriodicalPress_Public::get_instance( $this );
+		$plugin_theme_patching = PeriodicalPress_Theme_Patching::get_instance( $this );
 
 		/*
 		 * Public-facing CSS and JavaScript
@@ -443,6 +444,17 @@ class PeriodicalPress {
 			'wp_enqueue_scripts',
 			$plugin_public,
 			'enqueue_scripts'
+		);
+
+		/*
+		 * Register the theme patching actions and filters, after init (to
+		 * allow time for add_theme_supports() to be called by the theme).
+		 */
+		$this->loader->add_action(
+			'init',
+			$plugin_theme_patching,
+			'define_hooks',
+			999
 		);
 
 	}
