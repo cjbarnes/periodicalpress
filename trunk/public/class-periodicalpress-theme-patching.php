@@ -378,6 +378,7 @@ class PeriodicalPress_Theme_Patching {
 			$matches = array();
 
 			if ( preg_match( $pattern, $link, $matches ) ) {
+
 				$pagenum = intval( $matches[1] ) - 1;
 
 				/*
@@ -390,21 +391,23 @@ class PeriodicalPress_Theme_Patching {
 				$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
 				$issues = $plugin_common->get_ordered_issue_IDs();
 
-				if ( isset( $issues[ $pagenum ] ) ) {
-					// Get the new pagination link.
-					$link = get_term_link( $issues[ $pagenum ], $tax_name );
+				$issue_id = isset( $issues[ $pagenum ] )
+					? $issues[ $pagenum ]
+					: 0;
+
+			} else { // This is Page 1, so get the Current Issue.
+
+				$issue_id = intval( get_option( 'pp_current_issue' , 0 ) );
+
+				if ( ! $issue_id ) {
+					$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+					$issue_id = $plugin_common->get_newest_issue_id();
 				}
 
-			} else {
-
-				// Find the link to the blog index page.
-				// TODO: maybe replace with link straight to the first Issue.
-				$blog_index_url = ( 'page' === get_option( 'show_on_front' ) )
-					? get_permalink( get_option( 'page_for_posts', 0 ) )
-					: home_url();
-				$link = $blog_index_url;
-
 			}
+
+			// Get the new pagination link.
+			$link = get_term_link( $issue_id, $tax_name );
 
 		}
 
