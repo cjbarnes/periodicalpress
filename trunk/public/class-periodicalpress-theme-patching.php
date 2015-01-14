@@ -157,6 +157,21 @@ class PeriodicalPress_Theme_Patching {
 
 		$this->loader->run();
 
+		$this->do_init_actions();
+
+	}
+
+	/**
+	 * Calls 2 class-specific init hooks at the end of the site-wide init hook.
+	 *
+	 * This is useful so that the define_hooks() function can add its own set
+	 * of "init" actions, which can then be deregistered by other plugins/themes
+	 * as normal, even though define_hooks() is itself an `init` action.
+	 *
+	 * @since 1.0.0
+	 */
+	public function do_init_actions() {
+
 		/**
 		 * Hook that runs immediately after the theme patching hooks have all
 		 * been registered. Use this hook to remove actions or filters
