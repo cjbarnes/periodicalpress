@@ -226,11 +226,34 @@ class PeriodicalPress_Common {
 
 		$tax_name = $this->plugin->get_taxonomy_name();
 
-		$term_ids = $this->get_ordered_issue_IDs( $excludes );
-		$term_id = isset( $term_ids[0] ) ? $term_ids[0] : 0;
-
 		// Retrieve the term object and return.
-		return get_term( (int) $term_id, $tax_name );
+		return get_term( $this->get_newest_issue_id( $excludes ), $tax_name );
+	}
+
+	/**
+	 * Retrieves the ID of the newest (i.e. highest-numbered) published Issue.
+	 *
+	 * Used for setting a new Current Issue when the previous one is removed,
+	 * and for getting the most recent issue when a Current Issue is not set
+	 * (which should not happen in ordinary circumstances).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb The WordPress database class.
+	 *
+	 * @param array $excludes Optional. Term IDs that shouldn't count. Default
+	 *                        array().
+	 * @return int The newest Issue's ID.
+	 */
+	public function get_newest_issue_id( $excludes = array() ) {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		$term_ids = $this->get_ordered_issue_IDs( $excludes );
+
+		return isset( $term_ids[0] )
+			? intval( $term_ids[0] )
+			: 0;
 	}
 
 	/**
