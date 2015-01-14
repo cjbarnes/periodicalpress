@@ -157,6 +157,21 @@ class PeriodicalPress_Theme_Patching {
 
 		$this->loader->run();
 
+		/**
+		 * Hook that runs immediately after the theme patching hooks have all
+		 * been registered. Use this hook to remove actions or filters
+		 * registered by PeriodicalPress_Theme_Patching, if needed.
+		 */
+		do_action( 'periodicalpress_remove_theme_patching_hooks' );
+
+		/**
+		 * Hook that substitutes for `init` just for this class. Added because
+		 * `init` is already in progress at this point. A separate action is
+		 * necessary, rather than just running the init actions immediately, so
+		 * that themes and other plugins can deregister these default actions.
+		 */
+		do_action( 'periodicalpress_theme_patching_init' );
+
 	}
 
 	/**
