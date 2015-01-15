@@ -164,6 +164,11 @@ class PeriodicalPress_Theme_Patching {
 			$this,
 			'issue_pagination_link'
 		);
+		$this->loader->add_filter(
+			'get_pagenum_link',
+			$this,
+			'issue_pagination_link'
+		);
 
 		$this->loader->run();
 
@@ -314,9 +319,13 @@ class PeriodicalPress_Theme_Patching {
 	 * @since 1.0.0
 	 *
 	 * @global WP_Query $wp_query The completed main query object.
+	 * @global int $paged The pagination page (must be set for Core functions
+	 *                    {@link get_previous_posts_link()} and
+	 *                    {@link get_next_posts_link()}).
 	 */
 	public function override_number_of_pages() {
 		global $wp_query;
+		global $paged;
 
 		$tax_name = $this->plugin->get_taxonomy_name();
 
@@ -350,6 +359,7 @@ class PeriodicalPress_Theme_Patching {
 			// Set the pagination page to match this page's Issue.
 			$pagenum = ! empty( $pagenum ) ? $pagenum : 1;
 			$wp_query->query_vars['paged'] = $pagenum;
+			$paged = $pagenum;
 
 		}
 
