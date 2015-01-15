@@ -1,12 +1,20 @@
 /**
  * All of the CSS for admin-specific functionality.
+ *
+ * Contents:
+ *
+ * 1.0 LIST TABLES
+ * 1.1 Issues list table
  */
 
-
 /**
- * List tables
+ * 1.0 LIST TABLES
  *
  * Styles for WP_List_Table and PeriodicalPress_List_Table output.
+ */
+
+/**
+ * 1.1 Issues list table
  */
 
 /* Issue row borders */
