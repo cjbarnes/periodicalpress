@@ -327,7 +327,7 @@ class PeriodicalPress {
 	private function define_admin_hooks() {
 
 		$plugin_admin = PeriodicalPress_Admin::get_instance( $this );
-		$plugin_post_metabox = new PeriodicalPress_Post_Metabox( $this );
+		$plugin_post_issue_box = new PeriodicalPress_Post_Issue_Box( $this );
 
 		/*
 		 * Admin CSS and JavaScript.
@@ -409,13 +409,18 @@ class PeriodicalPress {
 		 */
 		$this->loader->add_action(
 			'add_meta_boxes_post',
-			$plugin_post_metabox,
+			$plugin_post_issue_box,
 			'add_remove_metaboxes'
 		);
+
+		/**
+		 * Save the Issue for a post, whether set by the Edit Post screen or
+		 * the Quick Edit.
+		 */
 		$this->loader->add_action(
 			'save_post',
-			$plugin_post_metabox,
-			'save_issue_metabox'
+			$plugin_post_issue_box,
+			'save_post_issue'
 		);
 
 	}

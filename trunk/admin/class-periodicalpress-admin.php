@@ -111,9 +111,10 @@ class PeriodicalPress_Admin {
 		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-edit-issues.php';
 
 		/**
-		 * The class that renders and saves the Edit Post metabox for Issues.
+		 * The class that renders and saves the Edit Post metabox and the Quick
+		 * Edit Posts custom box for the Issues taxonomy.
 		 */
-		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-post-metabox.php';
+		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-post-issue-box.php';
 
 	}
 
