@@ -94,7 +94,8 @@ class PeriodicalPress_Public {
 	 *
 	 * Include the following files:
 	 *
-	 * - (None)
+	 * - PeriodicalPress_Theme_Patching. Customises themes that do not natively
+	 *   support this plugin.
 	 *
 	 * @since 1.0.0
 	 * @access private
