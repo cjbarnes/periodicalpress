@@ -147,6 +147,7 @@ class PeriodicalPress_Admin {
 
 		$domain = $this->plugin->get_plugin_name();
 
+		// Script used thoughout the admin area.
 		wp_enqueue_script(
 			$this->plugin->get_plugin_name(),
 			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-admin.js',
@@ -159,7 +160,7 @@ class PeriodicalPress_Admin {
 			true
 		);
 
-		// Translation of JavaScript strings
+		// Setup array for translation of JavaScript strings.
 		wp_localize_script(
 			$this->plugin->get_plugin_name(),
 			'l10n',
