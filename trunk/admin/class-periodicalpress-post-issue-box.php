@@ -71,6 +71,94 @@ class PeriodicalPress_Post_Issue_Box {
 	}
 
 	/**
+	 * Move the Issue taxonomy column so that it appears before the Categories
+	 * and Tags columns.
+	 *
+	 * Used on the Posts list table screen to make Issue data more prominent,
+	 * and to change which column its Quick Edit box appears in.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $columns Associative array of all columns in the list table.
+	 * @return array The reordered array of columns.
+	 */
+	public function posts_move_issue_column( $columns ) {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+		$tax = get_taxonomy( $tax_name );
+
+		$tax_col = "taxonomy-$tax_name";
+		$tax_col_label = $columns[ $tax_col ];
+
+		// Only make changes if the Issue column exists.
+		if ( ! empty( $tax_col_label ) ) {
+
+			unset( $columns[ $tax_col ] );
+
+			/*
+			 * Reinsert the original column data just before the Categories
+			 * column.
+			 */
+			$insert_pos = array_search( 'categories', array_keys( $columns ) );
+			if ( $insert_pos ) {
+
+				$middle_column = array(
+					$tax_name => $tax->labels->singular_name
+				);
+				$end_columns = array_splice( $columns, $insert_pos );
+
+				$columns += $middle_column + $end_columns;
+			}
+
+		}
+
+		return $columns;
+	}
+
+	/**
+	 * Output the Issue column contents in the Posts list table.
+	 *
+	 * The reason we override the default rendering of this column (which is
+	 * visibly identical to this) is so we can add the `data-issue-id` attribute
+	 * to the DOM, for use in the Quick Edit JavaScript.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $column_name The name of the column being outputted.
+	 * @param int    $post_id     The ID of the post being outputted.
+	 */
+	public function list_table_column_pp_issue( $column_name, $post_id ) {
+
+		if ( 'pp_issue' === $column_name ) {
+
+			$tax_name = $this->plugin->get_taxonomy_name();
+			$tax = get_taxonomy( $tax_name );
+
+			$terms = get_the_terms( $post_id, $tax_name );
+			$out = array();
+
+			if ( $terms ) {
+				foreach ( $terms as $t ) {
+
+					// Assemble the URL for viewing posts in an Issue.
+					$posts_in_term_qv = array();
+					$posts_in_term_qv[ $tax->query_var ] = $t->slug;
+					$url = esc_url( add_query_arg( $posts_in_term_qv, 'edit.php' ) );
+
+					$attr = "data-issue-id='{$t->term_id}'";
+					$out[] = "<a href='$url' $attr>{$t->name}</a>";
+
+				}
+			}
+
+			// Output all the Issues.
+			echo join( __( ', ' ), $out );
+
+		}
+
+	}
+
+	/**
 	 * Output the Issue metabox contents.
 	 *
 	 * @since 1.0.0
@@ -81,6 +169,29 @@ class PeriodicalPress_Post_Issue_Box {
 
 		$path = $this->plugin->get_partials_path( 'admin' );
 		require $path . 'periodicalpress-issue-metabox.php';
+
+	}
+
+	/**
+	 * Output the Quick Edit custom box contents.
+	 *
+	 * Only used for the Issue column, and only if the post type is Post.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $column_name The name of the column this Quick Edit box
+	 *                            relates to.
+	 * @param string $post_type   The Post Type, e.g. 'post'.
+	 */
+	public function render_issue_quick_edit_box( $column_name, $post_type ) {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		if ( ( $tax_name === $column_name )
+		&& ( 'post' === $post_type ) ) {
+			$path = $this->plugin->get_partials_path( 'admin' );
+			require $path . 'periodicalpress-issue-quick-edit-box.php';
+		}
 
 	}
 

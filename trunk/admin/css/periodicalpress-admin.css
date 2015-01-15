@@ -5,6 +5,7 @@
  *
  * 1.0 LIST TABLES
  * 1.1 Issues list table
+ * 1.2 Posts list table
  */
 
 /**
@@ -54,4 +55,13 @@
 }
 .issue-status-current-issue {
 	/* color: #7ad03a; */
+}
+
+/**
+ * 1.2 Posts list table
+ */
+
+/* Quick Edit - align right column labels (to match left column) */
+.quick-edit-row-post fieldset.inline-edit-col-right .alignleft span.title {
+	width: 5em;
 }

@@ -161,6 +161,20 @@ class PeriodicalPress_Admin {
 			true
 		);
 
+		// Script that enables Quick Editing for posts.
+		$screen = get_current_screen();
+		if ( 'edit-post' === $screen->id ) {
+
+			wp_enqueue_script(
+				$this->plugin->get_plugin_name() . '_posts_list_table',
+				plugin_dir_url( __FILE__ ) . 'js/periodicalpress-posts-list-table.js',
+				array( 'jquery' ),
+				$this->plugin->get_version(),
+				true
+			);
+
+		}
+
 		// Setup array for translation of JavaScript strings.
 		wp_localize_script(
 			$this->plugin->get_plugin_name(),

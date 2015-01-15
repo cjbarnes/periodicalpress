@@ -405,6 +405,26 @@ class PeriodicalPress {
 		);
 
 		/*
+		 * Reorder the Posts table columns (and Quick Edit boxes).
+		 */
+		$this->loader->add_action(
+			'manage_posts_columns',
+			$plugin_post_issue_box,
+			'posts_move_issue_column'
+		);
+
+		/*
+		 * Add a custom Issues box to the Quick Edit for posts.
+		 */
+		$this->loader->add_action(
+			'quick_edit_custom_box',
+			$plugin_post_issue_box,
+			'render_issue_quick_edit_box',
+			10,
+			2
+		);
+
+		/*
 		 * Replace the Issues box on the Post Add/Edit page.
 		 */
 		$this->loader->add_action(
@@ -422,6 +442,16 @@ class PeriodicalPress {
 			$plugin_post_issue_box,
 			'save_post_issue'
 		);
+
+
+		$this->loader->add_action(
+			'manage_posts_custom_column',
+			$plugin_post_issue_box,
+			'list_table_column_pp_issue',
+			10,
+			2
+		);
+
 
 	}
 
