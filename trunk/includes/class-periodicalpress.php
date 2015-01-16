@@ -440,7 +440,9 @@ class PeriodicalPress {
 		$this->loader->add_action(
 			'save_post',
 			$plugin_post_issue_box,
-			'save_post_issue'
+			'save_post_issue',
+			10,
+			2
 		);
 
 

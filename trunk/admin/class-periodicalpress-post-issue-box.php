@@ -207,7 +207,7 @@ class PeriodicalPress_Post_Issue_Box {
 	 * @param int $post_id ID of the post being saved.
 	 * @return int ID of the post being saved.
 	 */
-	public function save_post_issue( $post_id ) {
+	public function save_post_issue( $post_id, $post ) {
 
 		$tax_name = $this->plugin->get_taxonomy_name();
 		$tax = get_taxonomy( $tax_name );
@@ -284,8 +284,7 @@ class PeriodicalPress_Post_Issue_Box {
 					 * Revert post to Pending Review if it used to be published
 					 * and now shouldn't be.
 					 */
-					if ( ( $post = get_post( $post_id ) )
-					&& ( 'publish' === $post->post_status ) ) {
+					if ( 'publish' === $post->post_status ) {
 						$this->update_post_status( $post_id, 'pending' );
 					}
 
