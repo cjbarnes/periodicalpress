@@ -262,4 +262,40 @@ class PeriodicalPress_Post_Issue_Box {
 
 	}
 
+	/**
+	 * Update a post's publication status.
+	 *
+	 * Abbreviated version of Core's {@link wp_publish_post()} that won't rerun
+	 * the `edit_post` and `save_post` actions.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb The WordPress database object.
+	 *
+	 * @param int|WP_Post $post   The post's ID or post object.
+	 * @param string      $status The new post status.
+	 * @return bool Result of update.
+	 */
+	public function update_post_status( $post, $status ) {
+		global $wpdb;
+
+		if ( ! $post = get_post( $post ) ) {
+			return false;
+		}
+		if ( $status === $post->post_status ) {
+			return true;
+		}
+
+		$wpdb->update( $wpdb->posts, array( 'post_status' => $status ), array( 'ID' => $post->ID ) );
+
+		clean_post_cache( $post->ID );
+
+		$old_status = $post->post_status;
+		$post->post_status = $status;
+		wp_transition_post_status( $status, $old_status, $post );
+
+		return true;
+	}
+
+
 }
