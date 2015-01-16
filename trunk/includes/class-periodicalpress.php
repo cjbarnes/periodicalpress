@@ -433,7 +433,7 @@ class PeriodicalPress {
 			'add_remove_metaboxes'
 		);
 
-		/**
+		/*
 		 * Save the Issue for a post, whether set by the Edit Post screen or
 		 * the Quick Edit.
 		 */
@@ -451,7 +451,6 @@ class PeriodicalPress {
 			10,
 			2
 		);
-
 
 	}
 
