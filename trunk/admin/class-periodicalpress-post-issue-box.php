@@ -244,22 +244,58 @@ class PeriodicalPress_Post_Issue_Box {
 		}
 
 		/**
-		 * Update the DB if the new issue exists or if 'No issue' was selected.
+		 * Update the DB if the new issue exists or if 'No issue' was selected,
+		 * and if the new issue doesn't match the old one.
 		 */
 		$new_issue = intval( $_POST['pp_issue'] );
+		$old_issues = wp_get_post_terms( $post_id, $tax_name, array( 'fields' => 'ids' ) );
 
+		// End if Issue hasn't changed.
+		if ( isset( $old_issues[0] ) && ( $old_issues[0] === $new_issue ) ) {
+			return $post_id;
+		}
+
+		// Update the stored Issue number.
 		if ( -1 === $new_issue ) {
 
 			wp_delete_object_term_relationships( $post_id, $tax_name );
 
-		} elseif ( ! is_null( get_term( $new_issue, $tax_name ) ) ) {
-
-			wp_set_post_terms( $post_id, $new_issue, $tax_name );
-
 		} else {
-			return $post_id;
+
+			$term_object = get_term( $new_issue, $tax_name );
+
+			if ( ! is_null( $term_object ) ) {
+
+				wp_set_post_terms( $post_id, $new_issue, $tax_name );
+
+				$issue_status = get_metadata( 'pp_term', $new_issue, "{$tax_name}_status", true );
+
+				/*
+				 * Update whether this post should be published, based on
+				 * whether its new Issue is published.
+				 */
+				if ( 'publish' === $issue_status ) {
+
+					$this->update_post_status( $post_id, 'publish' );
+
+				} else {
+
+					/*
+					 * Revert post to Pending Review if it used to be published
+					 * and now shouldn't be.
+					 */
+					if ( ( $post = get_post( $post_id ) )
+					&& ( 'publish' === $post->post_status ) ) {
+						$this->update_post_status( $post_id, 'pending' );
+					}
+
+				}
+
+			}
+
 		}
 
+		return $post_id;
 	}
 
 	/**
