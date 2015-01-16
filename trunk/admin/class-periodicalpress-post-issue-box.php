@@ -214,8 +214,8 @@ class PeriodicalPress_Post_Issue_Box {
 
 		/*
 		 * If this is an autosave, our form has not been submitted, so we don't
-         * want to do anything.
-         */
+		 * want to do anything.
+		 */
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
 			return $post_id;
 
@@ -228,7 +228,8 @@ class PeriodicalPress_Post_Issue_Box {
 
 		// Check form nonce was properly set.
 		if ( empty( $_POST['periodicalpress-post-issue-nonce'] )
-			|| ( 1 !== wp_verify_nonce( $_POST['periodicalpress-post-issue-nonce'], 'set-post-issue' ) ) ) {
+		|| ( 1 !== wp_verify_nonce( $_POST['periodicalpress-post-issue-nonce'], 'set-post-issue' ) ) ) {
+
 			return $post_id;
 		}
 
