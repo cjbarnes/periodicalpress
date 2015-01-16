@@ -290,6 +290,76 @@ class PeriodicalPress_Edit_Issues {
 	}
 
 	/**
+	 * If this post is being unpublished, check whether its Issue is now empty
+	 * and therefore should also be unpublished.
+	 *
+	 * Hooks into all post transitions.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string  $new_status The new post status.
+	 * @param string  $old_status The original post status.
+	 * @param WP_Post $post       The current post object.
+	 */
+	public function unpublish_post_issues_if_empty( $new_status, $old_status, $post ) {
+
+		/*
+		 * End here if this post isn't changing from Published to some other
+		 * status.
+		 */
+		if ( ( 'publish' !== $old_status ) || ( $new_status === $old_status ) ) {
+			return;
+		}
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		$issues = wp_get_post_terms( $post->ID, $tax_name );
+
+		foreach( $issues as $issue ) {
+			unpublish_issue_if_empty( $issue, $tax_name );
+		}
+
+	}
+
+	/**
+	 * Unpublish this Issue if it has no posts.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int|object    $issue The Issue ID or object to unpublish if empty.
+	 * @param string|object $tax   The Issues taxonomy or its name.
+	 * @return bool|WP_Error Success, failure, or error.
+	 */
+	public function unpublish_issue_if_empty( $issue, $tax ) {
+
+		$tax_name = ( is_object( $tax ) && isset( $tax->name ) )
+			? $tax->name
+			: $tax;
+
+		// Get the Issue object if only an ID was passed.
+		$issue = get_term( $issue, $tax_name );
+
+		// Return FALSE if Issue doesn't exist, WP_Error if error.
+		if ( is_null( $issue ) || is_wp_error( $issue ) ) {
+			if ( is_null( $issue ) ) {
+				$issue = false;
+			}
+			return $issue;
+		}
+
+		$status = get_metadata( 'pp_term', $issue->term_id, "{$tax_name}_status", true );
+
+		// Unpublish if the Issue both is published and has no posts.
+		if ( ( 'publish' === $status ) && ( 0 === $issue->count ) ) {
+			$ret = $this->unpublish_issue( $issue );
+		} else {
+			$ret = true;
+		}
+
+		return $ret;
+	}
+
+	/**
 	 * Delete an Issue from the plugin taxonomy.
 	 *
 	 * Includes deletion of metadata. Note that the returned success/failure/

@@ -327,6 +327,7 @@ class PeriodicalPress {
 	private function define_admin_hooks() {
 
 		$plugin_admin = PeriodicalPress_Admin::get_instance( $this );
+		$plugin_edit_issues = PeriodicalPress_Edit_Issues::get_instance( $this );
 		$plugin_post_issue_box = new PeriodicalPress_Post_Issue_Box( $this );
 
 		/*
@@ -445,7 +446,27 @@ class PeriodicalPress {
 			2
 		);
 
+		/*
+		 * Unpublish an Issue when all posts within it are unpublished.
+		 */
+		$this->loader->add_action(
+			'transition_post_status',
+			$plugin_edit_issues,
+			'unpublish_post_issues_if_empty',
+			10,
+			3
+		);
+		$this->loader->add_action(
+			'edited_term_taxonomy',
+			$plugin_edit_issues,
+			'unpublish_issue_if_empty',
+			10,
+			2
+		);
 
+		/*
+		 * Manually add the Issue column to the Posts list table.
+		 */
 		$this->loader->add_action(
 			'manage_posts_custom_column',
 			$plugin_post_issue_box,
