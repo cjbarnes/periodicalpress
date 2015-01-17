@@ -92,6 +92,7 @@ class PeriodicalPress_Admin {
 	 * Include the following files:
 	 *
 	 * - PeriodicalPress_List_Table. Duplicate of private class WP_List_Table.
+	 * - PeriodicalPress_Edit_Issues. Issue adding/editing/deleting methods.
 	 * - PeriodicalPress_Post_Metabox. Callbacks for Edit Post screen metabox.
 	 *
 	 * @since 1.0.0
