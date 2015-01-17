@@ -44,11 +44,11 @@ class PeriodicalPress_Activator {
 	 * publication is handled automatically by the plugin.
 	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 *
 	 * @global WP_Roles $wp_roles The WordPress roles and capabilities class
 	 */
-	private static function create_capabilities() {
+	protected static function create_capabilities() {
 		global $wp_roles;
 
 		$all_roles = $wp_roles->roles;
@@ -95,11 +95,11 @@ class PeriodicalPress_Activator {
 	 * get_metadata() when applied to taxonomy terms (i.e. Issues).
 	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 *
 	 * @global wpdb $wpdb The database interaction wrapper.
 	 */
-	private static function create_termmeta_table() {
+	protected static function create_termmeta_table() {
 		global $wpdb;
 
 		/*
@@ -138,9 +138,9 @@ class PeriodicalPress_Activator {
 	 * loading in the new types/taxonomies and then flushing rewrite rules.
 	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 */
-	private static function set_rewrite_rules() {
+	protected static function set_rewrite_rules() {
 
 		/*
 		 * Load the class that creates custom post types and taxonomies, so
