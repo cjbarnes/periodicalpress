@@ -18,14 +18,14 @@ $domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
 $tax = get_taxonomy( $tax_name );
 if ( ! is_object( $tax ) ) {
-	wp_die( __( 'Cannot find the Issues taxonomy', $domain ) );
+	exit();
 }
 
 $title = $tax->labels->name;
 
 // Check security
 if ( ! current_user_can( $tax->cap->assign_terms ) ) {
-	wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+	exit();
 }
 
 /**
@@ -62,7 +62,7 @@ switch ( $list_table->current_action() ) {
 
 		// Check permissions.
 		if ( ! current_user_can( $tax->cap->edit_terms ) ) {
-			wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+			exit();
 		}
 
 		// If this Issue doesn't exist, show error message.
@@ -96,15 +96,27 @@ switch ( $list_table->current_action() ) {
 		$term_id = (int) $_REQUEST['tag_id'];
 		check_admin_referer( "$action-tag_" . $term_id );
 
-		// Check permissions
+		// Check permissions.
 		if ( 'delete' === $action ) {
 			if ( ! current_user_can( $tax->cap->delete_terms ) ) {
-				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+
+				// Not Deleted error message.
+				$msg_id = 6;
+				$location = add_query_arg( 'message', $msg_id, $location );
+
+				break;
 			}
-		} else {
-			if ( ! current_user_can( $tax->cap->manage_terms ) ) {
-				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+		} elseif ( ! current_user_can( $tax->cap->manage_terms ) ) {
+
+			// Not Published/Unpublished error message.
+			if ( 'publish' === $action ) {
+				$msg_id = 87;
+			} else {
+				$msg_id = 89;
 			}
+			$location = add_query_arg( 'message', $msg_id, $location );
+
+			break;
 		}
 
 		/*
