@@ -428,11 +428,6 @@ class PeriodicalPress_Admin {
 
 		}
 
-		// Issue Title
-		if ( isset( $_POST["{$tax_name}_title"] ) ) {
-			update_metadata( 'pp_term', $issue_id, "{$tax_name}_title", trim( $_POST["{$tax_name}_title"] ) );
-		}
-
 		// Issue Status
 		if ( isset( $_POST["{$tax_name}_status"] )
 			&& ( (string) $_POST["{$tax_name}_status"] ) ) {
