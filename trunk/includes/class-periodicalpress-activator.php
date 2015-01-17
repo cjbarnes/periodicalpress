@@ -28,7 +28,12 @@ class PeriodicalPress_Activator {
 
 		self::create_capabilities();
 		self::create_termmeta_table();
+		self::default_settings();
 		self::set_rewrite_rules();
+
+		// Todo: create a default Issue, add all the posts, and set as Current.
+
+		// Todo: show the welcome screen and/or message to all users.
 
 	}
 
@@ -128,6 +133,28 @@ class PeriodicalPress_Activator {
 
 		// Add to DB
 		$wpdb->query( $sql );
+
+
+	}
+
+	/**
+	 * Create default values for all plugin settings.
+	 *
+	 * Settings created:
+	 * - (none)
+	 *
+	 * Use of add_option() here means that we don't override any settings that
+	 * exist from a previous activation of this plugin.
+	 *
+	 * Each setting can be accessed using get_option() and saved using
+	 * update_option().
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 */
+	protected static function default_settings() {
+
+		// add_option( 'periodicalpress_x', 'default', true );
 
 	}
 
