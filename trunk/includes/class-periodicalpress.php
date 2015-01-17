@@ -369,34 +369,6 @@ class PeriodicalPress {
 		);
 
 		/*
-		 * Display extra metadata boxes in Issues area.
-		 */
-		$this->loader->add_action(
-			'pp_issue_add_form_fields',
-			$plugin_admin,
-			'display_add_issue_metadata_fields'
-		);
-		$this->loader->add_action(
-			'pp_issue_edit_form_fields',
-			$plugin_admin,
-			'display_edit_issue_metadata_fields'
-		);
-
-		/*
-		 * Save submitted metadata boxes in Issues area.
-		 */
-		$this->loader->add_action(
-			'created_pp_issue',
-			$plugin_admin,
-			'save_issue_metadata_fields'
-		);
-		$this->loader->add_action(
-			'edited_pp_issue',
-			$plugin_admin,
-			'save_issue_metadata_fields'
-		);
-
-		/*
 		 * Sanitize settings choices and save to database.
 		 */
 		$this->loader->add_action(

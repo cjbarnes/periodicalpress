@@ -367,33 +367,9 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
-	 * Outputs form fields on the Add Issue pages for metadata items.
-	 *
-	 * @since 1.0.0
-	 */
-	public function display_add_issue_metadata_fields() {
-
-		$path = $this->plugin->get_partials_path( 'admin' );
-		require $path . 'periodicalpress-add-issue-metadata.php';
-
-	}
-
-	/**
-	 * Outputs form fields on the Edit Issue pages for metadata items.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param object $issue    Taxonomy term object for the Issue being edited.
-	 */
-	public function display_edit_issue_metadata_fields( $issue ) {
-
-		$path = $this->plugin->get_partials_path( 'admin' );
-		require $path . 'periodicalpress-edit-issue-metadata.php';
-
-	}
-
-	/**
 	 * Save submitted metadata form fields on the Add/Edit Issue pages.
+	 *
+	 * **TODO repurpose into a full Save Issue Data function.**
 	 *
 	 * @since 1.0.0
 	 *
