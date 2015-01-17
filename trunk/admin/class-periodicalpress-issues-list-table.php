@@ -265,6 +265,26 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		) );
 
 		/*
+		 * Add metadata to the Issues data. Added here, rather than in the next
+		 * foreach loop, so that we can sort by metadata.
+		 */
+		foreach ( $issues as $issue ) {
+			$meta = get_metadata( 'pp_term', $issue->term_id );
+			$issue->number = ! empty( $meta['pp_issue_number'][0] )
+				? $meta['pp_issue_number'][0]
+				: '';
+			$issue->date = ! empty( $meta['pp_issue_date'][0] )
+				? $meta['pp_issue_date'][0]
+				: '';
+			$issue->status = ! empty( $meta['pp_issue_status'][0] )
+				? $meta['pp_issue_status'][0]
+				: '';
+			$issue->created_date = ! empty( $meta['pp_issue_created_date'][0] )
+				? $meta['pp_issue_created_date'][0]
+				: 0;
+		}
+
+		/*
 		 * Sort Issues data if 'name' (the default) is the orderby choice.
 		 * Although get_terms() allows ordering by name, we need to order
 		 * manually so we can do a natural sort on Issue numbers - e.g.
@@ -272,9 +292,9 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 */
 		if ( 'name' === $orderby ) {
 			if ( 'DESC' === $order ) {
-				usort( $issues, array( $this, 'descending_sort_term_names' ) );
+				usort( $issues, array( $this, 'descending_sort_terms' ) );
 			} else {
-				usort( $issues, array( $this, 'ascending_sort_term_names' ) );
+				usort( $issues, array( $this, 'ascending_sort_terms' ) );
 			}
 		}
 
@@ -285,36 +305,19 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		$current_issue = (int) get_option( 'pp_current_issue', 0 );
 
 		// Add each term as a new row.
-		foreach ( $issues as $n => $issue ) {
-
-			// Get all metadata for this term.
-			$meta = get_metadata( 'pp_term', $issue->term_id );
-
-			// Prep metadata empty states.
-			$number = ! empty( $meta['pp_issue_number'][0] )
-				? $meta['pp_issue_number'][0]
-				: '';
-			$date = ! empty( $meta['pp_issue_date'][0] )
-				? $meta['pp_issue_date'][0]
-				: '';
-			$title = ! empty( $meta['pp_issue_title'][0] )
-				? $meta['pp_issue_title'][0]
-				: '';
-			$status = ! empty( $meta['pp_issue_status'][0] )
-				? $meta['pp_issue_status'][0]
-				: '';
+		foreach ( $issues as $issue ) {
 
 			// Prep current issue boolean.
 			$current = ( (int) $issue->term_id === $current_issue );
 
 			$data[] = array(
-				'number'        => $number,
+				'number'        => $issue->number,
 				'name'          => $issue->name,
-				'date'          => $date,
+				'date'          => $issue->date,
 				'description'   => $issue->description,
 				'slug'          => $issue->slug,
 				'posts'         => $issue->count,
-				'status'        => $status,
+				'status'        => $issue->status,
 				'ssid'          => $issue->term_id,
 				'current_issue' => $current
 			);
@@ -325,9 +328,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	}
 
 	/**
-	 * Reversed natural sorting function for terms.
+	 * Reversed sorting function for terms.
 	 *
-	 * The opposite of {@see ascending_sort_term_names}.
+	 * Sorts by:
+	 * 1. Unpublished issues (newest first)
+	 * 2. Unpublished issues with no created date
+	 * 3. Published issues (highest number first)
 	 *
 	 * Generates the default sort order of the Issues list table.
 	 *
@@ -339,22 +345,31 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * @return int The comparison result: -1 = greater than, 1 = lesser than,
 	 *             0 = equal to.
 	 */
-	protected function descending_sort_term_names( $obj1, $obj2 ) {
+	protected function descending_sort_terms( $obj1, $obj2 ) {
 
-		$str1 = isset( $obj1->name ) ? $obj1->name : '';
-		$str2 = isset( $obj2->name ) ? $obj2->name : '';
+		$compare = array();
 
-		return strnatcasecmp( $str2, $str1 );
+		foreach( array( $obj1, $obj2 ) as $n => $obj ) {
+			if ( ! empty( $obj->number ) ) {
+				$compare[ $n ] = $obj->number;
+			} else {
+				// All non-numbered issues should be at the top.
+				$compare[ $n ] = 9999;
+
+				// Sort non-numbered issues by created date.
+				if ( ! empty( $obj->created_date ) ) {
+					$compare[ $n ] += $obj->created_date;
+				}
+			}
+		}
+
+		return strnatcmp( $compare[1], $compare[0] );
 	}
 
 	/**
 	 * Natural sorting function for terms.
 	 *
-	 * Basically an array-of-objects extension of PHP's strnatcasecmp()
-	 * {@link http://php.net/manual/en/function.strnatcasecmp.php}. Called by
-	 * usort() to carry out an ascending order 'natural sort' - e.g.
-	 * "Issue 10" > "Issue 2" - of an array of taxonomy terms based on their
-	 * `name` properties.
+	 * The opposite of {@see descending_sort_term_names}.
 	 *
 	 * @since 1.0.0
 	 * @access protected
@@ -364,12 +379,8 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * @return int The comparison result: -1 = greater than, 1 = lesser than,
 	 *             0 = equal to.
 	 */
-	protected function ascending_sort_term_names( $obj1, $obj2 ) {
-
-		$str1 = isset( $obj1->name ) ? $obj1->name : '';
-		$str2 = isset( $obj2->name ) ? $obj2->name : '';
-
-		return strnatcasecmp( $str1, $str2 );
+	protected function ascending_sort_terms( $obj1, $obj2 ) {
+		return $this->descending_sort_terms( $obj2, $obj1 );
 	}
 
 	/**
