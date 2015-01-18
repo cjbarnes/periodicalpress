@@ -178,7 +178,7 @@ class PeriodicalPress_Post_Issue_Box extends PeriodicalPress_Singleton {
 	public function render_issue_metabox( $post ) {
 
 		$path = $this->plugin->get_partials_path( 'admin' );
-		require $path . 'periodicalpress-issue-metabox.php';
+		require $path . 'periodicalpress-posts-metabox-issue.php';
 
 	}
 
@@ -200,7 +200,7 @@ class PeriodicalPress_Post_Issue_Box extends PeriodicalPress_Singleton {
 		if ( ( $tax_name === $column_name )
 		&& ( 'post' === $post_type ) ) {
 			$path = $this->plugin->get_partials_path( 'admin' );
-			require $path . 'periodicalpress-issue-quick-edit-box.php';
+			require $path . 'periodicalpress-posts-quick-edit-issue.php';
 		}
 
 	}
