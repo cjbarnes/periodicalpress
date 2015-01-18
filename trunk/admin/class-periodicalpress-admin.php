@@ -234,7 +234,7 @@ class PeriodicalPress_Admin {
 				'pp_edit_issues',
 				$tax->labels->name,
 				sprintf( _x( '%s (debugging)', 'Admin menu', $domain ), $tax->labels->all_items ),
-				$tax->cap->edit_terms,
+				'activate_plugins',
 				"edit-tags.php?taxonomy={$tax->name}"
 			);
 		}
