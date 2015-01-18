@@ -19,77 +19,7 @@
  *
  * @since 1.0.0
  */
-class PeriodicalPress_Common {
-
-	/**
-	 * The plugin's main class.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @var PeriodicalPress $plugin
-	 */
-	protected $plugin;
-
-	/**
-	 * Returns the instance of this class.
-	 *
-	 * The key method that enables the Singleton pattern for this class. Calls
-	 * __construct() to create the class instance if it doesn't exist yet.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param PeriodicalPress $plugin The main plugin class instance.
-	 * @return PeriodicalPress_Common Instance of this class.
-	 */
-	public static function get_instance( $plugin ) {
-
-		static $instance = null;
-		if ( null === $instance ) {
-			$instance = new static( $plugin );
-		}
-
-		return $instance;
-	}
-
-	/**
-	 * Initialize the class and set its properties and hooks.
-	 *
-	 * Access `protected` enforces the Singleton pattern by disabling the `new`
-	 * operator.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @var PeriodicalPress $plugin The main plugin class instance.
-	 */
-	protected function __construct( $plugin ) {
-
-		$this->plugin = $plugin;
-
-		$this->define_hooks();
-		$this->load_dependencies();
-
-	}
-
-	/**
-	 * Private clone method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __clone() {
-
-	}
-
-	/**
-	 * Private unserialize method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __wakeup() {
-
-	}
+class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 
 	/**
 	 * Load the required dependencies for the admin area.
@@ -98,10 +28,12 @@ class PeriodicalPress_Common {
 	 *
 	 * - PeriodicalPress_Taxonomy. Registers the main Issues taxonomy.
 	 *
+	 * Called by the parent class's Constructor.
+	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 */
-	private function load_dependencies() {
+	protected function load_dependencies() {
 
 		$path = $this->plugin->get_plugin_path();
 
@@ -116,10 +48,12 @@ class PeriodicalPress_Common {
 	/**
 	 * Register all hooks for actions and filters in this class.
 	 *
+	 * Called by the parent class's Constructor.
+	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 */
-	private function define_hooks() {
+	protected function define_hooks() {
 
 		$tax_name = $this->plugin->get_taxonomy_name();
 

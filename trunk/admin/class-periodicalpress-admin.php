@@ -15,77 +15,7 @@
  *
  * @since 1.0.0
  */
-class PeriodicalPress_Admin {
-
-	/**
-	 * The plugin's main class.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @var PeriodicalPress $plugin
-	 */
-	protected $plugin;
-
-	/**
-	 * Returns the instance of this class.
-	 *
-	 * The key method that enables the Singleton pattern for this class. Calls
-	 * __construct() to create the class instance if it doesn't exist yet.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param PeriodicalPress $plugin The main plugin class instance.
-	 * @return PeriodicalPress_Admin Instance of this class.
-	 */
-	public static function get_instance( $plugin ) {
-
-		static $instance = null;
-		if ( null === $instance ) {
-			$instance = new static( $plugin );
-		}
-
-		return $instance;
-	}
-
-	/**
-	 * Initialize the class and set its properties and hooks.
-	 *
-	 * Access `protected` enforces the Singleton pattern by disabling the `new`
-	 * operator.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @var PeriodicalPress $plugin The main plugin class instance.
-	 */
-	protected function __construct( $plugin ) {
-
-		$this->plugin = $plugin;
-
-		$this->define_hooks();
-		$this->load_dependencies();
-
-	}
-
-	/**
-	 * Private clone method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __clone() {
-
-	}
-
-	/**
-	 * Private unserialize method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __wakeup() {
-
-	}
+class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 
 	/**
 	 * Load the required dependencies for the admin area.
@@ -99,10 +29,12 @@ class PeriodicalPress_Admin {
 	 * PeriodicalPress_List_Table is a parent class only, so we do not
 	 * instantiate it here.
 	 *
+	 * Called by the parent class's Constructor.
+	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 */
-	private function load_dependencies() {
+	protected function load_dependencies() {
 
 		$path = $this->plugin->get_plugin_path();
 
@@ -121,10 +53,12 @@ class PeriodicalPress_Admin {
 	/**
 	 * Register all hooks for actions and filters in this class.
 	 *
+	 * Called by the parent class's Constructor.
+	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 */
-	private function define_hooks() {
+	protected function define_hooks() {
 
 		// Admin CSS and JavaScript.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );

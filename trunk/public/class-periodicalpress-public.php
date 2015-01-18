@@ -11,84 +11,11 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the dashboard-specific stylesheet and JavaScript.
- *
  * Uses the Singleton pattern.
  *
  * @since 1.0.0
  */
-class PeriodicalPress_Public {
-
-	/**
-	 * The plugin's main class.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @var PeriodicalPress $plugin
-	 */
-	protected $plugin;
-
-	/**
-	 * Returns the instance of this class.
-	 *
-	 * The key method that enables the Singleton pattern for this class. Calls
-	 * __construct() to create the class instance if it doesn't exist yet.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param PeriodicalPress $plugin The main plugin class instance.
-	 * @return PeriodicalPress_Public Instance of this class.
-	 */
-	public static function get_instance( $plugin ) {
-
-		static $instance = null;
-		if ( null === $instance ) {
-			$instance = new static( $plugin );
-		}
-
-		return $instance;
-	}
-
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * Access `protected` enforces the Singleton pattern by disabling the `new`
-	 * operator.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @var PeriodicalPress $plugin The main plugin class instance.
-	 */
-	protected function __construct( $plugin ) {
-
-		$this->plugin = $plugin;
-
-		$this->define_hooks();
-		$this->load_dependencies();
-
-	}
-
-	/**
-	 * Private clone method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __clone() {
-
-	}
-
-	/**
-	 * Private unserialize method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __wakeup() {
-
-	}
+class PeriodicalPress_Public extends PeriodicalPress_Singleton {
 
 	/**
 	 * Load the required dependencies for the admin area.
@@ -98,10 +25,12 @@ class PeriodicalPress_Public {
 	 * - PeriodicalPress_Theme_Patching. Customises themes that do not natively
 	 *   support this plugin.
 	 *
+	 * Called by the parent class's Constructor.
+	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 */
-	private function load_dependencies() {
+	protected function load_dependencies() {
 
 		$path = $this->plugin->get_plugin_path();
 
@@ -117,10 +46,12 @@ class PeriodicalPress_Public {
 	/**
 	 * Register all hooks for actions and filters in this class.
 	 *
+	 * Called by the parent class's Constructor.
+	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 */
-	private function define_hooks() {
+	protected function define_hooks() {
 
 		// Public-facing CSS and JavaScript
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );

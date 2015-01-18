@@ -8,8 +8,10 @@
  * @package PeriodicalPress\admin
  */
 
-
 if ( ! class_exists( 'PeriodicalPress_List_Table' ) ) {
+	/**
+	 * Get the parent class for List Tables.
+	 */
 	require_once( plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-periodicalpress-list-table.php' );
 }
 

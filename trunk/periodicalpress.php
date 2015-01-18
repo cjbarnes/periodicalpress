@@ -99,11 +99,10 @@ function deactivate_periodicalpress() {
 register_deactivation_hook( __FILE__, 'deactivate_periodicalpress' );
 
 /**
- * The core plugin class that is used to define internationalization,
- * dashboard-specific hooks, and public-facing site hooks.
+ * The core plugin classes that are used to define internationalization,
+ * load dependencies, and setup the common, admin, and public classes.
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-periodicalpress.php';
-
 
 /**
  * Begins execution of the plugin.

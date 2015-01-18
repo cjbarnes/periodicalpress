@@ -11,6 +11,13 @@
  * @package PeriodicalPress
  */
 
+if ( ! class_exists( 'PeriodicalPress_Singleton' ) ) {
+	/**
+	 * Get the parent class for all Singleton classes.
+	 */
+	require_once( plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-singleton.php' );
+}
+
 /**
  * The core plugin class.
  *

@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  *
- * @package PeriodicalPress
+ * @package PeriodicalPress\Admin
  */
 
 /**
@@ -19,83 +19,17 @@
  *
  * @since 1.0.0
  */
-class PeriodicalPress_Post_Issue_Box {
-
-	/**
-	 * The plugin's main class.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @var PeriodicalPress $plugin
-	 */
-	protected $plugin;
-
-	/**
-	 * Returns the instance of this class.
-	 *
-	 * The key method that enables the Singleton pattern for this class. Calls
-	 * __construct() to create the class instance if it doesn't exist yet.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param PeriodicalPress $plugin The main plugin class instance.
-	 * @return PeriodicalPress_Post_Issue_Box Instance of this class.
-	 */
-	public static function get_instance( $plugin ) {
-
-		static $instance = null;
-		if ( null === $instance ) {
-			$instance = new static( $plugin );
-		}
-
-		return $instance;
-	}
-
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * Access `protected` enforces the Singleton pattern by disabling the `new`
-	 * operator.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param PeriodicalPress $plugin The main plugin class instance.
-	 */
-	protected function __construct( $plugin ) {
-
-		$this->plugin = $plugin;
-
-		$this->define_hooks();
-
-	}
-
-	/**
-	 * Private clone method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __clone() {
-
-	}
-
-	/**
-	 * Private unserialize method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __wakeup() {
-
-	}
+class PeriodicalPress_Post_Issue_Box extends PeriodicalPress_Singleton {
 
 	/**
 	 * Register all hooks for actions and filters in this class.
 	 *
+	 * Called by the parent class's Constructor.
+	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 */
-	private function define_hooks() {
+	protected function define_hooks() {
 
 		// Reorder the Posts table columns (and Quick Edit boxes).
 		add_action( 'manage_posts_columns', array( $this, 'posts_move_issue_column' ) );

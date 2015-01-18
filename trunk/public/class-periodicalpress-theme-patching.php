@@ -20,43 +20,13 @@
  *
  * @since 1.0.0
  */
-class PeriodicalPress_Theme_Patching {
-
-	/**
-	 * The plugin's main class.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @var PeriodicalPress $plugin
-	 */
-	protected $plugin;
-
-	/**
-	 * Returns the instance of this class.
-	 *
-	 * The key method that enables the Singleton pattern for this class. Calls
-	 * __construct() to create the class instance if it doesn't exist yet.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param PeriodicalPress $plugin The main plugin class instance.
-	 * @return PeriodicalPress_Theme_Patching Instance of this class.
-	 */
-	public static function get_instance( $plugin ) {
-
-		static $instance = null;
-		if ( null === $instance ) {
-			$instance = new static( $plugin );
-		}
-
-		return $instance;
-	}
+class PeriodicalPress_Theme_Patching extends PeriodicalPress_Singleton {
 
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * Access `protected` enforces the Singleton pattern by disabling the `new`
-	 * operator.
+	 * Calls the Constructor {@see PeriodicalPress_Singleton::__construct()} of
+	 * the parent's class first.
 	 *
 	 * @since 1.0.0
 	 * @access protected
@@ -65,35 +35,17 @@ class PeriodicalPress_Theme_Patching {
 	 */
 	protected function __construct( $plugin ) {
 
-		$this->plugin = $plugin;
+		// Also call the parent class Constructor.
+		parent::__construct( $plugin );
 
-		$this->define_hooks();
 		$this->do_init_actions();
 
 	}
 
 	/**
-	 * Private clone method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __clone() {
-
-	}
-
-	/**
-	 * Private unserialize method to enforce the Singleton pattern.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function __wakeup() {
-
-	}
-
-	/**
 	 * Register all hooks required to customise the current theme.
+	 *
+	 * Called by the parent class's Constructor.
 	 *
 	 * @since 1.0.0
 	 * @access protected
