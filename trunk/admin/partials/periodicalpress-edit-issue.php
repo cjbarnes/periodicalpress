@@ -3,12 +3,15 @@
 /**
  * Display the Edit Issue form
  *
+ * Security for this form (i.e. checking capabilites), and saving, is handled by
+ * the calling file, periodicalpress_edit_pp_issues.php.
+ *
  * @since 1.0.0
  *
  * @package PeriodicalPress\Admin
  */
 
-if ( ! $term_id ) {
+if ( ! $term_id || ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 

@@ -10,6 +10,11 @@
  * @package PeriodicalPress\Admin
  */
 
+// Don't allow direct loading of this file.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $domain = $this->plugin->get_plugin_name();
 
 /*

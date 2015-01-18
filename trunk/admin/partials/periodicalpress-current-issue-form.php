@@ -8,6 +8,11 @@
  * @package PeriodicalPress\Admin
  */
 
+// Don't allow direct loading of this file.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
 

@@ -11,6 +11,11 @@
  * @package PeriodicalPress\Admin
  */
 
+// Don't allow direct loading of this file.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 // Get the main plugin class variables.
 $domain = $this->plugin->get_plugin_name();
 ?>
