@@ -364,8 +364,17 @@ class PeriodicalPress {
 		 */
 		$this->loader->add_action(
 			"load-toplevel_page_pp_edit_issues",
-			$plugin_admin,
+			$plugin_edit_issues,
 			'edit_issues_screen_options'
+		);
+
+		/*
+		 * Set up the metaboxes for the Edit Issue page.
+		 */
+		$this->loader->add_action(
+			'add_meta_boxes_pp_issue',
+			$plugin_edit_issues,
+			'add_remove_metaboxes'
 		);
 
 		/*

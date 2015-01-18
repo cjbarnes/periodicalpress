@@ -161,6 +161,16 @@ class PeriodicalPress_Admin {
 			$this->plugin->get_version(),
 			true
 		);
+		wp_localize_script(
+			$this->plugin->get_plugin_name(),
+			'l10n',
+			array(
+				'datepickerCurrentText' => _x( 'Today', 'Datepicker Button', $domain ),
+				'datepickerDateFormat' => _x( 'dd/mm/yy', 'Datepicker Date Format', $domain ),
+				'isRTL' => is_rtl() ? 'true' : 'false'
+
+			)
+		);
 
 		// Script that enables Quick Editing for posts.
 		$screen = get_current_screen();
@@ -176,18 +186,6 @@ class PeriodicalPress_Admin {
 
 		}
 
-		// Setup array for translation of JavaScript strings.
-		wp_localize_script(
-			$this->plugin->get_plugin_name(),
-			'l10n',
-			array(
-				'datepickerCurrentText' => _x( 'Today', 'Datepicker Button', $domain ),
-				'datepickerDateFormat' => _x( 'dd/mm/yy', 'Datepicker Date Format', $domain ),
-				'isRTL' => is_rtl() ? 'true' : 'false',
-
-			)
-		);
-
 	}
 
 	/**
@@ -196,6 +194,8 @@ class PeriodicalPress_Admin {
 	 * @since 1.0.0
 	 */
 	public function admin_menu_setup() {
+
+		$plugin_edit_issues = PeriodicalPress_Edit_Issues::get_instance( $this->plugin );
 
 		$domain = $this->plugin->get_plugin_name();
 		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
@@ -211,7 +211,7 @@ class PeriodicalPress_Admin {
 			$tax->labels->menu_name,
 			$tax->cap->assign_terms, // user capability required to show this menu
 			'pp_edit_issues',
-			array( $this, 'edit_issues_screen' ),
+			array( $plugin_edit_issues, 'edit_issues_screen' ),
 			'dashicons-pressthis',
 			'4.44' // position in the menu (Posts is 5)
 		);
@@ -265,38 +265,6 @@ class PeriodicalPress_Admin {
 		}
 
 		return $parent_file;
-	}
-
-	/**
-	 * Display the Edit Issues admin page.
-	 *
-	 * @since 1.0.0
-	 */
-	public function edit_issues_screen() {
-
-		/**
-		 * Output the Edit Issues page.
-		 */
-		$path = $this->plugin->get_partials_path( 'admin' );
-		require $path . 'periodicalpress-edit-pp-issues.php';
-
-	}
-
-	/**
-	 * Registers the Screen Options for the Edit Issues admin page.
-	 *
-	 * @since 1.0.0
-	 */
-	public function edit_issues_screen_options() {
-
-		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
-
-		add_screen_option( 'per_page', array(
-			'label' => $tax->labels->name,
-			'default' => 20,
-			'option' => 'edit_' . $tax->name . '_per_page'
-		) );
-
 	}
 
 	/**
