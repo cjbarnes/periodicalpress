@@ -107,9 +107,14 @@ class PeriodicalPress_Admin {
 		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-list-table.php';
 
 		/**
-		 * The class that handles Issue adding, editing, and deleting.
+		 * The class that prepares and renders Issue editing screens.
 		 */
 		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-edit-issues.php';
+
+		/**
+		 * The class that handles Issue saving and deleting.
+		 */
+		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-save-issues.php';
 
 		/**
 		 * The class that renders and saves the Edit Post metabox and the Quick

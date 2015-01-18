@@ -328,6 +328,7 @@ class PeriodicalPress {
 
 		$plugin_admin = PeriodicalPress_Admin::get_instance( $this );
 		$plugin_edit_issues = PeriodicalPress_Edit_Issues::get_instance( $this );
+		$plugin_save_issues = PeriodicalPress_Save_Issues::get_instance( $this );
 		$plugin_post_issue_box = new PeriodicalPress_Post_Issue_Box( $this );
 
 		/*
@@ -432,14 +433,14 @@ class PeriodicalPress {
 		 */
 		$this->loader->add_action(
 			'transition_post_status',
-			$plugin_edit_issues,
+			$plugin_save_issues,
 			'unpublish_post_issues_if_empty',
 			10,
 			3
 		);
 		$this->loader->add_action(
 			'edited_term_taxonomy',
-			$plugin_edit_issues,
+			$plugin_save_issues,
 			'unpublish_issue_if_empty',
 			10,
 			2
