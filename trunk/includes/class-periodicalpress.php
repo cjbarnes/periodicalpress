@@ -11,13 +11,6 @@
  * @package PeriodicalPress
  */
 
-if ( ! class_exists( 'PeriodicalPress_Singleton' ) ) {
-	/**
-	 * Get the parent class for all Singleton classes.
-	 */
-	require_once( plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-periodicalpress-singleton.php' );
-}
-
 /**
  * The core plugin class.
  *
@@ -32,16 +25,6 @@ if ( ! class_exists( 'PeriodicalPress_Singleton' ) ) {
  * @since 1.0.0
  */
 class PeriodicalPress {
-
-	/**
-	 * The loader that's responsible for maintaining and registering all hooks
-	 * that power the plugin.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @var PeriodicalPress_Loader $loader
-	 */
-	protected $loader;
 
 	/**
 	 * The unique identifier of this plugin.
@@ -198,6 +181,9 @@ class PeriodicalPress {
 	private function load_dependencies() {
 
 		$path = $this->plugin_path;
+
+		// Get the parent class for all Singleton classes.
+		require_once $path . 'includes/class-periodicalpress-singleton.php';
 
 		/*
 		 * Load main classes.
