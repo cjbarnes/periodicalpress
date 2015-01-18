@@ -476,7 +476,7 @@ span.wp-media-buttons-icon:before {
 	z-index: 1000000;
 }
 
-#excerpt {
+textarea#description {
 	margin: 0;
 	height: 4em;
 	width: 98%;

@@ -20,6 +20,9 @@ if ( ! defined( 'ABSPATH' ) || ! isset( $issue ) ) {
 
 $domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
+
 ?>
+
+<!-- TODO: Save, publish, unpublish, delete, Set Current Issue, Preview buttons -->
 
 <?php
