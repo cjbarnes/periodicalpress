@@ -145,14 +145,6 @@ class PeriodicalPress {
 		 */
 
 		$this->load_dependencies();
-		$this->set_locale();
-		$this->define_common_hooks();
-
-		if ( is_admin() ) {
-			$this->define_admin_hooks();
-		} else {
-			$this->define_public_hooks();
-		}
 
 	}
 
@@ -181,7 +173,6 @@ class PeriodicalPress {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - PeriodicalPress_Loader. Orchestrates the hooks of the plugin.
 	 * - PeriodicalPress_i18n. Defines internationalization functionality.
 	 * - PeriodicalPress_Taxonomy. Defines the Issues taxonomy.
 	 * - PeriodicalPress_Common. Defines all hooks shared by the dashboard and
@@ -189,6 +180,7 @@ class PeriodicalPress {
 	 * - PeriodicalPress_Admin. Defines all hooks for the dashboard.
 	 * - PeriodicalPress_Public. Defines all hooks for the public side of the
 	 *   site.
+	 * - PeriodicalPress_Template_Tags. All plugin template tags.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -198,54 +190,35 @@ class PeriodicalPress {
 	 */
 	private function load_dependencies() {
 
-		/**
-		 * The class responsible for orchestrating the actions and filters of
-		 * the core plugin.
-		 */
-		require_once $this->plugin_path . 'includes/class-periodicalpress-loader.php';
+		$path = $this->plugin_path;
 
-		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
+		/*
+		 * Load main classes.
 		 */
-		require_once $this->plugin_path . 'includes/class-periodicalpress-i18n.php';
-
-		/**
-		 * The class responsible for registering the main plugin taxonomy.
-		 */
-		require_once $this->plugin_path . 'includes/class-periodicalpress-taxonomy.php';
-
-		/**
-		 * The class responsible for defining all actions that are common to
-		 * both Dashboard and public-facing pages.
-		 */
-		require_once $this->plugin_path . 'includes/class-periodicalpress-common.php';
+		require_once $path . 'includes/class-periodicalpress-i18n.php';
+		require_once $path . 'includes/class-periodicalpress-common.php';
 
 		if ( is_admin() ) {
-
-			/**
-			 * The class responsible for defining all actions that occur in the
-			 * Dashboard.
-			 */
-			require_once $this->plugin_path . 'admin/class-periodicalpress-admin.php';
-
+			require_once $path . 'admin/class-periodicalpress-admin.php';
 		} else {
-
-			/**
-			 * The class responsible for defining all actions that occur in the
-			 * public-facing side of the site.
-			 */
-			require_once $this->plugin_path . 'public/class-periodicalpress-public.php';
-
+			require_once $path . 'public/class-periodicalpress-public.php';
 		}
 
-		/**
-		 * All plugin template tags. These will be registered as methods of
-		 * PeriodicalPress (this class).
-		 */
-		require_once $this->plugin_path . 'includes/periodicalpress-template-tags.php';
+		require_once $path . 'includes/periodicalpress-template-tags.php';
 
-		$this->loader = new PeriodicalPress_Loader();
+		// Prepare internationalization class and hooks.
+		$this->set_locale();
+
+		/*
+		 * Instantiate classes.
+		 */
+		PeriodicalPress_Common::get_instance( $this );
+
+		if ( is_admin() ) {
+			PeriodicalPress_Admin::get_instance( $this );
+		} else {
+			PeriodicalPress_Public::get_instance( $this );
+		}
 
 	}
 
@@ -263,248 +236,8 @@ class PeriodicalPress {
 		$plugin_i18n = new PeriodicalPress_i18n();
 		$plugin_i18n->set_domain( $this->get_plugin_name() );
 
-		$this->loader->add_action(
-			'plugins_loaded',
-			$plugin_i18n,
-			'load_plugin_textdomain'
-		);
+		add_action( 'plugins_loaded', array( $plugin_i18n, 'load_plugin_textdomain' ) );
 
-	}
-
-	/**
-	 * Register all of the hooks that affect both public and admin areas, e.g.
-	 * custom post types.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function define_common_hooks() {
-
-		$plugin_common = PeriodicalPress_Common::get_instance( $this );
-		$plugin_taxonomy = PeriodicalPress_Taxonomy::get_instance( $this );
-
-		$tax_name = $this->taxonomy_name;
-
-		/*
-		 * Setup custom taxonomies, including the main pp_issue taxonomy
-		 */
-		$this->loader->add_action(
-			'init',
-			$plugin_taxonomy,
-			'register_taxonomy',
-			0
-		);
-
-		/*
-		 * Register custom taxonomy metadata table with $wpdb database object.
-		 */
-		$this->loader->add_action(
-			'init',
-			$plugin_common,
-			'register_metadata_table'
-		);
-
-		/*
-		 * Set allowed Issue publication statuses.
-		 */
-		$this->loader->add_filter(
-			"{$tax_name}_statuses",
-			$plugin_common,
-			'set_issue_statuses_list',
-			1,
-			1
-		);
-
-	}
-
-	/**
-	 * Register all of the hooks related to the dashboard functionality of the
-	 * plugin.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function define_admin_hooks() {
-
-		$plugin_admin = PeriodicalPress_Admin::get_instance( $this );
-		$plugin_edit_issues = PeriodicalPress_Edit_Issues::get_instance( $this );
-		$plugin_save_issues = PeriodicalPress_Save_Issues::get_instance( $this );
-		$plugin_post_issue_box = new PeriodicalPress_Post_Issue_Box( $this );
-
-		/*
-		 * Admin CSS and JavaScript.
-		 */
-		$this->loader->add_action(
-			'admin_enqueue_scripts',
-			$plugin_admin,
-			'enqueue_styles'
-		);
-		$this->loader->add_action(
-			'admin_enqueue_scripts',
-			$plugin_admin,
-			'enqueue_scripts'
-		);
-
-		/*
-		 * Admin menu item setup.
-		 */
-		$this->loader->add_action(
-			'admin_menu',
-			$plugin_admin,
-			'admin_menu_setup'
-		);
-		$this->loader->add_filter(
-			'parent_file',
-			$plugin_admin,
-			'fix_submenu_parent_files'
-		);
-
-		/*
-		 * Create hooks to set up screen options and help tabs for menus and
-		 * submenus.
-		 */
-		$this->loader->add_action(
-			"load-toplevel_page_pp_edit_issues",
-			$plugin_edit_issues,
-			'edit_issues_screen_options'
-		);
-
-		/*
-		 * Set up the metaboxes for the Edit Issue page.
-		 */
-		$this->loader->add_action(
-			'add_meta_boxes_pp_issue',
-			$plugin_edit_issues,
-			'add_remove_metaboxes'
-		);
-
-		/*
-		 * Sanitize settings choices and save to database.
-		 */
-		$this->loader->add_action(
-			'periodicalpress_admin_top',
-			$plugin_admin,
-			'save_current_issue_field'
-		);
-
-		/*
-		 * Reorder the Posts table columns (and Quick Edit boxes).
-		 */
-		$this->loader->add_action(
-			'manage_posts_columns',
-			$plugin_post_issue_box,
-			'posts_move_issue_column'
-		);
-
-		/*
-		 * Add a custom Issues box to the Quick Edit for posts.
-		 */
-		$this->loader->add_action(
-			'quick_edit_custom_box',
-			$plugin_post_issue_box,
-			'render_issue_quick_edit_box',
-			10,
-			2
-		);
-
-		/*
-		 * Replace the Issues box on the Post Add/Edit page.
-		 */
-		$this->loader->add_action(
-			'add_meta_boxes_post',
-			$plugin_post_issue_box,
-			'add_remove_metaboxes'
-		);
-
-		/*
-		 * Save the Issue for a post, whether set by the Edit Post screen or
-		 * the Quick Edit.
-		 */
-		$this->loader->add_action(
-			'save_post',
-			$plugin_post_issue_box,
-			'save_post_issue',
-			10,
-			2
-		);
-
-		/*
-		 * Unpublish an Issue when all posts within it are unpublished.
-		 */
-		$this->loader->add_action(
-			'transition_post_status',
-			$plugin_save_issues,
-			'unpublish_post_issues_if_empty',
-			10,
-			3
-		);
-		$this->loader->add_action(
-			'edited_term_taxonomy',
-			$plugin_save_issues,
-			'unpublish_issue_if_empty',
-			10,
-			2
-		);
-
-		/*
-		 * Manually add the Issue column to the Posts list table.
-		 */
-		$this->loader->add_action(
-			'manage_posts_custom_column',
-			$plugin_post_issue_box,
-			'list_table_column_pp_issue',
-			10,
-			2
-		);
-
-	}
-
-	/**
-	 * Register all of the hooks related to the public-facing functionality of
-	 * the plugin.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 */
-	private function define_public_hooks() {
-
-		$plugin_public = PeriodicalPress_Public::get_instance( $this );
-		$plugin_theme_patching = PeriodicalPress_Theme_Patching::get_instance( $this );
-
-		/*
-		 * Public-facing CSS and JavaScript
-		 */
-		$this->loader->add_action(
-			'wp_enqueue_scripts',
-			$plugin_public,
-			'enqueue_styles'
-		);
-		$this->loader->add_action(
-			'wp_enqueue_scripts',
-			$plugin_public,
-			'enqueue_scripts'
-		);
-
-		/*
-		 * Register the theme patching actions and filters, after init (to
-		 * allow time for add_theme_supports() to be called by the theme).
-		 */
-		$this->loader->add_action(
-			'init',
-			$plugin_theme_patching,
-			'define_hooks',
-			999
-		);
-
-	}
-
-	/**
-	 * Run the loader to execute all of the hooks with WordPress.
-	 *
-	 * @since 1.0.0
-	 */
-	public function run() {
-		$this->loader->run();
 	}
 
 	/**
@@ -517,17 +250,6 @@ class PeriodicalPress {
 	 */
 	public function get_plugin_name() {
 		return $this->plugin_name;
-	}
-
-	/**
-	 * The reference to the class that orchestrates the hooks with the plugin.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return PeriodicalPress_Loader Orchestrates the hooks of the plugin.
-	 */
-	public function get_loader() {
-		return $this->loader;
 	}
 
 	/**

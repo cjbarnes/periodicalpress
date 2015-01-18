@@ -117,8 +117,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-periodicalpress.php';
  */
 function run_periodicalpress() {
 
-	$plugin = PeriodicalPress::get_instance();
-	$plugin->run();
+	PeriodicalPress::get_instance();
 
 }
 run_periodicalpress();

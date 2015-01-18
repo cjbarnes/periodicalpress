@@ -62,6 +62,8 @@ class PeriodicalPress_Edit_Issues {
 
 		$this->plugin = $plugin;
 
+		$this->define_hooks();
+
 	}
 
 	/**
@@ -81,6 +83,22 @@ class PeriodicalPress_Edit_Issues {
 	 * @access private
 	 */
 	private function __wakeup() {
+
+	}
+
+	/**
+	 * Register all hooks for actions and filters in this class.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function define_hooks() {
+
+		// Set up screen options and help tabs for Edit Issues screen.
+		add_action( 'load-toplevel_page_pp_edit_issues', array( $this, 'edit_issues_screen_options' ) );
+
+		// Set up the metaboxes for the Edit Issue page.
+		add_action( 'add_meta_boxes_pp_issue', array( $this, 'add_remove_metaboxes' ) );
 
 	}
 

@@ -32,21 +32,6 @@ class PeriodicalPress_Theme_Patching {
 	protected $plugin;
 
 	/**
-	 * The loader that's responsible for maintaining and registering all hooks
-	 * in this class, except define_hooks().
-	 *
-	 * Cannot reuse the main plugin class's PeriodicalPress_Loader instance,
-	 * because its run() method (which registers all its hooks) has already been
-	 * run once. So we would end up with repeated actions and filters
-	 * registered everywhere.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @var PeriodicalPress_Loader $loader
-	 */
-	protected $loader;
-
-	/**
 	 * Returns the instance of this class.
 	 *
 	 * The key method that enables the Singleton pattern for this class. Calls
@@ -82,7 +67,8 @@ class PeriodicalPress_Theme_Patching {
 
 		$this->plugin = $plugin;
 
-		$this->loader = new PeriodicalPress_Loader();
+		$this->define_hooks();
+		$this->do_init_actions();
 
 	}
 
@@ -110,69 +96,25 @@ class PeriodicalPress_Theme_Patching {
 	 * Register all hooks required to customise the current theme.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 */
-	public function define_hooks() {
-
-		/*
-		 * Do not register any actions or filters if this theme is designed to
-		 * use PeriodicalPress without modifications.
-		 */
-		if ( current_theme_supports( 'periodicalpress' ) ) {
-			return;
-		}
+	protected function define_hooks() {
 
 		/*
 		 * Redirect the blog index page to the Current Issue permalink. (Also
 		 * ensures the taxonomy term layout is used.)
 		 */
-		$this->loader->add_action(
-			'parse_query',
-			$this,
-			'redirect_to_current_issue',
-			'1.5'
-		);
+		add_action( 'parse_query', array( $this, 'redirect_to_current_issue' ), '1.5' );
 
-		/*
-		 * CSS and JavaScript.
-		 */
-		$this->loader->add_action(
-			'wp_enqueue_scripts',
-			$this,
-			'enqueue_styles'
-		);
-		$this->loader->add_action(
-			'wp_enqueue_scripts',
-			$this,
-			'enqueue_scripts'
-		);
+		// CSS and JavaScript.
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		/*
-		 * Modify the Loop to paginate properly between Issues.
-		 */
-		$this->loader->add_action(
-			'pre_get_posts',
-			$this,
-			'modify_issue_query'
-		);
-		$this->loader->add_action(
-			'wp_head',
-			$this,
-			'override_number_of_pages'
-		);
-		$this->loader->add_filter(
-			'paginate_links',
-			$this,
-			'issue_pagination_link'
-		);
-		$this->loader->add_filter(
-			'get_pagenum_link',
-			$this,
-			'issue_pagination_link'
-		);
-
-		$this->loader->run();
-
-		$this->do_init_actions();
+		// Modify the Loop to paginate properly between Issues.
+		add_action( 'pre_get_posts', array( $this, 'modify_issue_query' ) );
+		add_action( 'wp_head', array( $this, 'override_number_of_pages' ) );
+		add_filter( 'paginate_links', array( $this, 'issue_pagination_link' ) );
+		add_filter( 'get_pagenum_link', array( $this, 'issue_pagination_link' ) );
 
 	}
 
@@ -184,8 +126,9 @@ class PeriodicalPress_Theme_Patching {
 	 * as normal, even though define_hooks() is itself an `init` action.
 	 *
 	 * @since 1.0.0
+	 * @access protected
 	 */
-	public function do_init_actions() {
+	protected function do_init_actions() {
 
 		/**
 		 * Hook that runs immediately after the theme patching hooks have all
@@ -208,19 +151,18 @@ class PeriodicalPress_Theme_Patching {
 	 * Register the stylesheets that accompany the theme modifications in this
 	 * class.
 	 *
-	 * @since 1.0.0
+	 * Stylesheets used:
+	 * - periodicalpress-theme-patching.css - Theme patching stylesheet.
 	 *
-	 * @see PeriodicalPress_Loader
+	 * @since 1.0.0
 	 */
 	public function enqueue_styles() {
 
-		wp_enqueue_style(
-			$this->plugin->get_plugin_name(),
-			plugin_dir_url( __FILE__ ) . 'css/periodicalpress-theme-patching.css',
-			array(),
-			$this->plugin->get_version(),
-			'all'
-		);
+		$name = $this->plugin->get_plugin_name();
+		$path = plugin_dir_url( __FILE__ ) . 'css/';
+		$version = $this->plugin->get_version();
+
+		wp_enqueue_style( "{$name}_theme_patching", "{$path}periodicalpress-theme-patching.css", array(), $version, 'all' );
 
 	}
 
@@ -228,19 +170,18 @@ class PeriodicalPress_Theme_Patching {
 	 * Register the scripts that accompany the theme modifications in this
 	 * class.
 	 *
-	 * @since 1.0.0
+	 * Scripts used:
+	 * - periodicalpress-theme-patching.js - Theme patching scripts.
 	 *
-	 * @see PeriodicalPress_Loader
+	 * @since 1.0.0
 	 */
 	public function enqueue_scripts() {
 
-		wp_enqueue_script(
-			$this->plugin->get_plugin_name(),
-			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-theme-patching.js',
-			array( 'jquery' ),
-			$this->plugin->get_version(),
-			true
-		);
+		$name = $this->plugin->get_plugin_name();
+		$path = plugin_dir_url( __FILE__ ) . 'js/';
+		$version = $this->plugin->get_version();
+
+		wp_enqueue_script( "{$name}_theme_patching", "{$path}periodicalpress-theme-patching.js", array( 'jquery' ), $version, true );
 
 	}
 

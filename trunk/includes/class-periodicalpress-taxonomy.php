@@ -23,6 +23,15 @@
 class PeriodicalPress_Taxonomy {
 
 	/**
+	 * The plugin's main class.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 * @var PeriodicalPress $plugin
+	 */
+	protected $plugin;
+
+	/**
 	 * Returns the instance of this class.
 	 *
 	 * The key method that enables the Singleton pattern for this class. Calls
@@ -30,13 +39,14 @@ class PeriodicalPress_Taxonomy {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param PeriodicalPress $plugin The main plugin class instance.
 	 * @return PeriodicalPress_Taxonomy Instance of this class.
 	 */
-	public static function get_instance() {
+	public static function get_instance( $plugin ) {
 
 		static $instance = null;
 		if ( null === $instance ) {
-			$instance = new static();
+			$instance = new static( $plugin );
 		}
 
 		return $instance;
@@ -50,8 +60,14 @@ class PeriodicalPress_Taxonomy {
 	 *
 	 * @since 1.0.0
 	 * @access protected
+	 *
+	 * @var PeriodicalPress $plugin The main plugin class instance.
 	 */
-	protected function __construct() {
+	protected function __construct( $plugin ) {
+
+		$this->plugin = $plugin;
+
+		$this->define_hooks();
 
 	}
 
@@ -76,6 +92,19 @@ class PeriodicalPress_Taxonomy {
 	}
 
 	/**
+	 * Register all hooks for actions and filters in this class.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function define_hooks() {
+
+		// Register the taxonomy.
+		add_action( 'init', array( $this, 'register_taxonomy' ), 0 );
+
+	}
+
+	/**
 	 * Register the custom taxonomy for Issues.
 	 *
 	 * @since 1.0.0
@@ -84,6 +113,10 @@ class PeriodicalPress_Taxonomy {
 	 */
 	public static function register_taxonomy() {
 
+		/*
+		 * Cannot use the class property $this->plugin here, because on
+		 * activation this method is called statically.
+		 */
 		$plugin = PeriodicalPress::get_instance();
 		$domain = $plugin->get_plugin_name();
 		$tax_name = $plugin->get_taxonomy_name();
@@ -128,7 +161,7 @@ class PeriodicalPress_Taxonomy {
 			'query_var'             => 'issue',
 			'rewrite'               => $rewrite,
 			'capabilities'          => $capabilities,
-			'update_count_callback' => array( self::get_instance(), 'update_issue_post_count' )
+			'update_count_callback' => array( self::get_instance( $plugin ), 'update_issue_post_count' )
 		);
 		register_taxonomy( $tax_name, array( 'post' ), $args );
 

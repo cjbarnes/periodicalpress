@@ -15,6 +15,8 @@
  * {@link render_issue_metabox()}) and the Quick Edit Posts custom box
  * (see {@link render_issue_quick_edit_box()}).
  *
+ * Uses the Singleton pattern.
+ *
  * @since 1.0.0
  */
 class PeriodicalPress_Post_Issue_Box {
@@ -29,15 +31,89 @@ class PeriodicalPress_Post_Issue_Box {
 	protected $plugin;
 
 	/**
+	 * Returns the instance of this class.
+	 *
+	 * The key method that enables the Singleton pattern for this class. Calls
+	 * __construct() to create the class instance if it doesn't exist yet.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param PeriodicalPress $plugin The main plugin class instance.
+	 * @return PeriodicalPress_Post_Issue_Box Instance of this class.
+	 */
+	public static function get_instance( $plugin ) {
+
+		static $instance = null;
+		if ( null === $instance ) {
+			$instance = new static( $plugin );
+		}
+
+		return $instance;
+	}
+
+	/**
 	 * Initialize the class and set its properties.
+	 *
+	 * Access `protected` enforces the Singleton pattern by disabling the `new`
+	 * operator.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param PeriodicalPress $plugin The main plugin class instance.
 	 */
-	public function __construct( $plugin ) {
+	protected function __construct( $plugin ) {
 
 		$this->plugin = $plugin;
+
+		$this->define_hooks();
+
+	}
+
+	/**
+	 * Private clone method to enforce the Singleton pattern.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function __clone() {
+
+	}
+
+	/**
+	 * Private unserialize method to enforce the Singleton pattern.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function __wakeup() {
+
+	}
+
+	/**
+	 * Register all hooks for actions and filters in this class.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function define_hooks() {
+
+		// Reorder the Posts table columns (and Quick Edit boxes).
+		add_action( 'manage_posts_columns', array( $this, 'posts_move_issue_column' ) );
+
+		// Add a custom Issues box to the Quick Edit for posts.
+		add_action( 'quick_edit_custom_box', array( $this, 'render_issue_quick_edit_box' ), 10, 2 );
+
+		// Replace the Issues box on the Post Add/Edit page.
+		add_action( 'add_meta_boxes_post', array( $this, 'add_remove_metaboxes' ) );
+
+		/*
+		 * Save the Issue for a post, whether set by the Edit Post screen or
+		 * the Quick Edit.
+		 */
+		add_action( 'save_post', array( $this, 'save_post_issue' ), 10, 2 );
+
+		// Manually add the Issue column to the Posts list table.
+		add_action( 'manage_posts_custom_column', array( $this, 'list_table_column_pp_issue' ), 10, 2 );
 
 	}
 

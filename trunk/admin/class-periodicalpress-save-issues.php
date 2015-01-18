@@ -66,6 +66,8 @@ class PeriodicalPress_Save_Issues {
 
 		$this->plugin = $plugin;
 
+		$this->define_hooks();
+
 	}
 
 	/**
@@ -85,6 +87,20 @@ class PeriodicalPress_Save_Issues {
 	 * @access private
 	 */
 	private function __wakeup() {
+
+	}
+
+	/**
+	 * Register all hooks for actions and filters in this class.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function define_hooks() {
+
+		// Unpublish an Issue when all posts within it are unpublished.
+		add_action( 'transition_post_status', array( $this, 'unpublish_post_issues_if_empty' ), 10, 3 );
+		add_action( 'edited_term_taxonomy', array( $this, 'unpublish_issue_if_empty' ), 10, 2 );
 
 	}
 

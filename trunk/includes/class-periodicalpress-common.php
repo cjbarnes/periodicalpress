@@ -52,7 +52,7 @@ class PeriodicalPress_Common {
 	}
 
 	/**
-	 * Initialize the class and set its properties.
+	 * Initialize the class and set its properties and hooks.
 	 *
 	 * Access `protected` enforces the Singleton pattern by disabling the `new`
 	 * operator.
@@ -66,6 +66,7 @@ class PeriodicalPress_Common {
 
 		$this->plugin = $plugin;
 
+		$this->define_hooks();
 		$this->load_dependencies();
 
 	}
@@ -95,12 +96,38 @@ class PeriodicalPress_Common {
 	 *
 	 * Include the following files:
 	 *
-	 * - (None)
+	 * - PeriodicalPress_Taxonomy. Registers the main Issues taxonomy.
 	 *
 	 * @since 1.0.0
 	 * @access private
 	 */
 	private function load_dependencies() {
+
+		$path = $this->plugin->get_plugin_path();
+
+		// Include all other common-functionality classes.
+		require_once $path . 'includes/class-periodicalpress-taxonomy.php';
+
+		// Instantiate classes.
+		PeriodicalPress_Taxonomy::get_instance( $this->plugin );
+
+	}
+
+	/**
+	 * Register all hooks for actions and filters in this class.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function define_hooks() {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		// Register custom taxonomy metadata table with $wpdb database object.
+		add_action(	'init',	array( $this, 'register_metadata_table' ) );
+
+		// Set allowed Issue publication statuses.
+		add_filter( "{$tax_name}_statuses", array( $this, 'set_issue_statuses_list' ), 1, 1 );
 
 	}
 

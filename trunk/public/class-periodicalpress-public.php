@@ -65,6 +65,7 @@ class PeriodicalPress_Public {
 
 		$this->plugin = $plugin;
 
+		$this->define_hooks();
 		$this->load_dependencies();
 
 	}
@@ -102,49 +103,88 @@ class PeriodicalPress_Public {
 	 */
 	private function load_dependencies() {
 
-		/**
-		 * The class responsible for adapting the public site when the theme
-		 * does not explicitly support this plugin.
+		$path = $this->plugin->get_plugin_path();
+
+		/*
+		 * Include the class that patches unsupported themes. (Not instantiated
+		 * until init, when we know whether the current theme supports this
+		 * plugin.)
 		 */
-		require_once $this->plugin->get_plugin_path() . 'public/class-periodicalpress-theme-patching.php';
+		require_once $path . 'public/class-periodicalpress-theme-patching.php';
+
+	}
+
+	/**
+	 * Register all hooks for actions and filters in this class.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function define_hooks() {
+
+		// Public-facing CSS and JavaScript
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+		/*
+		 * Register the theme patching actions and filters, after init (to
+		 * allow time for add_theme_supports() to be called by the theme).
+		 */
+		add_action( 'init', array( $this, 'patch_theme' ), 999 );
 
 	}
 
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
-	 * @since 1.0.0
+	 * Stylesheets used:
+	 * - periodicalpress-public.css - Styles loaded on whole public site.
 	 *
-	 * @see PeriodicalPress_Loader
+	 * @since 1.0.0
 	 */
 	public function enqueue_styles() {
 
-		wp_enqueue_style(
-			$this->plugin->get_plugin_name(),
-			plugin_dir_url( __FILE__ ) . 'css/periodicalpress-public.css',
-			array(),
-			$this->plugin->get_version(),
-			'all'
-		);
+		$name = $this->plugin->get_plugin_name();
+		$path = plugin_dir_url( __FILE__ ) . 'css/';
+		$version = $this->plugin->get_version();
+
+		wp_enqueue_style( $name, "{$path}periodicalpress-public.css", array(), $version, 'all' );
 
 	}
 
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
-	 * @since 1.0.0
+	 * Scripts used:
+	 * - periodicalpress-admin.js - Script loaded on whole public site.
 	 *
-	 * @see PeriodicalPress_Loader
+	 * @since 1.0.0
 	 */
 	public function enqueue_scripts() {
 
-		wp_enqueue_script(
-			$this->plugin->get_plugin_name(),
-			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-public.js',
-			array( 'jquery' ),
-			$this->plugin->get_version(),
-			true
-		);
+		$name = $this->plugin->get_plugin_name();
+		$path = plugin_dir_url( __FILE__ ) . 'js/';
+		$version = $this->plugin->get_version();
+
+		wp_enqueue_script( $name, "{$path}periodicalpress-public.js", array( 'jquery' ), $version, true );
+
+	}
+
+	/**
+	 * Loads the Theme Patching class if the current theme does not natively
+	 * support this plugin.
+	 *
+	 * Cannot be called before the init hook because of
+	 * {@see current_theme_supports()}. We can't assume the theme will declare
+	 * theme support for 'periodicalpress' before init.
+	 *
+	 * @since 1.0.0
+	 */
+	public function patch_theme() {
+
+		if ( ! current_theme_supports( 'periodicalpress' ) ) {
+			PeriodicalPress_Theme_Patching::get_instance( $this->plugin );
+		}
 
 	}
 

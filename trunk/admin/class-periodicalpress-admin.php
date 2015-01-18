@@ -48,7 +48,7 @@ class PeriodicalPress_Admin {
 	}
 
 	/**
-	 * Initialize the class and set its properties.
+	 * Initialize the class and set its properties and hooks.
 	 *
 	 * Access `protected` enforces the Singleton pattern by disabling the `new`
 	 * operator.
@@ -62,6 +62,7 @@ class PeriodicalPress_Admin {
 
 		$this->plugin = $plugin;
 
+		$this->define_hooks();
 		$this->load_dependencies();
 
 	}
@@ -91,103 +92,109 @@ class PeriodicalPress_Admin {
 	 *
 	 * Include the following files:
 	 *
-	 * - PeriodicalPress_List_Table. Duplicate of private class WP_List_Table.
-	 * - PeriodicalPress_Edit_Issues. Issue adding/editing/deleting methods.
+	 * - PeriodicalPress_Edit_Issues. Issue editing screens.
+	 * - PeriodicalPress_Save_Issues. Issue saving/deleting methods.
 	 * - PeriodicalPress_Post_Metabox. Callbacks for Edit Post screen metabox.
+	 *
+	 * PeriodicalPress_List_Table is a parent class only, so we do not
+	 * instantiate it here.
 	 *
 	 * @since 1.0.0
 	 * @access private
 	 */
 	private function load_dependencies() {
 
-		/**
-		 * The base class that assembles and displays admin list tables.
-		 * Duplicate of {@see WP_List_Table} in Core.
-		 */
-		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-list-table.php';
+		$path = $this->plugin->get_plugin_path();
 
-		/**
-		 * The class that prepares and renders Issue editing screens.
-		 */
-		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-edit-issues.php';
+		// Include all other dashboard classes.
+		require_once $path . 'admin/class-periodicalpress-edit-issues.php';
+		require_once $path . 'admin/class-periodicalpress-post-issue-box.php';
+		require_once $path . 'admin/class-periodicalpress-save-issues.php';
 
-		/**
-		 * The class that handles Issue saving and deleting.
-		 */
-		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-save-issues.php';
+		// Instantiate classes.
+		PeriodicalPress_Edit_Issues::get_instance( $this->plugin );
+		PeriodicalPress_Post_Issue_Box::get_instance( $this->plugin );
+		PeriodicalPress_Save_Issues::get_instance( $this->plugin );
 
-		/**
-		 * The class that renders and saves the Edit Post metabox and the Quick
-		 * Edit Posts custom box for the Issues taxonomy.
-		 */
-		require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-post-issue-box.php';
+	}
+
+	/**
+	 * Register all hooks for actions and filters in this class.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 */
+	private function define_hooks() {
+
+		// Admin CSS and JavaScript.
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+		// Admin menu item setup.
+		add_action( 'admin_menu', array( $this, 'admin_menu_setup' ) );
+		add_filter( 'parent_file', array( $this, 'fix_submenu_parent_files' ) );
 
 	}
 
 	/**
 	 * Register the stylesheets for the Dashboard.
 	 *
-	 * @since 1.0.0
+	 * Stylesheets used:
+	 * - periodicalpress-admin.css - Styles loaded on whole admin area.
 	 *
-	 * @see PeriodicalPress_Loader
+	 * @since 1.0.0
 	 */
 	public function enqueue_styles() {
 
-		wp_enqueue_style(
-			$this->plugin->get_plugin_name(),
-			plugin_dir_url( __FILE__ ) . 'css/periodicalpress-admin.css',
-			array(),
-			$this->plugin->get_version(),
-			'all'
-		);
+		$name = $this->plugin->get_plugin_name();
+		$path = plugin_dir_url( __FILE__ ) . 'css/';
+		$version = $this->plugin->get_version();
+
+		wp_enqueue_style( $name, "{$path}periodicalpress-admin.css", array(), $version, 'all' );
 
 	}
 
 	/**
 	 * Register the JavaScript for the dashboard.
 	 *
-	 * @since 1.0.0
+	 * Scripts used:
+	 * - periodicalpress-admin.js - Script loaded on whole admin area.
+	 * - periodicalpress-posts-list-table.js - Quick Editing for Posts list
+	 *   table.
 	 *
-	 * @see PeriodicalPress_Loader
+	 * @since 1.0.0
 	 */
 	public function enqueue_scripts() {
 
-		$domain = $this->plugin->get_plugin_name();
+		$name = $this->plugin->get_plugin_name();
+		$path = plugin_dir_url( __FILE__ ) . 'js/';
+		$version = $this->plugin->get_version();
+
+		$domain = $name;
 
 		// Script used thoughout the admin area.
-		wp_enqueue_script(
-			$this->plugin->get_plugin_name(),
-			plugin_dir_url( __FILE__ ) . 'js/periodicalpress-admin.js',
-			array(
-				'jquery',
-				'jquery-ui-core',
-				'jquery-ui-datepicker'
-			),
-			$this->plugin->get_version(),
-			true
-		);
-		wp_localize_script(
-			$this->plugin->get_plugin_name(),
-			'l10n',
-			array(
-				'datepickerCurrentText' => _x( 'Today', 'Datepicker Button', $domain ),
-				'datepickerDateFormat' => _x( 'dd/mm/yy', 'Datepicker Date Format', $domain ),
-				'isRTL' => is_rtl() ? 'true' : 'false'
+		wp_enqueue_script( $name, "{$path}periodicalpress-admin.js", array(
+			'jquery',
+			'jquery-ui-core',
+			'jquery-ui-datepicker'
+		), $version, true );
 
-			)
-		);
+		/*
+		 * Localization object for the main script file. All key-value pairs
+		 * in this array will be available as a global 'l10n' object in the
+		 * JavaScript file ({@see wp_localize_script()}).
+		 */
+		wp_localize_script( $name, 'l10n', array(
+			'datepickerCurrentText' => _x( 'Today', 'Datepicker Button', $domain ),
+			'datepickerDateFormat' => _x( 'dd/mm/yy', 'Datepicker Date Format', $domain ),
+			'isRTL' => is_rtl() ? 'true' : 'false'
+		) );
 
 		// Script that enables Quick Editing for posts.
 		$screen = get_current_screen();
 		if ( 'edit-post' === $screen->id ) {
 
-			wp_enqueue_script(
-				$this->plugin->get_plugin_name() . '_posts_list_table',
-				plugin_dir_url( __FILE__ ) . 'js/periodicalpress-posts-list-table.js',
-				array( 'jquery' ),
-				$this->plugin->get_version(),
-				true
-			);
+			wp_enqueue_script( "{$name}_posts_list_table", "{$path}periodicalpress-posts-list-table.js", array( 'jquery' ), $version, true );
 
 		}
 
