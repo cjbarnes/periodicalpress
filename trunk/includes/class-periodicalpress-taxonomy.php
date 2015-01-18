@@ -172,6 +172,7 @@ class PeriodicalPress_Taxonomy {
 			do_action( 'edited_term_taxonomy', $term, $taxonomy );
 
 		}
+
 	}
 
 }
