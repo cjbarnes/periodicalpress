@@ -107,22 +107,14 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		$domain = $name;
 
 		// Script used thoughout the admin area.
-		wp_enqueue_script( $name, "{$path}periodicalpress-admin.js", array(
-			'jquery',
-			'jquery-ui-core',
-			'jquery-ui-datepicker'
-		), $version, true );
+		wp_enqueue_script( $name, "{$path}periodicalpress-admin.js", array( 'jquery' ), $version, true );
 
 		/*
 		 * Localization object for the main script file. All key-value pairs
 		 * in this array will be available as a global 'l10n' object in the
 		 * JavaScript file ({@see wp_localize_script()}).
 		 */
-		wp_localize_script( $name, 'l10n', array(
-			'datepickerCurrentText' => _x( 'Today', 'Datepicker Button', $domain ),
-			'datepickerDateFormat' => _x( 'dd/mm/yy', 'Datepicker Date Format', $domain ),
-			'isRTL' => is_rtl() ? 'true' : 'false'
-		) );
+		wp_localize_script( $name, 'l10n', array() );
 
 		// Script that enables Quick Editing for posts.
 		$screen = get_current_screen();
