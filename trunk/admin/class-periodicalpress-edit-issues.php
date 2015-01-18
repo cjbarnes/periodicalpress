@@ -128,6 +128,9 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 	 */
 	public function render_submit_metabox( $issue ) {
 
+		$path = $this->plugin->get_partials_path( 'admin' );
+		require $path . 'periodicalpress-issues-metabox-submit.php';
+
 	}
 
 	/**
@@ -139,6 +142,9 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 	 */
 	public function render_meta_metabox( $issue ) {
 
+		$path = $this->plugin->get_partials_path( 'admin' );
+		require $path . 'periodicalpress-issues-metabox-meta.php';
+
 	}
 
 	/**
@@ -149,6 +155,9 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 	 * @param object $issue The Issue term object.
 	 */
 	public function render_description_metabox( $issue ) {
+
+		$path = $this->plugin->get_partials_path( 'admin' );
+		require $path . 'periodicalpress-issues-metabox-description.php';
 
 	}
 
