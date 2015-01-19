@@ -195,10 +195,17 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	/**
 	 * Retrieve an array of the posts objects associated with a single Issue.
 	 *
+	 * Note that a `$status` **must** be provided, or the function fails. This
+	 * is to prevent likely errors, because {@see get_posts()} does not just
+	 * return everything when no `post_status` arg is provided.
+	 *
+	 * To retrieve posts of any status (other than auto-drafts and trash), pass
+	 * in 'any' as the `$status` param.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param int          $issue_id The Issue term ID to get posts for.
-	 * @param array|string $status  Which post statuses to return.
+	 * @param array|string $status   Which post statuses to return.
 	 * @return array The post objects {@see WP_Post}.
 	 */
 	public function get_issue_posts( $issue_id, $status ) {
@@ -208,7 +215,8 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 		if ( is_array( $status ) ) {
 			$statuses = array_intersect( $status, $allowed_statuses );
 		} else {
-			if ( in_array( $status, $allowed_statuses ) ) {
+			if ( ( 'any' === $status )
+			|| in_array( $status, $allowed_statuses ) ) {
 				$statuses = $status;
 			}
 		}
