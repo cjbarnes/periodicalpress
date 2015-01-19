@@ -103,15 +103,105 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Wrapper for add_metadata() for Issues.
+	 *
+	 * Assumes that multiple values are not allowed for any Issue meta keys.
+	 *
+	 * If this meta key already exists for this Issue, nothing is changed. (Use
+	 * {@see update_issue_meta()} to overwrite existing meta values.)
+	 *
+	 * @since 1.0.0
+	 * @see add_metadata()
+	 *
+	 * @param int    $issue_id   ID of the Issue the new metadata belongs to.
+	 * @param string $meta_key   Key to insert.
+	 * @param string $meta_value Value to insert.
+	 * @return int|bool The row ID of the inserted meta key-value pair, or FALSE
+	 *                  on failure.
+	 */
+	public function add_issue_meta( $issue_id, $meta_key, $meta_value ) {
+		return add_metadata( 'pp_term', $issue_id, $meta_key, $meta_value, true );
+	}
+
+	/**
+	 * Wrapper for update_metadata() for Issues.
+	 *
+	 * @since 1.0.0
+	 * @see update_metadata()
+	 *
+	 * @param int    $issue_id   ID of the Issue the metadata belongs to.
+	 * @param string $meta_key   Key to edit/add.
+	 * @param string $meta_value Value to edit/add.
+	 * @param string $prev_value Optional. If set, only overwrite existing
+	 *                           values if they match this param. Default ''.
+	 * @return bool Success of update.
+	 */
+	public function update_issue_meta( $issue_id, $meta_key, $meta_value, $prev_value = '' ) {
+		return update_metadata( 'pp_term', $issue_id, $meta_key, $meta_value, $prev_value );
+	}
+
+	/**
+	 * Wrapper for delete_metadata() for Issues.
+	 *
+	 * Lacks the `$delete_all` param of `delete_metadata()`, which allows the
+	 * bulk deletion of key-value pairs matching `$meta_key` and `$meta_value`
+	 * across all Issues. Use `delete_metadata()` instead to do this.
+	 *
+	 * @since 1.0.0
+	 * @see delete_metadata()
+	 *
+	 * @param int    $issue_id   ID of the Issue the metadata belongs to.
+	 * @param string $meta_key   Key to delete.
+	 * @param string $meta_value Optional. If set, only delete key-value pairs
+	 *                           whose values match this param.
+	 * @return bool Success of deletion.
+	 */
+	public function delete_issue_meta( $issue_id, $meta_key, $meta_value ) {
+		return delete_metadata( 'pp_term', $issue_id, $meta_key, $meta_value );
+	}
+
+	/**
+	 * Wrapper for get_metadata() for Issues.
+	 *
+	 * Assumes that only one meta value is allowed per meta key, and therefore
+	 * returns a one-dimensional array when multiple key-value pairs are being
+	 * retrieved (unlike the Core {@see get_metadata()} function, which returns
+	 * an array of values for each meta key).
+	 *
+	 * @since 1.0.0
+	 * @see get_metadata()
+	 *
+	 * @param int    $issue_id The Issue ID to retrieve metadata for.
+	 * @param string $meta_key Optional. The metadata key to retrieve. If empty,
+	 *                         an associative array of all metadata for this
+	 *                         Issue will be retrieved. Default ''.
+	 * @return string|array|bool The metadata value or array of values.
+	 *                           Returned string|array is empty if meta_key
+	 *                           doesn't exist. FALSE if a param is invalid.
+	 */
+	public function get_issue_meta( $issue_id, $meta_key = '' ) {
+
+		$meta_raw = get_metadata( 'pp_term', $issue_id, $meta_key, true );
+
+		if ( ! empty( $meta_key ) ) {
+			$meta = $meta_raw;
+		} else {
+			// Convert two-dimensional array into a simple associative array.
+			$meta = array_combine( array_keys( $meta_raw ), array_column( $meta_raw, 0 ) );
+		}
+		return $meta;
+	}
+
+	/**
 	 * Retrieve an array of the posts objects associated with a single Issue.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int          $term_id The Issue term ID to get posts for.
+	 * @param int          $issue_id The Issue term ID to get posts for.
 	 * @param array|string $status  Which post statuses to return.
 	 * @return array The post objects {@see WP_Post}.
 	 */
-	public function get_issue_posts( $term_id, $status ) {
+	public function get_issue_posts( $issue_id, $status ) {
 
 		// Sanitize and prep the post statuses passed in.
 		$allowed_statuses = get_post_stati();
@@ -136,7 +226,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 				array(
 					'taxonomy' => $this->plugin->get_taxonomy_name(),
 					'field'    => 'term_id',
-					'terms'    => (int) $term_id
+					'terms'    => (int) $issue_id
 				)
 			)
 		);
