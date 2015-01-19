@@ -26,6 +26,8 @@ class PeriodicalPress_Touch_Time {
 	 *
 	 * Stored as a timestamp (number of seconds since Unix Epoch).
 	 *
+	 * Use (int) `-1` for no datetime.
+	 *
 	 * @since 1.0.0
 	 * @access protected
 	 * @var int $datetime
@@ -47,12 +49,7 @@ class PeriodicalPress_Touch_Time {
 	public function __construct( $datetime ) {
 
 		// Sanitize the date value. Use the current time as a fallback.
-		$datetime = $this->sanitize_date( $datetime );
-		if ( $datetime ) {
-			$this->datetime = $datetime;
-		} else {
-			$this->datetime = time();
-		}
+		$this->datetime = $this->sanitize_date( $datetime );
 
 	}
 
@@ -71,7 +68,7 @@ class PeriodicalPress_Touch_Time {
 		} elseif ( is_string( $new_datetime ) ) {
 			return strtotime( $new_datetime );
 		} else {
-			return 0;
+			return -1;
 		}
 	}
 
@@ -138,22 +135,29 @@ class PeriodicalPress_Touch_Time {
 		// Prepare the days input.
 		if ( 0 >= $p_int ) {
 
-			// Get the current value.
-			$jj = date( 'd', $this->datetime );
+			// Get the current day value, or blank if none.
+			$jj = ( -1 !== $this->datetime )
+				? date( 'd', $this->datetime )
+				: '';
 
 			$day = sprintf( '<label for="pp-jj" class="screen-reader-text">%s</label>', __( 'Day' ) );
-			$day .= "<input type='text' id='pp-jj' name='jj value='$jj' size='2' maxlength='2'{$tab_index_attribute} autocomplete='off' />";
+			$day .= "<input type='text' id='pp-jj' name='jj' value='$jj' size='2' maxlength='2'{$tab_index_attribute} autocomplete='off' />";
 
 		}
 
 		// Prepare the months dropdown.
 		if ( 1 >= $p_int ) {
 
-			// Get the current value.
-			$mm = date( 'm', $this->datetime );
+			// Get the current month value, or blank if none.
+			$mm =  ( -1 !== $this->datetime )
+				? date( 'm', $this->datetime )
+				: '';
 
 			$month = sprintf( "<label for='pp-mm' class='screen-reader-text'>%s</label>\n", __( 'Month' ) );
 			$month .= "<select id='pp-mm' name='mm'{$tab_index_attribute} >\n";
+
+			// Empty date option.
+			$month .= "\t<option value='-1'>--</option>\n";
 
 			// Assemble the twelve month options.
 			for ( $i = 1; $i < 13; $i = $i +1 ) {
@@ -173,7 +177,9 @@ class PeriodicalPress_Touch_Time {
 		}
 
 		// Get the current year value.
-		$aa = date( 'Y', $this->datetime );
+		$aa = ( -1 !== $this->datetime )
+			? date( 'Y', $this->datetime )
+			: '';
 
 		// Prepare the year input.
 		$year = sprintf( '<label for="pp-aa" class="screen-reader-text">%s</label>', __( 'Year' ) );
@@ -214,15 +220,10 @@ class PeriodicalPress_Touch_Time {
 	 *
 	 * @param int|string $new_datetime The new date-time, as a timestamp or a
 	 *                                 string parseable by strtotime().
-	 * @return string The new timestamp (or the old one if setting fails).
+	 * @return string The new timestamp.
 	 */
 	public function set( $new_datetime ) {
-
-		$new_datetime = $this->sanitize_date( $new_datetime );
-		if ( $new_datetime ) {
-			$this->datetime = $new_datetime;
-		}
-
+		$this->datetime = $this->sanitize_date( $new_datetime );
 		return $this->datetime;
 	}
 }
