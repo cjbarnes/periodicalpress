@@ -532,7 +532,7 @@ textarea#description {
 	margin-top: 3px;
 }
 
-#issuestuff #submitdiv .inside {
+#issuestuff #pp_issue_submitdiv .inside {
 	margin: 0;
 	padding: 0;
 }
@@ -882,4 +882,34 @@ table.links-table {
 /* Turn off metabox movable cursor */
 .js .postbox .hndle {
 	cursor: pointer;
+}
+
+/* Publish box icons */
+.issue-status-label,
+.issue-posts-label {
+	cursor: default;
+}
+
+.issue-status-label::before,
+.issue-posts-label::before {
+	position: relative;
+	left: -1px;
+	top: 0;
+	display: inline-block;
+	padding: 0 5px 0 0;
+	vertical-align: top;
+	font: 400 20px/1 dashicons;
+	text-decoration: none !important;
+	color:#888;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	speak: none;
+}
+
+.issue-status-label:before {
+	content: '\f173';
+}
+
+.issue-posts-label:before {
+	content: '\f109';
 }
