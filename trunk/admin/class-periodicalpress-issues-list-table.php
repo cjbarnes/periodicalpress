@@ -127,8 +127,8 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 */
 		$columns = apply_filters( "manage_{$this->tax->name}_columns", array(
 			'name'        => esc_html_x( $this->tax->labels->singular_name, $context, $domain ),
-			'date'        => esc_html_x( 'Date', $context, $domain ),
 			'number'      => esc_html_x( 'Number', $context, $domain ),
+			'date'        => esc_html_x( 'Date', $context, $domain ),
 			'description' => esc_html_x( 'Description', $context, $domain ),
 			'slug'        => esc_html_x( 'Slug', $context, $domain ),
 			'posts'       => esc_html_x( 'Posts', $context, $domain ),
@@ -158,7 +158,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 * @param array $hidden_columns Array of column names.
 		 */
 		$hidden_columns = apply_filters( "manage_{$this->tax->name}_hidden_columns", array(
-			'number',
 			'slug',
 			'ssid'
 		) );
@@ -188,8 +187,8 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 *                                ( name => array( name, order ) ).
 		 */
 		$sortable_columns = apply_filters( "manage_{$this->tax->name}_hidden_columns", array(
-			'name'  => array( 'name', false ),
-			'posts' => array( 'posts', false )
+			'number' => array( 'number', false ),
+			'posts'  => array( 'posts', false )
 		) );
 
 		return $sortable_columns;
@@ -212,7 +211,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		$data = array();
 
 		// Default sort order.
-		$orderby = 'name';
+		$orderby = 'number';
 		$order = 'DESC';
 
 		// Get user-set sort column.
@@ -251,7 +250,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 * don't need to use a 'natural' sort order. If we do need natural sort,
 		 * load the complete list of Issues from the DB.
 		 */
-		if ( 'name' !== $orderby ) {
+		if ( 'number' !== $orderby ) {
 			$args = array_merge( $args, array(
 				'number'       => $page_size,
 				'offset'       => $offset
@@ -295,7 +294,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 * manually so we can do a natural sort on Issue numbers - e.g.
 		 * 'Issue 10' > 'Issue 2'.
 		 */
-		if ( 'name' === $orderby ) {
+		if ( 'number' === $orderby ) {
 			if ( 'DESC' === $order ) {
 				usort( $issues, array( $this, 'descending_sort_terms' ) );
 			} else {
