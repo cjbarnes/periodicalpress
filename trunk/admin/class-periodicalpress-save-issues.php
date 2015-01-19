@@ -54,7 +54,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			return false;
 		}
 
-		$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
 		$domain = $this->plugin->get_plugin_name();
 		$tax_name = $this->plugin->get_taxonomy_name();
@@ -76,13 +76,13 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		$term_id = $term_object->term_id;
 
 		// End here if the issue is published already.
-		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status", true );
+		$old_status = $pp_common->get_issue_meta( $term_id, "{$tax_name}_status" );
 		if ( 'publish' === $old_status ) {
 			return true;
 		}
 
 		// Get a free issue number if there isn't one yet.
-		$issue_num = get_metadata( 'pp_term', $term_id, "{$tax_name}_number", true );
+		$issue_num = $pp_common->get_issue_meta( $term_id, "{$tax_name}_number" );
 		if ( ! is_int( $issue_num ) ) {
 			$issue_num = $this->create_issue_number();
 		}
@@ -100,14 +100,14 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			: false;
 
 		// Metadata changes.
-		$results[] = update_metadata( 'pp_term', $term_id, "{$tax_name}_number", $issue_num );
+		$results[] = $pp_common->update_issue_meta( $term_id, "{$tax_name}_number", $issue_num );
 
 		// Get the ready-to-publish posts attached to this Issue.
 		$post_statuses = array(
 			'pending',
 			'future'
 		);
-		$term_posts = $plugin_common->get_issue_posts( $term_id, $post_statuses );
+		$term_posts = $pp_common->get_issue_posts( $term_id, $post_statuses );
 
 		// Publish the waiting Issues.
 		foreach ( $term_posts as $post ) {
@@ -121,7 +121,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		// Set this as the current issue.
 		update_option( 'pp_current_issue', $term_id );
 
-		$plugin_common->delete_issue_transients();
+		$pp_common->delete_issue_transients();
 
 		/**
 		 * Action for whenever an Issue status changes.
@@ -135,7 +135,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 		// Only set status to Published if all other changes were successful.
 		if ( in_array( false, $results ) ) {
-			$result = update_metadata( 'pp_term', $term_id, "{$tax_name}_status", 'publish' );
+			$result = $pp_common->update_issue_meta( $term_id, "{$tax_name}_status", 'publish' );
 		} else {
 			$result = false;
 		}
@@ -160,7 +160,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			return false;
 		}
 
-		$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
 		$domain = $this->plugin->get_plugin_name();
 		$tax_name = $this->plugin->get_taxonomy_name();
@@ -182,17 +182,17 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		$term_id = $term_object->term_id;
 
 		// End here if the issue is unpublished already.
-		$old_status = get_metadata( 'pp_term', $term_id, "{$tax_name}_status", true );
+		$old_status = $pp_common->get_issue_meta( $term_id, "{$tax_name}_status" );
 
 		if ( 'publish' !== $old_status ) {
 			return true;
 		}
 
 		// Metadata changes.
-		$result = update_metadata( 'pp_term', $term_id, "{$tax_name}_status", 'draft' );
+		$result = $pp_common->update_issue_meta( $term_id, "{$tax_name}_status", 'draft' );
 
 		// Get the already published posts attached to this Issue.
-		$term_posts = $plugin_common->get_issue_posts( $term_id, 'publish' );
+		$term_posts = $pp_common->get_issue_posts( $term_id, 'publish' );
 
 		// Send them back to Pending.
 		foreach ( $term_posts as $post ) {
@@ -232,12 +232,12 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			'slug' => $new_slug
 		);
 		wp_update_term( $term_id, $tax_name, $term_updates );
-		delete_metadata( 'pp_term', $term_id, "{$tax_name}_number" );
+		$pp_common->delete_issue_meta( $term_id, "{$tax_name}_number" );
 
 		/** This action is documented in admin/class-periodicalpress-admin.php */
 		do_action( 'periodicalpress_transition_issue_status', 'draft', $old_status, $term_id );
 
-		$plugin_common->delete_issue_transients();
+		$pp_common->delete_issue_transients();
 
 		return $result;
 	}
@@ -285,6 +285,8 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	 */
 	public function unpublish_issue_if_empty( $issue, $tax ) {
 
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+
 		$tax_name = ( is_object( $tax ) && isset( $tax->name ) )
 			? $tax->name
 			: $tax;
@@ -300,7 +302,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			return $issue;
 		}
 
-		$status = get_metadata( 'pp_term', $issue->term_id, "{$tax_name}_status", true );
+		$status = $pp_common->get_issue_meta( $issue->term_id, "{$tax_name}_status" );
 
 		// Unpublish if the Issue both is published and has no posts.
 		if ( ( 'publish' === $status ) && ( 0 === $issue->count ) ) {
@@ -332,7 +334,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			return false;
 		}
 
-		$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
 		$tax_name = $this->plugin->get_taxonomy_name();
 
@@ -377,7 +379,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			'future',
 			'private'
 		);
-		$term_posts = $plugin_common->get_issue_posts( $term_id, $post_statuses );
+		$term_posts = $pp_common->get_issue_posts( $term_id, $post_statuses );
 
 		/*
 		 * Update posts in this Issue. The Issue term is removed and the post is
@@ -402,9 +404,9 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		 * deleted successfully.
 		 */
 		if ( ! is_wp_error( $result ) && $result ) {
-			$meta_to_delete = get_metadata( 'pp_term', $term_id );
+			$meta_to_delete = $pp_common->get_issue_meta( $term_id );
 			foreach ( $meta_to_delete as $meta_key => $meta_values ) {
-				delete_metadata( 'pp_term', $term_id, $meta_key );
+				$pp_common->delete_issue_meta( $term_id, $meta_key );
 			}
 		}
 
@@ -435,7 +437,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	 */
 	public function create_issue_number() {
 
-		$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
 		$transient = 'periodicalpress_highest_issue_num';
 		$tax_name = $this->plugin->get_taxonomy_name();
@@ -444,7 +446,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		$highest_num = (int) get_transient( $transient );
 		if ( empty( $highest_num ) ) {
 
-			$existing_issues = $plugin_common->get_issues_metadata_column( 'pp_issue_number' );
+			$existing_issues = $pp_common->get_issues_metadata_column( 'pp_issue_number' );
 			if ( ! is_array( $existing_issues ) ) {
 				return false;
 			}
@@ -493,14 +495,14 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	 */
 	public function set_not_current_issue( $excluded_id = 0 ) {
 
-		$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
 		$excluded_id = (int) $excluded_id;
 
 		// Check whether the Issue passed in is the Current Issue.
 		if ( (int) get_option( 'pp_current_issue' ) === $excluded_id ) {
 
-			$new_current_issue = $plugin_common->get_newest_issue( array( $excluded_id ) );
+			$new_current_issue = $pp_common->get_newest_issue( array( $excluded_id ) );
 
 			if ( is_object( $new_current_issue )
 			&& ! empty( $new_current_issue->term_id ) ) {

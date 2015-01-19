@@ -287,6 +287,8 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 	public function save_issue_metadata_fields( $issue_id ) {
 		global $wpdb;
 
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+
 		$tax_name = $this->plugin->get_taxonomy_name();
 		$tax = get_taxonomy( $tax_name );
 
@@ -329,7 +331,7 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 
 			if ( $date ) {
 				$output_date = date( 'Y-m-d', $date );
-				update_metadata( 'pp_term', $issue_id, "{$tax_name}_date", $output_date );
+				$pp_common->update_issue_meta( $issue_id, "{$tax_name}_date", $output_date );
 			}
 
 		}
@@ -359,7 +361,7 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 
 			// Check this is an allowed status for Issues.
 			if ( array_key_exists( $new_value, $statuses ) ) {
-				update_metadata( 'pp_term', $issue_id, "{$tax_name}_status", $new_value );
+				$pp_common->update_issue_meta( $issue_id, "{$tax_name}_status", $new_value );
 			}
 
 		}

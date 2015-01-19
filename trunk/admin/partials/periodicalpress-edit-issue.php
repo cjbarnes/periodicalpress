@@ -15,6 +15,8 @@ if ( ! $term_id || ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+
 $screen = get_current_screen();
 
 $domain = $this->plugin->get_plugin_name();
@@ -25,7 +27,7 @@ $tax = get_taxonomy( $tax_name );
 $issue = get_term( $term_id, $tax_name );
 $issue_link = esc_url( get_term_link( $issue, $tax_name ) );
 
-$status = get_metadata( 'pp_term', $issue->term_id, 'pp_issue_status', true );
+$status = $pp_common->get_issue_meta( $issue->term_id, 'pp_issue_status' );
 
 /**
  * Fires after all hard-coded metaboxes have been added.

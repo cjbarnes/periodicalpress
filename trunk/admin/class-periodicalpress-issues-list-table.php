@@ -207,6 +207,8 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 */
 	protected function table_data() {
 
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+
 		$data = array();
 
 		// Default sort order.
@@ -271,18 +273,19 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 * foreach loop, so that we can sort by metadata.
 		 */
 		foreach ( $issues as $issue ) {
-			$meta = get_metadata( 'pp_term', $issue->term_id );
-			$issue->number = ! empty( $meta['pp_issue_number'][0] )
-				? $meta['pp_issue_number'][0]
+			$meta = $pp_common->get_issue_meta( $issue->term_id );
+			write_log( $meta );
+			$issue->number = ! empty( $meta['pp_issue_number'] )
+				? $meta['pp_issue_number']
 				: '';
-			$issue->date = ! empty( $meta['pp_issue_date'][0] )
-				? $meta['pp_issue_date'][0]
+			$issue->date = ! empty( $meta['pp_issue_date'] )
+				? $meta['pp_issue_date']
 				: '';
-			$issue->status = ! empty( $meta['pp_issue_status'][0] )
-				? $meta['pp_issue_status'][0]
+			$issue->status = ! empty( $meta['pp_issue_status'] )
+				? $meta['pp_issue_status']
 				: '';
-			$issue->created_date = ! empty( $meta['pp_issue_created_date'][0] )
-				? $meta['pp_issue_created_date'][0]
+			$issue->created_date = ! empty( $meta['pp_issue_created_date'] )
+				? $meta['pp_issue_created_date']
 				: 0;
 		}
 

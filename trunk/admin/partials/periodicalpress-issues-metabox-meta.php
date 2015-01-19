@@ -21,16 +21,18 @@ if ( ! defined( 'ABSPATH' ) || ! isset( $issue ) ) {
 	exit;
 }
 
+$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+
 $domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
 
 // Get the Issue's metadata.
-$meta = get_metadata( 'pp_term', $issue->term_id );
+$meta = $pp_common->get_issue_meta( $issue->term_id );
 $meta_date = isset( $meta['pp_issue_date'] )
-	? $meta['pp_issue_date'][0]
+	? $meta['pp_issue_date']
 	: time();
 $meta_number = isset( $meta['pp_issue_number'] )
-	? $meta['pp_issue_number'][0]
+	? $meta['pp_issue_number']
 	: '';
 
 if ( ! class_exists( 'PeriodicalPress_Touch_Time' ) ) {
