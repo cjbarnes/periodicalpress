@@ -30,7 +30,7 @@ if ( empty( $status ) ) {
 /** This filter is documented in admin/class-periodicalpress-admin.php */
 $allowed_statuses = apply_filters( "{$tax_name}_statuses", array() );
 $status_name = ( isset( $allowed_statuses[ $status ] ) )
-	? $allowed_statuses[ $status ]
+	? esc_html( $allowed_statuses[ $status ] )
 	: '';
 
 ?>
@@ -86,7 +86,15 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 			<?php echo _x( 'Status:', 'Edit Issue', $domain ); ?>
 		</label>
 		<strong id="issue-status-display">
-			<?php echo esc_html( $status_name ); ?>
+			<?php
+			$current_issue = (int) get_option( 'pp_current_issue', 0 );
+			if ( $current_issue === $issue->term_id ) {
+				// Translators: %s = Issue Status display name.
+				printf( _x( '%s (Current Issue)', 'Edit Issue', $domain ), $status_name );
+			} else {
+				echo $status_name;
+			}
+			?>
 		</strong>
 	</div>
 
