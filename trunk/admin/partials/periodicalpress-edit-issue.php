@@ -23,7 +23,7 @@ $tax = get_taxonomy( $tax_name );
 
 // Load existing data for this Issue, for use within the form.
 $issue = get_term( $term_id, $tax_name );
-$issue_link = get_term_link( $issue, $tax_name );
+$issue_link = esc_url( get_term_link( $issue, $tax_name ) );
 
 $status = get_metadata( 'pp_term', $issue->term_id, 'pp_issue_status', true );
 
