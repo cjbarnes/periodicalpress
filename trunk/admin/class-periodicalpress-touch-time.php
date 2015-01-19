@@ -141,7 +141,7 @@ class PeriodicalPress_Touch_Time {
 				: '';
 
 			$day = sprintf( '<label for="pp-jj" class="screen-reader-text">%s</label>', __( 'Day' ) );
-			$day .= "<input type='text' id='pp-jj' name='jj' value='$jj' size='2' maxlength='2'{$tab_index_attribute} autocomplete='off' />";
+			$day .= "<input type='text' id='pp-jj' name='jj' value='$jj' size='2' maxlength='2'{$tab_index_attribute} placeholder='day' autocomplete='off' />";
 
 		}
 
@@ -183,7 +183,7 @@ class PeriodicalPress_Touch_Time {
 
 		// Prepare the year input.
 		$year = sprintf( '<label for="pp-aa" class="screen-reader-text">%s</label>', __( 'Year' ) );
-		$year .= "<input type='text' id='pp-aa' name='aa' value='$aa' size='4' maxlength='4'{$tab_index_attribute} autocomplete='off' />";
+		$year .= "<input type='text' id='pp-aa' name='aa' value='$aa' size='4' maxlength='4'{$tab_index_attribute} placeholder='year' autocomplete='off' />";
 
 		// Begin output.
 		$out .= '<div class="timestamp-wrap">';
@@ -192,7 +192,7 @@ class PeriodicalPress_Touch_Time {
 		 * Translators: 1: month, 2: day, 3: year. Use this to localize the
 		 * order of date fields.
 		 */
-		$out .= sprintf( __( ' %2$s %1$s %3$s' ), $month, $day, $year );
+		$out .= sprintf( __( ' %2$s/%1$s/%3$s' ), $month, $day, $year );
 		$out .= '</div>';
 
 		if ( ! empty( $return ) ) {
