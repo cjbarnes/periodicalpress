@@ -866,6 +866,14 @@ table.links-table {
 	cursor: pointer;
 }
 
+/* Meta metabox rows */
+.pp-side-row {
+	padding: 6px 0 8px;
+}
+.pp-side-input-wrap {
+	padding-top: 5px;
+}
+
 /* Publish box icons */
 .issue-status-label,
 .issue-posts-label {

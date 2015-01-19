@@ -46,17 +46,19 @@ $datefield = new PeriodicalPress_Touch_Time( mysql2date( 'U', $meta_date ) );
 ?>
 
 <div class="pp-side-row">
-<label class="pp-side-label" for="pp-issue-number">
-	<?php echo esc_html_x( 'Issue Number', 'Edit Issue', $domain ); ?>
-</label>
-<input type="text" name="pp_issue_number" id="pp-issue-number" size="4" maxlength="4" autocomplete="off" value="<?php echo $meta_number; ?>" />
+	<label class="pp-side-label" for="pp-issue-number">
+		<?php echo esc_html_x( 'Issue Number:', 'Edit Issue', $domain ); ?>
+	</label>
+	<div class="pp-side-input-wrap">
+		<input type="text" name="pp_issue_number" id="pp-issue-number" size="4" maxlength="4" autocomplete="off" value="<?php echo $meta_number; ?>" />
+	</div>
 </div>
 
 <div class="pp-side-row">
-<label class="pp-side-label">
-	<?php echo esc_html_x( 'Issue Date', 'Edit Issue', $domain ); ?>
-</label>
+	<label class="pp-side-label">
+		<?php echo esc_html_x( 'Issue Date:', 'Edit Issue', $domain ); ?>
+	</label>
+	<?php $datefield->display( 'day', 0, false ); ?>
 </div>
-<?php $datefield->display( 'day', 0, false ); ?>
 
 <?php
