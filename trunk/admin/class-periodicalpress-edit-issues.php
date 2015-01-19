@@ -88,18 +88,20 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 		add_meta_box(
 			'pp_issue_metadiv',
 			_x( 'Meta', 'Edit Issue meta box title', $domain ),
-			array( $this, 'render_meta_metabox' ),
+			array( $this, 'render_metabox' ),
 			'pp_issue',
 			'side',
-			'core'
+			'core',
+			array( 'slug' => 'meta' )
 		);
 		add_meta_box(
 			'pp_issue_submitdiv',
 			_x( 'Publish', 'Edit Issue meta box title', $domain ),
-			array( $this, 'render_submit_metabox' ),
+			array( $this, 'render_metabox' ),
 			'pp_issue',
 			'side',
-			'core'
+			'core',
+			array( 'slug' => 'submit' )
 		);
 
 
@@ -110,54 +112,38 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 		add_meta_box(
 			'pp_issue_descriptiondiv',
 			_x( 'Description', 'Edit Issue meta box title', $domain ),
-			array( $this, 'render_description_metabox' ),
+			array( $this, 'render_metabox' ),
 			'pp_issue',
 			'normal',
-			'core'
+			'core',
+			array( 'slug' => 'description' )
 		);
 
 
 	}
 
 	/**
-	 * Output the Issue status metabox on the Edit Issue screen.
+	 * Output an Issue metabox's contents on the Edit Issue screen.
+	 *
+	 * The specific HTML partial to load for this metabox is set using the
+	 * `$callback_args`.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param object $issue The Issue term object.
+	 * @param array  $callback_args {
+	 *
+	 *     @type string $slug The end of the filename for this metabox's HTML
+	 *                        partial.
+	 * }
 	 */
-	public function render_submit_metabox( $issue ) {
+	public function render_metabox( $issue, $callback_args ) {
 
 		$path = $this->plugin->get_partials_path( 'admin' );
-		require $path . 'periodicalpress-issues-metabox-submit.php';
-
-	}
-
-	/**
-	 * Output the Issue Date/Number metabox on the Edit Issue screen.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param object $issue The Issue term object.
-	 */
-	public function render_meta_metabox( $issue ) {
-
-		$path = $this->plugin->get_partials_path( 'admin' );
-		require $path . 'periodicalpress-issues-metabox-meta.php';
-
-	}
-
-	/**
-	 * Output the Issue Description metabox on the Edit Issue screen.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param object $issue The Issue term object.
-	 */
-	public function render_description_metabox( $issue ) {
-
-		$path = $this->plugin->get_partials_path( 'admin' );
-		require $path . 'periodicalpress-issues-metabox-description.php';
+		$slug = ( isset( $callback_args['args']['slug'] ) )
+			? $callback_args['args']['slug']
+			: 'default';
+		include "{$path}periodicalpress-issues-metabox-{$slug}.php";
 
 	}
 
