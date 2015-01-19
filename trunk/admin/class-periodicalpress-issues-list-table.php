@@ -488,7 +488,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		// Delete action link
 		if ( current_user_can( $this->tax->cap->delete_terms ) ) {
 			$delete_url = wp_nonce_url( $this->url . "&amp;action=delete&amp;tag_id=$term_id&amp;delete-tag_$term_id", "delete-tag_$term_id" );
-			$delete_label = _x( 'Delete', $domain );
+			$delete_label = __( 'Delete', $domain );
 
 			$actions['delete'] = "<a class='delete-tag' href='$delete_url'>$delete_label</a>";
 		}
