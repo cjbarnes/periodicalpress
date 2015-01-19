@@ -76,6 +76,37 @@ class PeriodicalPress_Touch_Time {
 	}
 
 	/**
+	 * Convert a date precision string into an integer (for use by the display()
+	 * method).
+	 *
+	 * Possible results:
+	 * - 0 = 'day' (the default)
+	 * - 1 = 'month'
+	 * - 2 = 'year'
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $precision The precision argument to convert.
+	 * @return int A valid precision (0|'day' if the precision is invalid).
+	 */
+	protected function precision_to_int( $precision ) {
+
+		// The default.
+		$result = 0;
+
+		switch ( strtolower( $precision ) ) {
+			case 'month':
+				$result = 1;
+				break;
+			case 'year':
+				$result = 2;
+				break;
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Echo the HTML form fields for this date-time.
 	 *
 	 * @since 1.0.0
@@ -98,54 +129,65 @@ class PeriodicalPress_Touch_Time {
 			$tab_index_attribute = " tabindex=\"$tab_index\"";
 		}
 
-		// Prepare the current date parts.
-		$jj = date( 'd', $this->datetime );
-		$mm = date( 'm', $this->datetime );
-		$aa = date( 'Y', $this->datetime );
-		$hh = date( 'H', $this->datetime );
-		$mn = date( 'i', $this->datetime );
-		$ss = date( 's', $this->datetime );
+		$p_int = $this->precision_to_int( $precision );
 
-		/*
-		 * Assemble the months dropdown.
-		 */
-		$month = sprintf( "<label for='mm' class='screen-reader-text'>%s</label>\n", __( 'Month' ) );
-		$month .= "<select id='mm' name='mm'{$tab_index_attribute} >\n";
+		$day   = '';
+		$month = '';
+		$year  = '';
 
-		for ( $i = 1; $i < 13; $i = $i +1 ) {
-			$monthnum = zeroise($i, 2);
-			$month .= sprintf( "\t<option value='$monthnum' %s>", selected( $monthnum, $mm, false ) );
-			/* translators: 1: month number (01, 02, etc.), 2: month abbreviation */
-			$month .= sprintf( __( '%1$s-%2$s' ), $monthnum, $wp_locale->get_month_abbrev( $wp_locale->get_month( $i ) ) );
-			$month .= "</option>\n";
+		// Prepare the days input.
+		if ( 0 >= $p_int ) {
+
+			// Get the current value.
+			$jj = date( 'd', $this->datetime );
+
+			$day = sprintf( '<label for="jj" class="screen-reader-text">%s</label>', __( 'Day' ) );
+			$day .= "<input type='text' id='jj' name='jj\'' value='$jj' size='2' maxlength='2'{$tab_index_attribute} autocomplete='off' />";
+
 		}
-		$month .= '</select>';
 
-		/**
-		 * Assemble the text inputs.
-		 */
-		$day = sprintf( '<label for="jj" class="screen-reader-text">%s</label>', __( 'Day' ) );
-		$day .= "<input type='text' id='jj' name='jj\'' value='$jj' size='2' maxlength='2'{$tab_index_attribute} autocomplete='off' />";
+		// Prepare the months dropdown.
+		if ( 1 >= $p_int ) {
 
+			// Get the current value.
+			$mm = date( 'm', $this->datetime );
+
+			$month = sprintf( "<label for='mm' class='screen-reader-text'>%s</label>\n", __( 'Month' ) );
+			$month .= "<select id='mm' name='mm'{$tab_index_attribute} >\n";
+
+			// Assemble the twelve month options.
+			for ( $i = 1; $i < 13; $i = $i +1 ) {
+				$monthnum = zeroise($i, 2);
+				$month .= sprintf( "\t<option value='$monthnum' %s>", selected( $monthnum, $mm, false ) );
+				/*
+				 * translators:
+				 * 1: month number (01, 02, etc.),
+				 * 2: month abbreviation
+				 */
+				$month .= sprintf( __( '%1$s-%2$s' ), $monthnum, $wp_locale->get_month_abbrev( $wp_locale->get_month( $i ) ) );
+				$month .= "</option>\n";
+			}
+
+			$month .= '</select>';
+
+		}
+
+		// Get the current year value.
+		$aa = date( 'Y', $this->datetime );
+
+		// Prepare the year input.
 		$year = sprintf( '<label for="aa" class="screen-reader-text">%s</label>', __( 'Year' ) );
 		$year .= "<input type='text' id='aa' name='aa' value='$aa' size='4' maxlength='4'{$tab_index_attribute} autocomplete='off' />";
-
-		$hour = sprintf( '<label for="hh" class="screen-reader-text">%s</label>', __( 'Hour' ) );
-		$hour .= "<input type='text' id='hh' name='hh' value='$hh' size='2' maxlength='2'{$tab_index_attribute} autocomplete='off' />";
-
-		$minute = sprintf( '<label for="mn" class="screen-reader-text">%s</label>', __( 'Minute' ) );
-		$minute = "<input type='text' id='mn' name='mn' value='$mn' size='2' maxlength='2'{$tab_index_attribute} autocomplete='off' />";
 
 		// Begin output.
 		$out .= '<div class="timestamp-wrap">';
 
 		/*
-		 * Translators: 1: month, 2: day, 3: year, 4: hour, 5: minute. Use this
-		 * to localize the order of date fields.
+		 * Translators: 1: month, 2: day, 3: year. Use this to localize the
+		 * order of date fields.
 		 */
-		$out .= sprintf( __( '%1$s %2$s, %3$s @ %4$s : %5$s' ), $month, $day, $year, $hour, $minute );
-
-		$out .= '</div><input type="hidden" id="ss" name="ss" value="' . $ss . '" />';
+		$out .= sprintf( __( ' %2$s %1$s %3$s' ), $month, $day, $year );
+		$out .= '</div>';
 
 		if ( ! empty( $return ) ) {
 			return $out;
