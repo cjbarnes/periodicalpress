@@ -273,7 +273,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 */
 		foreach ( $issues as $issue ) {
 			$meta = $pp_common->get_issue_meta( $issue->term_id );
-			write_log( $meta );
 			$issue->number = ! empty( $meta['pp_issue_number'] )
 				? $meta['pp_issue_number']
 				: '';
