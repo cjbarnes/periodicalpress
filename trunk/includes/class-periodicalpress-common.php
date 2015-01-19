@@ -265,12 +265,14 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	 *
 	 * Used for setting a new Current Issue when the previous one is removed.
 	 *
+	 * See note about $excludes in {@see $this->get_ordered_issue_IDs()}.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @global wpdb $wpdb The WordPress database class.
 	 *
-	 * @param array $excludes Optional. Term IDs that shouldn't count. Default
-	 *                        array().
+	 * @param array $excludes Optional. Term IDs that shouldn't count because
+	 *                        they are being removed. Default array().
 	 * @return object The newest Issue's term object.
 	 */
 	public function get_newest_issue( $excludes = array() ) {
@@ -288,12 +290,14 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	 * and for getting the most recent issue when a Current Issue is not set
 	 * (which should not happen in ordinary circumstances).
 	 *
+	 * See note about $excludes in {@see $this->get_ordered_issue_IDs()}.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @global wpdb $wpdb The WordPress database class.
 	 *
-	 * @param array $excludes Optional. Term IDs that shouldn't count. Default
-	 *                        array().
+	 * @param array $excludes Optional. Term IDs that shouldn't count because
+	 *                        they are being removed. Default array().
 	 * @return int The newest Issue's ID.
 	 */
 	public function get_newest_issue_id( $excludes = array() ) {
@@ -310,12 +314,18 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	/**
 	 * Retrieves the published Issues in descending order of issue.
 	 *
+	 * Note that the result of this function is cached, without including any
+	 * Issues that were left out using the `$excludes` param. So **only use
+	 * `$excludes` to leave out Issues that are about to be deleted or
+	 * unpublished** and therefore shouldn't be included in the cached results
+	 * anyway.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @global wpdb $wpdb The WordPress database class.
 	 *
-	 * @param array $excludes Optional. Term IDs that shouldn't count. Default
-	 *                        array().
+	 * @param array $excludes Optional. Term IDs that shouldn't count because
+	 *                        they are being removed. Default array().
 	 * @return array An ordered array of Issue term IDs.
 	 */
 	public function get_ordered_issue_IDs( $excludes = array() ) {
