@@ -108,6 +108,7 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 		/*
 		 * Main column metaboxes:
 		 * - Description
+		 * - Posts
 		 */
 		add_meta_box(
 			'pp_issue_descriptiondiv',
@@ -117,6 +118,15 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 			'normal',
 			'core',
 			array( 'slug' => 'description' )
+		);
+		add_meta_box(
+			'pp_issue_postsdiv',
+			_x( 'Posts', 'Edit Issue meta box title', $domain ),
+			array( $this, 'render_metabox' ),
+			'pp_issue',
+			'advanced',
+			'core',
+			array( 'slug' => 'posts' )
 		);
 
 

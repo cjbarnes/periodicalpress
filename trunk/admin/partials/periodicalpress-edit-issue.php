@@ -167,6 +167,7 @@ do_action( 'periodicalpress_issue_edit_form_tag', $issue );
 		<div id="issuebox-container-2" class="issuebox-container">
 
 			<?php do_meta_boxes( 'pp_issue', 'normal', $issue ); ?>
+			<?php do_meta_boxes( 'pp_issue', 'advanced', $issue ); ?>
 
 		</div><!-- /#issuebox-container-2 -->
 
