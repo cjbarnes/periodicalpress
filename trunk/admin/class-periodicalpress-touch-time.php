@@ -141,8 +141,8 @@ class PeriodicalPress_Touch_Time {
 			// Get the current value.
 			$jj = date( 'd', $this->datetime );
 
-			$day = sprintf( '<label for="jj" class="screen-reader-text">%s</label>', __( 'Day' ) );
-			$day .= "<input type='text' id='jj' name='jj\'' value='$jj' size='2' maxlength='2'{$tab_index_attribute} autocomplete='off' />";
+			$day = sprintf( '<label for="pp-jj" class="screen-reader-text">%s</label>', __( 'Day' ) );
+			$day .= "<input type='text' id='pp-jj' name='jj value='$jj' size='2' maxlength='2'{$tab_index_attribute} autocomplete='off' />";
 
 		}
 
@@ -152,8 +152,8 @@ class PeriodicalPress_Touch_Time {
 			// Get the current value.
 			$mm = date( 'm', $this->datetime );
 
-			$month = sprintf( "<label for='mm' class='screen-reader-text'>%s</label>\n", __( 'Month' ) );
-			$month .= "<select id='mm' name='mm'{$tab_index_attribute} >\n";
+			$month = sprintf( "<label for='pp-mm' class='screen-reader-text'>%s</label>\n", __( 'Month' ) );
+			$month .= "<select id='pp-mm' name='mm'{$tab_index_attribute} >\n";
 
 			// Assemble the twelve month options.
 			for ( $i = 1; $i < 13; $i = $i +1 ) {
@@ -176,8 +176,8 @@ class PeriodicalPress_Touch_Time {
 		$aa = date( 'Y', $this->datetime );
 
 		// Prepare the year input.
-		$year = sprintf( '<label for="aa" class="screen-reader-text">%s</label>', __( 'Year' ) );
-		$year .= "<input type='text' id='aa' name='aa' value='$aa' size='4' maxlength='4'{$tab_index_attribute} autocomplete='off' />";
+		$year = sprintf( '<label for="pp-aa" class="screen-reader-text">%s</label>', __( 'Year' ) );
+		$year .= "<input type='text' id='pp-aa' name='aa' value='$aa' size='4' maxlength='4'{$tab_index_attribute} autocomplete='off' />";
 
 		// Begin output.
 		$out .= '<div class="timestamp-wrap">';
