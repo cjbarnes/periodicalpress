@@ -19,7 +19,7 @@
  *
  * @since 1.0.0
  */
-class PeriodicalPress_Singleton {
+abstract class PeriodicalPress_Singleton {
 
 	/**
 	 * The plugin's main class.
@@ -44,7 +44,7 @@ class PeriodicalPress_Singleton {
 	 * @param PeriodicalPress $plugin The main plugin class instance.
 	 * @return PeriodicalPress_Singleton Instance of this class.
 	 */
-	public static function get_instance( $plugin ) {
+	final public static function get_instance( $plugin ) {
 
 		static $instance = null;
 		if ( null === $instance ) {
@@ -85,7 +85,7 @@ class PeriodicalPress_Singleton {
 	 * @since 1.0.0
 	 * @access private
 	 */
-	private function __clone() {
+	final private function __clone() {
 
 	}
 
@@ -95,7 +95,7 @@ class PeriodicalPress_Singleton {
 	 * @since 1.0.0
 	 * @access private
 	 */
-	private function __wakeup() {
+	final private function __wakeup() {
 
 	}
 
