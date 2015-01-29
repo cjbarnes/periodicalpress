@@ -160,6 +160,19 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 			'pp_edit_issues'
 		);
 
+		add_submenu_page(
+			'pp_edit_issues',
+			/*
+			 * For translators: HTML title of the plugin settings page. %s is
+			 * the plugin name.
+			 */
+ 			sprintf( __( '%s Settings', 'periodicalpress' ), 'PeriodicalPress' ),
+			_x( 'Settings', 'Admin menu link for plugin settings page', 'periodicalpress' ),
+			$tax->cap->manage_terms,
+			'periodicalpress_settings',
+			array( $this, 'render_plugin_settings' )
+		);
+
 		/*
 		 * Issues submenu: Add and edit the Issues taxonomy - old version for
 		 * debugging purposes.
@@ -200,6 +213,27 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		}
 
 		return $parent_file;
+	}
+
+	/**
+	 * Output the contents of the Plugin Settings page.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_plugin_settings() {
+
+		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
+
+		if ( current_user_can( $tax->cap->manage_terms ) ) {
+
+			/**
+			 * Output the Settings page partial.
+			 */
+			$path = $this->plugin->get_partials_path( 'admin' );
+			require $path . 'periodicalpress-settings.php';
+
+		}
+
 	}
 
 	/**
@@ -264,101 +298,6 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 
 			if ( ! is_null( $new_current_issue ) ) {
 				update_option( 'pp_current_issue', $new_current_issue_id );
-			}
-
-		}
-
-	}
-
-	/**
-	 * Save submitted metadata form fields on the Add/Edit Issue pages.
-	 *
-	 * **TODO repurpose into a full Save Issue Data function.**
-	 *
-	 * @since 1.0.0
-	 *
-	 * @global wpdb $wpdb The WordPress database class.
-	 *
-	 * @param int $issue_id The object ID for this Issue taxonomy term.
-	 */
-	public function save_issue_metadata_fields( $issue_id ) {
-		global $wpdb;
-
-		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
-
-		$tax_name = $this->plugin->get_taxonomy_name();
-		$tax = get_taxonomy( $tax_name );
-
-		// Check form nonce was properly set.
-		if ( empty( $_POST['periodicalpress-set-issue-metadata-nonce'] )
-			|| ( 1 !== wp_verify_nonce( $_POST['periodicalpress-set-issue-metadata-nonce'], 'set-issue-metadata' ) ) ) {
-			return;
-		}
-
-		// Check current user has sufficient permissions.
-		if ( ! current_user_can( $tax->cap->edit_terms ) ) {
-			return;
-		}
-
-		// Validate the Issue ID by trying to fetch an associated term object.
-		$issue = get_term( $issue_id, $tax_name );
-		if ( is_null( $issue ) || is_wp_error( $issue ) ) {
-			return;
-		}
-
-		/*
-		 * Run through the metadata fields in turn.
-		 */
-
-		// Issue Date
-		if ( isset( $_POST["{$tax_name}_date"] ) ) {
-
-			/*
-			 * First try creating a Date using the jQuery UI datepicker's date
-			 * format.
-			 */
-			$date = DateTime::createFromFormat( 'd/m/y', $_POST["{$tax_name}_date"] );
-
-			// Try interpreting a user-inputted date that isn't in the correct format.
-			if ( $date ) {
-				$date = $date->format( 'U' );
-			} else {
-				$date = uk_strtotime( $_POST["{$tax_name}_date"] );
-			}
-
-			if ( $date ) {
-				$output_date = date( 'Y-m-d', $date );
-				$pp_common->update_issue_meta( $issue_id, "{$tax_name}_date", $output_date );
-			}
-
-		}
-
-		// Issue Status
-		if ( isset( $_POST["{$tax_name}_status"] )
-			&& ( (string) $_POST["{$tax_name}_status"] ) ) {
-
-			$new_value = $_POST["{$tax_name}_status"];
-
-			/**
-			 * Filter for allowed Issue publication statuses.
-			 *
-			 * The filter name is generated from the Issues taxonomy name. By
-			 * default it is:
-			 *
-			 *     pp_issue_statuses
-			 *
-			 * The returned value should be an associative array of statuses in
-			 * the form ( name => display name ).
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param array $statuses Array of allowed statuses.
-			 */
-			$statuses = apply_filters( "{$tax_name}_statuses", array() );
-
-			// Check this is an allowed status for Issues.
-			if ( array_key_exists( $new_value, $statuses ) ) {
-				$pp_common->update_issue_meta( $issue_id, "{$tax_name}_status", $new_value );
 			}
 
 		}
