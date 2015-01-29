@@ -42,13 +42,14 @@ class PeriodicalPress_Touch_Time {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int|string $datetime  The initial date-time for this class to
-	 *                              display, as a timestamp or a string
-	 *                              parseable by strtotime().
+	 * @param int|string $datetime  Optional. The initial date-time for this
+	 *                              class to display, as a timestamp or a string
+	 *                              parseable by strtotime(). -1 = no initial
+	 *                              value.
 	 */
-	public function __construct( $datetime ) {
+	public function __construct( $datetime = -1 ) {
 
-		// Sanitize the date value. Use the current time as a fallback.
+		// Sanitize the date value.
 		$this->datetime = $this->sanitize_date( $datetime );
 
 	}
@@ -59,7 +60,7 @@ class PeriodicalPress_Touch_Time {
 	 * @param int|string $new_datetime The date-time to check and convert, as a
 	 *                                 timestamp or a string parseable by
 	 *                                 strtotime().
-	 * @return int The timestamp, or 0 on failure.
+	 * @return int The timestamp, or -1 on failure.
 	 */
 	protected function sanitize_date( $new_datetime ) {
 

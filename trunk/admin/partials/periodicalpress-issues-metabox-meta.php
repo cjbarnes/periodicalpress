@@ -28,7 +28,7 @@ $tax_name = $this->plugin->get_taxonomy_name();
 $meta = $pp_common->get_issue_meta( $issue->term_id );
 $meta_date = isset( $meta['pp_issue_date'] )
 	? $meta['pp_issue_date']
-	: time();
+	: -1;
 $meta_number = isset( $meta['pp_issue_number'] )
 	? $meta['pp_issue_number']
 	: '';
@@ -39,7 +39,11 @@ if ( ! class_exists( 'PeriodicalPress_Touch_Time' ) ) {
 	 */
 	require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-touch-time.php';
 }
-$datefield = new PeriodicalPress_Touch_Time( mysql2date( 'U', $meta_date ) );
+
+$touch_date = ( -1 !== $meta_date )
+	? mysql2date( 'U', $meta_date )
+	: -1;
+$datefield = new PeriodicalPress_Touch_Time( $touch_date );
 
 ?>
 
