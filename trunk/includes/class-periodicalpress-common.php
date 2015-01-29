@@ -101,6 +101,39 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Function to set the Issue number for an Issue.
+	 *
+	 * Checks that the new Issue number is unique first.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $issue_id  The Issue's term ID.
+	 * @param int $issue_num The new Issue number.
+	 * @return bool Success or failure of the DB update.
+	 */
+	public function update_issue_number( $issue_id, $issue_num ) {
+		if ( ! is_numeric( $issue_num )
+		|| ! ( $issue_num = absint( $issue_num ) ) ) {
+			return false;
+		}
+
+		// Check for uniqueness of this value.
+		$all_nums = $this->get_issues_metadata_column( 'pp_issue_number' );
+		if ( in_array( $issue_num, $all_nums ) ) {
+			return false;
+		}
+
+		$result = $this->update_issue_meta( $issue_id, 'pp_issue_number', $issue_num );
+
+		// Delete cached issue numbers if they've changed.
+		if ( $result ) {
+			$this->delete_issue_transients();
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Wrapper for add_metadata() for Issues.
 	 *
 	 * Assumes that multiple values are not allowed for any Issue meta keys.
@@ -397,7 +430,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	/**
 	 * Delete all cached Issue-related values.
 	 *
-	 * Called whenever Issues are edited.
+	 * Called whenever Issue numbers are edited.
 	 *
 	 * @since 1.0.0
 	 */
