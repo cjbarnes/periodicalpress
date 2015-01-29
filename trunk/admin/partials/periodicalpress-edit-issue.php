@@ -19,7 +19,6 @@ $pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
 $screen = get_current_screen();
 
-$domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
 $tax = get_taxonomy( $tax_name );
 
@@ -93,7 +92,7 @@ do_action( 'periodicalpress_issue_edit_form_tag', $issue );
 					 *                     title here'.
 					 * @param object $issue The Issue object.
 					 */
-					$name_placeholder = apply_filters( 'periodicalpress_issue_name_placeholder', __( 'Enter issue title here', $domain ), $issue );
+					$name_placeholder = apply_filters( 'periodicalpress_issue_name_placeholder', __( 'Enter issue title here', 'periodicalpress' ), $issue );
 					?>
 					<label class="screen-reader-text" id="name-prompt-text" for="name">
 						<?php echo $name_placeholder; ?>
@@ -118,14 +117,14 @@ do_action( 'periodicalpress_issue_edit_form_tag', $issue );
 						<!-- Permalink and View button -->
 						<div id="edit-slug-box">
 							<strong>
-								<?php _e( 'Permalink:', $domain ); ?>
+								<?php _e( 'Permalink:', 'periodicalpress' ); ?>
 							</strong>
 							<span id="sample-permalink">
 								<?php echo $issue_link; ?>
 							</span>
 							<span id="view-issue-btn">
 								<a href="<?php echo $issue_link; ?>" class="button button-small">
-									<?php _e( 'View Issue', $domain ); ?>
+									<?php _e( 'View Issue', 'periodicalpress' ); ?>
 								</a>
 							</span>
 						</div>
@@ -184,8 +183,6 @@ do_action( 'periodicalpress_issue_edit_form_tag', $issue );
 		?>
 
 	</div><!-- /#issue-body -->
-
-	<!-- TODO: Table of posts (NOT a list table - needs to be a simple draggable list, but with Edit links.) -->
 
 	<br class="clear" />
 	</div><!-- /#issuestuff -->

@@ -22,8 +22,6 @@ if ( ! defined( 'ABSPATH' ) || ! isset( $issue ) ) {
 }
 
 $pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
-
-$domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
 
 // Get the Issue's metadata.
@@ -47,7 +45,7 @@ $datefield = new PeriodicalPress_Touch_Time( mysql2date( 'U', $meta_date ) );
 
 <div class="pp-side-row">
 	<label class="pp-side-label" for="pp-issue-number">
-		<?php echo esc_html_x( 'Issue Number:', 'Edit Issue', $domain ); ?>
+		<?php echo esc_html_x( 'Issue Number:', 'Edit Issue', 'periodicalpress' ); ?>
 	</label>
 	<div class="pp-side-input-wrap">
 		<input type="text" name="pp_issue_number" id="pp-issue-number" size="4" maxlength="4" autocomplete="off" value="<?php echo $meta_number; ?>" />
@@ -56,7 +54,7 @@ $datefield = new PeriodicalPress_Touch_Time( mysql2date( 'U', $meta_date ) );
 
 <div class="pp-side-row">
 	<label class="pp-side-label">
-		<?php echo esc_html_x( 'Issue Date:', 'Edit Issue', $domain ); ?>
+		<?php echo esc_html_x( 'Issue Date:', 'Edit Issue', 'periodicalpress' ); ?>
 	</label>
 	<?php $datefield->display( 'day', 0, false ); ?>
 </div>

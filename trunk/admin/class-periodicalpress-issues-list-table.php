@@ -111,9 +111,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 */
 	public function get_columns() {
 
-		$domain = $this->plugin->get_plugin_name();
-		$context = 'Issues Table';
-
 		$checkbox_header = current_user_can( $this->tax->cap->delete_terms )
 			? '&nbsp;'
 			: '';
@@ -126,14 +123,14 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 * @param array $columns Associative array of column names and labels.
 		 */
 		$columns = apply_filters( "manage_{$this->tax->name}_columns", array(
-			'name'        => esc_html_x( $this->tax->labels->singular_name, $context, $domain ),
-			'number'      => esc_html_x( 'Number', $context, $domain ),
-			'date'        => esc_html_x( 'Date', $context, $domain ),
-			'description' => esc_html_x( 'Description', $context, $domain ),
-			'slug'        => esc_html_x( 'Slug', $context, $domain ),
-			'posts'       => esc_html_x( 'Posts', $context, $domain ),
-			'status'      => esc_html_x( 'Status', $context, $domain ),
-			'ssid'        => esc_html_x( 'ID', $context, $domain )
+			'name'        => esc_html( $this->tax->labels->singular_name ),
+			'number'      => esc_html_x( 'Number', 'Issues Table', 'periodicalpress' ),
+			'date'        => esc_html_x( 'Date', 'Issues Table', 'periodicalpress' ),
+			'description' => esc_html_x( 'Description', 'Issues Table', 'periodicalpress' ),
+			'slug'        => esc_html_x( 'Slug', 'Issues Table', 'periodicalpress' ),
+			'posts'       => esc_html_x( 'Posts', 'Issues Table', 'periodicalpress' ),
+			'status'      => esc_html_x( 'Status', 'Issues Table', 'periodicalpress' ),
+			'ssid'        => esc_html_x( 'ID', 'Issues Table', 'periodicalpress' )
 		) );
 
 		return $columns;
@@ -443,15 +440,13 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 */
 	protected function column_name( $item ) {
 
-		$domain = $this->plugin->get_plugin_name();
-
 		$name = $item['name'];
 		$term_id = +$item['ssid'];
 
 		$can_edit = current_user_can( $this->tax->cap->edit_terms );
 
 		// Assemble the title attribute.
-		$edit_title = sprintf( __( 'Edit &lsquo;%s&rsquo;', $domain ), esc_attr( $name ) );
+		$edit_title = sprintf( __( 'Edit &lsquo;%s&rsquo;', 'periodicalpress' ), esc_attr( $name ) );
 
 		/*
 		 * The row of action links (appears on hover).
@@ -461,7 +456,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		// Edit action link
 		if ( $can_edit ) {
 			$edit_url = $this->url . "&amp;action=edit&amp;tag_id=$term_id";
-			$edit_label = _x( 'Edit', $domain );
+			$edit_label = _x( 'Edit', 'periodicalpress' );
 
 			$actions['edit'] = "<a href='$edit_url'>$edit_label</a>";
 		}
@@ -486,10 +481,10 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 			}
 		}
 
-		// Delete action link
+		// Delete action link.
 		if ( current_user_can( $this->tax->cap->delete_terms ) ) {
 			$delete_url = wp_nonce_url( $this->url . "&amp;action=delete&amp;tag_id=$term_id&amp;delete-tag_$term_id", "delete-tag_$term_id" );
-			$delete_label = __( 'Delete', $domain );
+			$delete_label = __( 'Delete', 'periodicalpress' );
 
 			$actions['delete'] = "<a class='delete-tag' href='$delete_url'>$delete_label</a>";
 		}
@@ -501,14 +496,14 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		$view_url = get_term_link( $term_id, $this->tax->name );
 		if ( ! is_wp_error( $view_url ) ) {
 			$view_label = ( 'publish' === $item['status'] )
-				? _x( 'View', $domain )
-				: _x( 'Preview', $domain );
+				? _x( 'View', 'periodicalpress' )
+				: _x( 'Preview', 'periodicalpress' );
 			$actions['view'] = "<a href='$view_url'>$view_label</a>";
 		}
 
 		$row_actions = $this->row_actions( $actions );
 
-		// Assemble the output
+		// Assemble the output.
 		$out = '<strong>';
 		if ( $can_edit ) {
 			$out .= "<a class='row-title' href='$edit_url' title='$edit_title'>";
@@ -520,7 +515,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 
 		// Flag the current issue.
 		if ( ! empty( $item['current_issue'] ) ) {
-			$current_label = _x( 'Current', $domain );
+			$current_label = _x( 'Current', 'periodicalpress' );
 			$out .= " <span class='issue-status-current-issue post-state'>- $current_label</span>";
 		}
 		$out .= '</strong>';
@@ -544,7 +539,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		$date = DateTime::createFromFormat( 'Y-m-d', $item['date'] );
 
 		if ( $date ) {
-			$out = esc_html( $date->format( 'Y/m/d' ) );
+			$out = esc_html( date_i18n( _x( 'Y/m/d', 'Issue Date - PHP date format', 'periodicalpress' ), $date->getTimestamp() ) );
 		} else {
 			$out = '&mdash;';
 		}
@@ -563,16 +558,17 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 */
 	protected function column_posts( $item ) {
 
-		$domain = $this->plugin->get_plugin_name();
-
-		// Number of posts
+		// Number of posts.
 		$out = ( absint( $item['posts'] ) )
 			? absint( $item['posts'] )
 			: '0';
 
-		$title = sprintf( __( 'Show posts in &lsquo;%s$rsquo;', $domain ), esc_attr( $item['name'] ) );
+		$title = sprintf( __( 'Show posts in &lsquo;%s$rsquo;', 'periodicalpress' ), esc_attr( $item['name'] ) );
 		$tax_query = $this->tax->query_var;
 		$term = $item['slug'];
+
+		// Localize the posts count.
+		$out = number_format_i18n( $out );
 
 		return "<a href='edit.php?$tax_query=$term' title='$title'>$out</a>";
 	}
@@ -587,9 +583,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 * @return string The output for this cell.
 	 */
 	protected function column_status( $item ) {
-
-		$domain = $this->plugin->get_plugin_name();
-		$context = 'Issues Table';
 
 		$tax_name = $this->tax->name;
 		$term_id = +$item['ssid'];

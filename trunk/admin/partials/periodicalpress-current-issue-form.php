@@ -13,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
 
 /**
@@ -27,7 +26,7 @@ $form_action = str_replace( 'toplevel_page_', '?page=', $screen->base );
 
 <div class="form-wrap">
 
-	<h3><?php esc_html_e( 'Current Issue', $domain ); ?></h3>
+	<h3><?php esc_html_e( 'Current Issue', 'periodicalpress' ); ?></h3>
 
 	<form id="set-current-issue" method="post" action="<?php echo $form_action; ?>" />
 
@@ -39,7 +38,7 @@ $form_action = str_replace( 'toplevel_page_', '?page=', $screen->base );
 		<input type="hidden" name="post_type" value="<?php echo $screen->post_type; ?>" />
 
 		<div class="form-field current-tag-wrap">
-			<label for="current-issue" class="screen-reader-text"><?php esc_html_e( 'Issue', $domain ); ?></label>
+			<label for="current-issue" class="screen-reader-text"><?php esc_html_e( 'Issue', 'periodicalpress' ); ?></label>
 
 		<?php
 			// Output a dropdown list of issues
@@ -55,9 +54,9 @@ $form_action = str_replace( 'toplevel_page_', '?page=', $screen->base );
 			wp_dropdown_categories( $args );
 		?>
 
-			<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_attr_e( 'Set Current Issue', $domain ); ?>" />
+			<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_attr_e( 'Set Current Issue', 'periodicalpress' ); ?>" />
 
-			<p><?php esc_html_e( 'The Current Issue is the issue featured on the homepage of the website. Usually it is the most recently published issue.', $domain ); ?></p>
+			<p><?php esc_html_e( 'The Current Issue is the issue featured on the homepage of the website. Usually it is the most recently published issue.', 'periodicalpress' ); ?></p>
 		</div>
 
 	</form>

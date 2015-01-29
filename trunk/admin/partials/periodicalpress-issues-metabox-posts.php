@@ -20,8 +20,6 @@ if ( ! defined( 'ABSPATH' ) || ! isset( $issue ) ) {
 
 $pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
-$domain = $this->plugin->get_plugin_name();
-
 // Get posts for this issue.
 $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 
@@ -32,27 +30,26 @@ $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 
 <div id="pp-posts-wrap">
 <?php if ( is_array( $posts ) && count( $posts ) ) : ?>
-	<p><?php echo _x( 'Click and drag posts to reorder them.', 'Edit Issue: posts list', $domain ); ?></p>
+	<p><?php echo _x( 'Click and drag posts to reorder them.', 'Edit Issue: posts list', 'periodicalpress' ); ?></p>
 	<ul id="pp-posts-list">
 		<?php foreach ( $posts as $n => $post ) : ?>
 			<?php
 			// Prepare post data for display.
-			$x = 'Edit Issue: post status';
 			switch ( $post->post_status ) {
 				case 'publish':
-					$post_status = esc_html_x( 'Published', $x, $domain );
+					$post_status = esc_html_x( 'Published', 'Edit Issue: post status', 'periodicalpress' );
 					break;
 				case 'pending':
-					$post_status = esc_html_x( 'Pending', $x, $domain );
+					$post_status = esc_html_x( 'Pending', 'Edit Issue: post status', 'periodicalpress' );
 					break;
 				case 'draft':
-					$post_status = esc_html_x( 'Draft', $x, $domain );
+					$post_status = esc_html_x( 'Draft', 'Edit Issue: post status', 'periodicalpress' );
 					break;
 				case 'private':
-					$post_status = esc_html_x( 'Private', $x, $domain );
+					$post_status = esc_html_x( 'Private', 'Edit Issue: post status', 'periodicalpress' );
 					break;
 				case 'future':
-					$post_status = esc_html_x( 'Future', $x, $domain );
+					$post_status = esc_html_x( 'Future', 'Edit Issue: post status', 'periodicalpress' );
 					break;
 				default:
 					$post_status = '';
@@ -72,11 +69,11 @@ $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 					|| ( 'private' === $post->post_status ) ) :
 					?>
 						<a href="<?php echo get_permalink( $post->ID ) ?>" class="issue-post-row-action-view">
-							<?php esc_html_e ( _x( 'View', 'Edit Issue: post actions', $domain ) ); ?>
+							<?php esc_html_e ( _x( 'View', 'Edit Issue: post actions', 'periodicalpress' ) ); ?>
 						</a>
 					<?php else : ?>
 						<a href="#todo" class="issue-post-row-action-preview">
-							<?php esc_html_e( _x( 'Preview', 'Edit Issue: post actions', $domain ) ); ?>
+							<?php esc_html_e( _x( 'Preview', 'Edit Issue: post actions', 'periodicalpress' ) ); ?>
 						</a>
 					<?php endif; ?>
 
@@ -84,7 +81,7 @@ $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 					<?php if ( current_user_can( 'edit_post', $post->ID ) ) : ?>
 						<span class="separator">|</span>
 						<a href="<?php echo get_edit_post_link( $post->ID ); ?>" class="issue-post-row-action-edit">
-							<?php esc_html_e( _x( 'Edit', 'Edit Issue: post actions', $domain ) ); ?>
+							<?php esc_html_e( _x( 'Edit', 'Edit Issue: post actions', 'periodicalpress' ) ); ?>
 						</a>
 					<?php endif; ?>
 				</span>
@@ -93,9 +90,9 @@ $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 	</ul><!-- /pp-posts-list -->
 <?php else : ?>
 	<p>
-		<?php echo _x( 'No posts in this issue.', 'Edit Issue', $domain ); ?>
+		<?php echo _x( 'No posts in this issue.', 'Edit Issue', 'periodicalpress' ); ?>
 		<a href="<?php echo esc_url( admin_url( 'post-new.php' ) ) ?>" class="add-new-post">
-			<?php echo _x( 'Add New', 'Edit Issue: Add New Post', $domain ); ?>
+			<?php echo _x( 'Add New', 'Edit Issue: Add New Post', 'periodicalpress' ); ?>
 		</a>
 	</p>
 <?php endif; ?>
@@ -123,7 +120,7 @@ function count_pending_issues( $item ) {
 $pending = array_filter( $posts, 'count_pending_issues' );
 if ( ( 'publish' !== $status )
 && ! count( $pending ) ) {
-	echo _x( 'You cannot publish an issue until it has at least one post in it marked "Pending" (which means submitted for publication).', 'Edit Issue: Posts meta box', $domain );
+	echo _x( 'You cannot publish an issue until it has at least one post in it marked "Pending" (which means submitted for publication).', 'Edit Issue: Posts meta box', 'periodicalpress' );
 }
 ?>
 </div><!-- /pp-posts-wrap -->

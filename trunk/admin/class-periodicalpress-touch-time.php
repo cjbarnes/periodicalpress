@@ -192,7 +192,7 @@ class PeriodicalPress_Touch_Time {
 		 * Translators: 1: month, 2: day, 3: year. Use this to localize the
 		 * order of date fields.
 		 */
-		$out .= sprintf( __( ' %2$s/%1$s/%3$s' ), $month, $day, $year );
+		$out .= sprintf( _x( ' %2$s/%1$s/%3$s', 'Date field order and separators', 'periodicalpress' ), $month, $day, $year );
 		$out .= '</div>';
 
 		if ( ! empty( $return ) ) {

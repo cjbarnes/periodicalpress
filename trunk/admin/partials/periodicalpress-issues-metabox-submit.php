@@ -18,7 +18,6 @@ if ( ! defined( 'ABSPATH' ) || ! isset( $issue ) ) {
 	exit;
 }
 
-$domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
 $tax = get_taxonomy( $tax_name );
 
@@ -44,7 +43,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 	<!-- Save Draft button -->
 	<div id="save-action">
 		<?php if ( 'publish' != $status ) : ?>
-			<input type="submit" name="save" id="save-post" value="<?php echo esc_attr_x( 'Save Draft', 'Edit Issue', $domain ); ?>" class="button" />
+			<input type="submit" name="save" id="save-post" value="<?php echo esc_attr_x( 'Save Draft', 'Edit Issue', 'periodicalpress' ); ?>" class="button" />
 		<?php endif; ?>
 		<span class="spinner"></span>
 	</div>
@@ -55,7 +54,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 		$preview_link = esc_url( get_term_link( $issue, $tax_name ) );
 
 		if ( 'publish' === $status ) {
-			$preview_button = _x( 'Preview Changes', 'Edit Issue', $domain );
+			$preview_button = _x( 'Preview Changes', 'Edit Issue', 'periodicalpress' );
 		} else {
 			$preview_link = add_query_arg( 'preview', 'true', $preview_link );
 			/**
@@ -68,7 +67,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 			 * @param object $issue The Issue object.
 			 */
 			$preview_link = esc_url( apply_filters( 'periodicalpress_preview_issue_link', $preview_link, $issue ) );
-			$preview_button = _x( 'Preview', 'Edit Issue', $domain );
+			$preview_button = _x( 'Preview', 'Edit Issue', 'periodicalpress' );
 		}
 		?>
 		<a class="preview button" href="<?php echo $preview_link; ?>" target="wp-preview-<?php echo (int) $issue->term_id; ?>" id="issue-preview"><?php echo $preview_button; ?></a>
@@ -83,14 +82,14 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 	<!-- Issue Status -->
 	<div class="misc-pub-section misc-pub-issue-status">
 		<label class="issue-status-label">
-			<?php echo _x( 'Status:', 'Edit Issue', $domain ); ?>
+			<?php echo _x( 'Status:', 'Edit Issue', 'periodicalpress' ); ?>
 		</label>
 		<strong id="issue-status-display">
 			<?php
 			$current_issue = (int) get_option( 'pp_current_issue', 0 );
 			if ( $current_issue === $issue->term_id ) {
 				// Translators: %s = Issue Status display name.
-				printf( _x( '%s (Current Issue)', 'Edit Issue', $domain ), $status_name );
+				printf( _x( '%s (Current Issue)', 'Edit Issue', 'periodicalpress' ), $status_name );
 			} else {
 				echo $status_name;
 			}
@@ -101,10 +100,10 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 	<!-- Issue Posts count -->
 	<div class="misc-pub-section misc-pub-issue-posts">
 		<label class="issue-posts-label">
-			<?php echo _x( 'Posts:', 'Edit Issue', $domain ); ?>
+			<?php echo _x( 'Posts:', 'Edit Issue', 'periodicalpress' ); ?>
 		</label>
 		<strong id="issue-posts-display">
-			<?php echo (int) $issue->count; ?>
+			<?php echo number_format_i18n( (int) $issue->count ); ?>
 		</strong>
 		<?php
 		// Assemble link to the Posts list table, filtered for this Issue.
@@ -152,7 +151,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 			$unpublish_link = '';
 			?>
 			<a class="submitdelete unpublish" href="<?php echo esc_url( $unpublish_link ); ?>">
-				<?php echo _x( 'Unpublish Issue', 'Edit Issue', $domain ); ?>
+				<?php echo _x( 'Unpublish Issue', 'Edit Issue', 'periodicalpress' ); ?>
 			</a>
 		<?php else: ?>
 			<!-- Delete link -->
@@ -161,7 +160,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 				$delete_url = wp_nonce_url( admin_url( 'admin.php?page=pp_edit_issues' ) . "&amp;action=delete&amp;tag_id={$issue->term_id}&amp;delete-tag_{$issue->term_id}", "delete-tag_{$issue->term_id}" );
 				?>
 				<a class="submitdelete deletion" href="<?php echo $delete_url; ?>">
-					<?php echo _x( 'Delete Permanently', 'Edit Issue', $domain ); ?>
+					<?php echo _x( 'Delete Permanently', 'Edit Issue', 'periodicalpress' ); ?>
 				</a>
 			<?php endif; ?>
 		<?php endif; ?>
@@ -176,13 +175,13 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 			if ( current_user_can( $tax->cap->manage_terms )
 			&& ( 0 < $issue->count ) ) :
 			?>
-				<input name="original_publish" type="hidden" id="original_publish" value="<?php echo esc_attr_x( 'Publish', 'Edit Issue', $domain ) ?>" />
-				<?php submit_button( _x( 'Publish', 'Edit Issue', $domain ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) ); ?>
+				<input name="original_publish" type="hidden" id="original_publish" value="<?php echo esc_attr_x( 'Publish', 'Edit Issue', 'periodicalpress' ) ?>" />
+				<?php submit_button( _x( 'Publish', 'Edit Issue', 'periodicalpress' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) ); ?>
 			<?php endif; ?>
 		<?php else: ?>
 			<!-- Update button -->
-			<input name="original_publish" type="hidden" id="original_publish" value="<?php echo esc_attr_x( 'Update', 'Edit Issue', $domain ) ?>" />
-			<input name="save" type="submit" class="button button-primary button-large" id="publish" accesskey="p" value="<?php echo esc_attr_x( 'Update', 'Edit Issue', $domain ); ?>" />
+			<input name="original_publish" type="hidden" id="original_publish" value="<?php echo esc_attr_x( 'Update', 'Edit Issue', 'periodicalpress' ) ?>" />
+			<input name="save" type="submit" class="button button-primary button-large" id="publish" accesskey="p" value="<?php echo esc_attr_x( 'Update', 'Edit Issue', 'periodicalpress' ); ?>" />
 		<?php endif; ?>
 	</div>
 

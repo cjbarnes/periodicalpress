@@ -62,26 +62,42 @@ class PeriodicalPress_Taxonomy extends PeriodicalPress_Singleton {
 		 * activation this method is called statically.
 		 */
 		$plugin = PeriodicalPress::get_instance();
-		$domain = $plugin->get_plugin_name();
 		$tax_name = $plugin->get_taxonomy_name();
 
 		// Setup the Issue custom post type that is the basis for this plugin.
 		$labels = array(
-			'name'                       => _x( 'Issues', 'Taxonomy General Name', $domain ),
-			'singular_name'              => _x( 'Issue', 'Taxonomy Singular Name', $domain ),
-			'menu_name'                  => __( 'Issues', $domain ),
-			'all_items'                  => __( 'All Issues', $domain ),
-			'parent_item'                => __( 'Parent Issue', $domain ),
-			'parent_item_colon'          => __( 'Parent Issue:', $domain ),
-			'new_item_name'              => __( 'New Issue Name', $domain ),
-			'add_new_item'               => __( 'Add New Issue', $domain ),
-			'edit_item'                  => __( 'Edit Issue', $domain ),
-			'update_item'                => __( 'Update Issue', $domain ),
-			'separate_items_with_commas' => __( 'Separate issues with commas', $domain ),
-			'search_items'               => __( 'Search Issues', $domain ),
-			'add_or_remove_items'        => __( 'Add or remove issues', $domain ),
-			'choose_from_most_used'      => __( 'Choose from the most used issues', $domain ),
-			'not_found'                  => __( 'Not Found', $domain ),
+			'name'                       => _x( 'Issues',
+													'Taxonomy General Name',
+													'periodicalpress' ),
+			'singular_name'              => _x( 'Issue',
+													'Taxonomy Singular Name',
+													'periodicalpress' ),
+			'menu_name'                  => __( 'Issues',
+													'periodicalpress' ),
+			'all_items'                  => __( 'All Issues',
+													'periodicalpress' ),
+			'parent_item'                => __( 'Parent Issue',
+													'periodicalpress' ),
+			'parent_item_colon'          => __( 'Parent Issue:',
+													'periodicalpress' ),
+			'new_item_name'              => __( 'New Issue Name',
+													'periodicalpress' ),
+			'add_new_item'               => __( 'Add New Issue',
+													'periodicalpress' ),
+			'edit_item'                  => __( 'Edit Issue',
+													'periodicalpress' ),
+			'update_item'                => __( 'Update Issue',
+													'periodicalpress' ),
+			'separate_items_with_commas' => __( 'Separate issues with commas',
+													'periodicalpress' ),
+			'search_items'               => __( 'Search Issues',
+													'periodicalpress' ),
+			'add_or_remove_items'        => __( 'Add or remove issues',
+													'periodicalpress' ),
+			'choose_from_most_used' => __( 'Choose from the most used issues',
+													'periodicalpress' ),
+			'not_found'                  => __( 'Not Found',
+													'periodicalpress' ),
 		);
 		$rewrite = array(
 			'slug'         => 'issue',

@@ -15,8 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$domain = $this->plugin->get_plugin_name();
-
 /*
  * Load the taxonomy.
  */
@@ -208,18 +206,19 @@ if ( ( $pagenum > $total_pages ) && ( 0 < $total_pages ) ) {
 // The term-updated messages.
 $messages = array(
 	0  => '', // Unused. Messages start at index 1.
-	1  => __( 'Issue added.', $domain ),
-	2  => __( 'Issue deleted.', $domain ),
-	3  => __( 'Issue updated.', $domain ),
-	4  => __( 'Issue not added.', $domain ),
-	5  => __( 'Issue not updated.', $domain ),
-	6  => __( 'Issues deleted.', $domain ),
-	82 => __( 'Issue not deleted.', $domain ), // Plugin messages start here.
-	86 => __( 'Issue published.', $domain ),
-	87 => __( 'Issue not published.', $domain ),
-	88 => __( 'Issue unpublished.', $domain ),
-	89 => __( 'Issue not unpublished.', $domain ),
-	90 => __( 'You attempted to edit an item that doesn&#8217;t exist. Perhaps it was deleted?', $domain ),
+	1  => __( 'Issue added.', 'periodicalpress' ),
+	2  => __( 'Issue deleted.', 'periodicalpress' ),
+	3  => __( 'Issue updated.', 'periodicalpress' ),
+	4  => __( 'Issue not added.', 'periodicalpress' ),
+	5  => __( 'Issue not updated.', 'periodicalpress' ),
+	6  => __( 'Issues deleted.', 'periodicalpress' ),
+	// Plugin messages start here.
+	82 => __( 'Issue not deleted.', 'periodicalpress' ),
+	86 => __( 'Issue published.', 'periodicalpress' ),
+	87 => __( 'Issue not published.', 'periodicalpress' ),
+	88 => __( 'Issue unpublished.', 'periodicalpress' ),
+	89 => __( 'Issue not unpublished.', 'periodicalpress' ),
+	90 => __( 'You attempted to edit an item that doesn&#8217;t exist. Perhaps it was deleted?', 'periodicalpress' ),
 );
 
 /**

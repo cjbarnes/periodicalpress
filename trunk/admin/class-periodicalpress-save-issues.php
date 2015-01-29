@@ -55,8 +55,6 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		}
 
 		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
-
-		$domain = $this->plugin->get_plugin_name();
 		$tax_name = $this->plugin->get_taxonomy_name();
 
 		/*
@@ -91,7 +89,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 		// Term object changes.
 		$term_updates = array(
-			'name' => sprintf( __( 'Issue %d', $domain ), $issue_num ),
+			'name' => sprintf( __( 'Issue %d', 'periodicalpress' ), $issue_num ),
 			'slug' => "$issue_num"
 		);
 		$temp_result = wp_update_term( $term_id, $tax_name, $term_updates );
@@ -161,8 +159,6 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		}
 
 		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
-
-		$domain = $this->plugin->get_plugin_name();
 		$tax_name = $this->plugin->get_taxonomy_name();
 
 		/*
@@ -221,7 +217,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		}
 
 		// Create a unique name.
-		$name = sprintf( __( 'New Issue (unpublished&nbsp;%s)', $domain ), date( 'Y/m/d', $created ) );
+		$name = sprintf( __( 'New Issue (unpublished&nbsp;%s)', 'periodicalpress' ), date( 'Y/m/d', $created ) );
 		if ( $copy > 1 ) {
 			$name .= ' (' . $copy . ')';
 		}

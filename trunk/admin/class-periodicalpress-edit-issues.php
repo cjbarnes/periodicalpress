@@ -74,8 +74,6 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 	 */
 	public function add_remove_metaboxes() {
 
-		$domain = $this->plugin->get_taxonomy_name();
-
 		/*
 		 * Side column metaboxes:
 		 * - Meta - number (read only) and date
@@ -87,7 +85,7 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 		 */
 		add_meta_box(
 			'pp_issue_metadiv',
-			_x( 'Meta', 'Edit Issue meta box title', $domain ),
+			_x( 'Meta', 'Edit Issue meta box title', 'periodicalpress' ),
 			array( $this, 'render_metabox' ),
 			'pp_issue',
 			'side',
@@ -96,7 +94,7 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 		);
 		add_meta_box(
 			'pp_issue_submitdiv',
-			_x( 'Publish', 'Edit Issue meta box title', $domain ),
+			_x( 'Publish', 'Edit Issue meta box title', 'periodicalpress' ),
 			array( $this, 'render_metabox' ),
 			'pp_issue',
 			'side',
@@ -112,7 +110,7 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 		 */
 		add_meta_box(
 			'pp_issue_descriptiondiv',
-			_x( 'Description', 'Edit Issue meta box title', $domain ),
+			_x( 'Description', 'Edit Issue meta box title', 'periodicalpress' ),
 			array( $this, 'render_metabox' ),
 			'pp_issue',
 			'normal',
@@ -121,7 +119,7 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 		);
 		add_meta_box(
 			'pp_issue_postsdiv',
-			_x( 'Posts', 'Edit Issue meta box title', $domain ),
+			_x( 'Posts', 'Edit Issue meta box title', 'periodicalpress' ),
 			array( $this, 'render_metabox' ),
 			'pp_issue',
 			'advanced',

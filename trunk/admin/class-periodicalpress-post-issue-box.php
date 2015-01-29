@@ -58,7 +58,6 @@ class PeriodicalPress_Post_Issue_Box extends PeriodicalPress_Singleton {
 	 */
 	public function add_remove_metaboxes() {
 
-		$domain = $this->plugin->get_plugin_name();
 		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
 
 		// Remove old Issues metabox.

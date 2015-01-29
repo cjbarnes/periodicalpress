@@ -13,14 +13,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
 
 // Output a nonce field for security.
 wp_nonce_field( 'set-post-issue', 'periodicalpress-post-issue-nonce' );
 ?>
 <label class="screen-reader-text" for="pp-issue">
-	<?php esc_html_e( 'Issue', $domain );?>
+	<?php esc_html_e( 'Issue', 'periodicalpress' );?>
 </label>
 <p>
 	<?php

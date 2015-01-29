@@ -94,11 +94,9 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	 * @return array The statuses array, in form ( name => display name ).
 	 */
 	public function set_issue_statuses_list( $statuses ) {
-		$domain = $this->plugin->get_taxonomy_name();
-
 		return array(
-			'publish' => __( 'Published', $domain ),
-			'draft' => __( 'Draft', $domain )
+			'publish' => __( 'Published', 'periodicalpress' ),
+			'draft' => __( 'Draft', 'periodicalpress' )
 		);
 	}
 

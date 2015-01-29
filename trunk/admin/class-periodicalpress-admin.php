@@ -104,8 +104,6 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		$path = plugin_dir_url( __FILE__ ) . 'js/';
 		$version = $this->plugin->get_version();
 
-		$domain = $name;
-
 		// Script used thoughout the admin area.
 		wp_enqueue_script( $name, "{$path}periodicalpress-admin.js", array( 'jquery' ), $version, true );
 
@@ -135,7 +133,6 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 
 		$plugin_edit_issues = PeriodicalPress_Edit_Issues::get_instance( $this->plugin );
 
-		$domain = $this->plugin->get_plugin_name();
 		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
 
 		// Get Issues taxonomy labels for use by menu pages/subpages.
@@ -171,7 +168,7 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 			add_submenu_page(
 				'pp_edit_issues',
 				$tax->labels->name,
-				sprintf( _x( '%s (debugging)', 'Admin menu', $domain ), $tax->labels->all_items ),
+				sprintf( _x( '%s (debugging)', 'Admin menu', 'periodicalpress' ), $tax->labels->all_items ),
 				'activate_plugins',
 				"edit-tags.php?taxonomy={$tax->name}"
 			);

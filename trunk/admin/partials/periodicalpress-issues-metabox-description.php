@@ -18,12 +18,10 @@ if ( ! defined( 'ABSPATH' ) || ! isset( $issue ) ) {
 	exit;
 }
 
-$domain = $this->plugin->get_plugin_name();
-
 ?>
 <label for="description" class="screen-reader-text">
-	<?php echo _x( 'Description', 'Edit Issue', $domain ); ?>
+	<?php echo _x( 'Description', 'Edit Issue', 'periodicalpress' ); ?>
 </label>
 <textarea rows="1" cols="40" name="description" id="description"><?php echo $issue->description; ?></textarea>
-<p><?php echo _x( 'The description is not prominent by default; however, some themes may show it.', 'Edit Issue', $domain ); ?></p>
+<p><?php echo _x( 'The description is not prominent by default; however, some themes may show it.', 'Edit Issue', 'periodicalpress' ); ?></p>
 <?php

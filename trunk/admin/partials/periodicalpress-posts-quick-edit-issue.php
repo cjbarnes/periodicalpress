@@ -13,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$domain = $this->plugin->get_plugin_name();
 $tax_name = $this->plugin->get_taxonomy_name();
 
 ?>
@@ -25,7 +24,7 @@ $tax_name = $this->plugin->get_taxonomy_name();
 	<div class="inline-edit-col column-<?php echo $tax_name; ?>">
 		<label class="inline-edit-pp-issue alignleft">
 			<span class="title">
-				<?php esc_html_e( 'Issue', $domain );?>
+				<?php esc_html_e( 'Issue', 'periodicalpress' );?>
 			</span>
 			<?php
 			/*
