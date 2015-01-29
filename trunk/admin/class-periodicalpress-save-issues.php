@@ -393,7 +393,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		// Returns boolean for success/failure or WP_Error on error.
 		$result = wp_delete_term( $term_id, $tax_name );
 
-		$plugin_common->delete_issue_transients();
+		$pp_common->delete_issue_transients();
 
 		/*
 		 * Only proceed to delete metadata if the term it attaches to was first

@@ -177,8 +177,8 @@ class PeriodicalPress_Theme_Patching extends PeriodicalPress_Singleton {
 			// Get the current issue.
 			$current_issue = (int) get_option( 'pp_current_issue' , 0 );
 			if ( ! $current_issue ) {
-				$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
-				$current_issue = $plugin_common->get_newest_issue_id();
+				$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+				$current_issue = $pp_common->get_newest_issue_id();
 			}
 
 			/*
@@ -231,8 +231,8 @@ class PeriodicalPress_Theme_Patching extends PeriodicalPress_Singleton {
 		}
 
 		// Get the ordered list of Issues currently published.
-		$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
-		$issues = $plugin_common->get_ordered_issue_IDs();
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$issues = $pp_common->get_ordered_issue_IDs();
 
 		// Set the total number of 'pages' (i.e. Issues).
 		$wp_query->max_num_pages = count( $issues );
@@ -291,8 +291,8 @@ class PeriodicalPress_Theme_Patching extends PeriodicalPress_Singleton {
 				 * transients to cache its results, so there is no need to cache
 				 * here as well.
 				 */
-				$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
-				$issues = $plugin_common->get_ordered_issue_IDs();
+				$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+				$issues = $pp_common->get_ordered_issue_IDs();
 
 				$issue_id = isset( $issues[ $pagenum ] )
 					? $issues[ $pagenum ]
@@ -303,8 +303,8 @@ class PeriodicalPress_Theme_Patching extends PeriodicalPress_Singleton {
 				$issue_id = intval( get_option( 'pp_current_issue' , 0 ) );
 
 				if ( ! $issue_id ) {
-					$plugin_common = PeriodicalPress_Common::get_instance( $this->plugin );
-					$issue_id = $plugin_common->get_newest_issue_id();
+					$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+					$issue_id = $pp_common->get_newest_issue_id();
 				}
 
 			}
