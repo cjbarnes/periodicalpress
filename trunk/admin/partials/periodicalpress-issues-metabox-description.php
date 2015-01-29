@@ -22,6 +22,6 @@ if ( ! defined( 'ABSPATH' ) || ! isset( $issue ) ) {
 <label for="description" class="screen-reader-text">
 	<?php echo _x( 'Description', 'Edit Issue', 'periodicalpress' ); ?>
 </label>
-<textarea rows="1" cols="40" name="description" id="description"><?php echo $issue->description; ?></textarea>
+<textarea rows="1" cols="40" name="description" id="description"><?php echo esc_textarea( $issue->description ); ?></textarea>
 <p><?php echo _x( 'The description is not prominent by default; however, some themes may show it.', 'Edit Issue', 'periodicalpress' ); ?></p>
 <?php
