@@ -69,11 +69,11 @@ $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 					|| ( 'private' === $post->post_status ) ) :
 					?>
 						<a href="<?php echo get_permalink( $post->ID ) ?>" class="issue-post-row-action-view">
-							<?php esc_html_e ( _x( 'View', 'Edit Issue: post actions', 'periodicalpress' ) ); ?>
+							<?php echo esc_html_x( 'View', 'Edit Issue: post actions', 'periodicalpress' ); ?>
 						</a>
 					<?php else : ?>
 						<a href="#todo" class="issue-post-row-action-preview">
-							<?php esc_html_e( _x( 'Preview', 'Edit Issue: post actions', 'periodicalpress' ) ); ?>
+							<?php echo esc_html_x( 'Preview', 'Edit Issue: post actions', 'periodicalpress' ); ?>
 						</a>
 					<?php endif; ?>
 
