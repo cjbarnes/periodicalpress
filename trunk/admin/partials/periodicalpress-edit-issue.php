@@ -55,10 +55,11 @@ $screen_columns = 2;
  */
 do_action( 'periodicalpress_issue_edit_form_tag', $issue );
 ?>>
-	<?php wp_nonce_field( 'edit-issue', 'periodicalpress-edit-issue-nonce' ); ?>
-	<input type="hidden" name="action" value="edited" />
+	<?php wp_nonce_field( "update-tag_$term_id" ); ?>
+	<input type="hidden" name="action" value="update" />
 	<input type="hidden" name="screen" value="<?php echo $screen->id; ?>" />
 	<input type="hidden" name="taxonomy" value="<?php echo $tax_name; ?>" />
+	<input type="hidden" name="tag_id" value="<?php echo $term_id; ?>" />
 
 	<?php
 	/**

@@ -68,10 +68,11 @@ switch ( $list_table->current_action() ) {
 			exit();
 		}
 
-		// If this Issue doesn't exist, show error message.
+		// If this Issue doesn't exist, show error message on List Table page.
 		if ( ! get_term( $term_id, $tax_name ) ) {
 			$location = 'admin.php?page=pp_edit_issues';
 			$location = add_query_arg( 'message', 90, $location );
+			break;
 		}
 
 		/**
@@ -81,15 +82,12 @@ switch ( $list_table->current_action() ) {
 
 		exit;
 
-	case 'edited':
-
-		break;
-
+	case 'update':
 	case 'delete':
 	case 'publish':
 	case 'unpublish':
-		$action = $list_table->current_action();
 
+		$action = $list_table->current_action();
 		$location = 'admin.php?page=pp_edit_issues';
 
 		// Check the Issue ID and nonce have been correctly passed via URL.
@@ -109,54 +107,96 @@ switch ( $list_table->current_action() ) {
 
 				break;
 			}
+
+		} elseif ( 'update' === $action ) {
+			if ( ! current_user_can( $tax->cap->edit_terms ) ) {
+
+				// Not Updated error message.
+				$msg_id = 5;
+				$location = add_query_arg( 'message', $msg_id, $location );
+
+				break;
+			}
+
 		} elseif ( ! current_user_can( $tax->cap->manage_terms ) ) {
 
 			// Not Published/Unpublished error message.
 			if ( 'publish' === $action ) {
 				$msg_id = 87;
-			} else {
+			} elseif ( 'unpublish' === $action ) {
 				$msg_id = 89;
+			} else {
+				$msg_id = 5;
 			}
 			$location = add_query_arg( 'message', $msg_id, $location );
 
 			break;
 		}
 
+		$pp_save_issues = PeriodicalPress_Save_Issues::get_instance( $this->plugin );
+
 		/*
 		 * Actually change the Issue in the database using the appropriate
 		 * method on {@see PeriodicalPress_Save_Issues}, and add result message
 		 * to the URL query string.
 		 */
-		$plugin_save_issues = PeriodicalPress_Save_Issues::get_instance( $this->plugin );
-		$do_it = $action . '_issue';
-		$result = $plugin_save_issues->$do_it( $term_id );
-
-		// Determine which success/failure message should be displayed.
-		if ( ! is_wp_error( $result ) && $result ) {
-			switch ( $action ) {
-				case 'delete':
-					$msg_id = 2;
-					break;
-				case 'publish':
-					$msg_id = 86;
-					break;
-				case 'unpublish':
-					$msg_id = 88;
-					break;
-			}
+		if ( 'update' === $action ) {
+			$result = $pp_save_issues->update_issue( $term_id, $_POST );
 		} else {
-			switch ( $action ) {
-				case 'delete':
-					$msg_id = 82;
-					break;
-				case 'publish':
-					$msg_id = 87;
-					break;
-				case 'unpublish':
-					$msg_id = 89;
-					break;
-			}
+			$do_it = $action . '_issue';
+			$result = $pp_save_issues->$do_it( $term_id );
 		}
+
+		// Direct back to Edit Issue page on Edit success or failure.
+		if ( 'update' === $action ) {
+
+			// Direct back to the Edit Issue screen.
+			$location = add_query_arg( 'action', 'edit', $location );
+			$location = add_query_arg( 'term_id', $term_id, $location );
+
+			if ( ! is_wp_error( $result ) && $result ) {
+				$msg_id = 3;
+			} else {
+				$msg_id = 5;
+			}
+
+			$location = add_query_arg( 'message', $msg_id, $location );
+
+
+		} else {
+
+			/*
+			 * Stay on this page, and determine which success/failure message
+			 * should be displayed.
+			 */
+			if ( ! is_wp_error( $result ) && $result ) {
+				switch ( $action ) {
+					case 'delete':
+						$msg_id = 2;
+						break;
+					case 'publish':
+						$msg_id = 86;
+						break;
+					case 'unpublish':
+						$msg_id = 88;
+						break;
+				}
+			} else {
+				switch ( $action ) {
+					case 'delete':
+						$msg_id = 82;
+						break;
+					case 'publish':
+						$msg_id = 87;
+						break;
+					case 'unpublish':
+						$msg_id = 89;
+						break;
+				}
+			}
+
+		}
+
 		$location = add_query_arg( 'message', $msg_id, $location );
 
 		break;

@@ -311,6 +311,138 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Save changes to an Issue.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int|object $term Either the Issue's term ID or its term object.
+	 * @param array      $data The changes to be made to the issue (usually a
+	 *                         $_POST object).
+	 * @return bool|WP_Error Success/failure of term deletion, or error object.
+	 */
+	public function update_issue( $term, $data ) {
+
+		if ( empty( $term ) ) {
+			return false;
+		}
+
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+		$tax = get_taxonomy( $tax_name );
+
+		/*
+		 * Check this ID matches an existing Issue. If a term slug or object was
+		 * passed in (instead of an integer term_id), get the term_id.
+		 */
+		$term_object = get_term( $term, $tax_name );
+
+		// Return FALSE if Issue doesn't exist, WP_Error if error.
+		if ( is_null( $term_object ) || is_wp_error( $term_object ) ) {
+			if ( is_null( $term_object ) ) {
+				$term_object = false;
+			}
+			return $term_object;
+		}
+
+		$term_id = $term_object->term_id;
+
+		/**
+		 * Hook for just before an Issue is updated.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int    $term_id     The ID of the Issue taxonomy term to be
+		 *                            updated.
+		 * @param object $term_object The complete term object for the Issue.
+		 * @param array  $data        Data (eg $_POST) passed into this method.
+		 */
+		do_action( 'periodicalpress_before_update_issue', $term_id, $term_object, $data );
+
+		// Sanitize and prep for wp_update_term().
+		$new_term_data = array();
+
+		$new_term_data['name'] = ! empty( $data['name'] )
+			? sanitize_text_field( $data['name'] )
+			: $term_object->name;
+
+		$new_term_data['slug'] = ! empty( $data['slug'] )
+			? sanitize_title_with_dashes( $data['slug'] )
+			: $term_object->slug;
+
+		$new_term_data['description'] = isset( $data['description'] )
+			? wp_kses_data( $data['description'] )
+			: $term_object->description;
+
+		// Slug must be unique. If not, go back to the old slug.
+		if ( ( $new_term_data['slug'] !== $term_object->slug )
+		&& get_term_by( 'slug', $new_term_data['slug'], $tax_name ) ) {
+			$new_term_data['slug'] = $term_object->slug;
+		}
+
+		// Update the terms table. End here if the DB doesn't update properly.
+		$result = wp_update_term( $term_id, $tax_name, $new_term_data );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		// Publish this if the submit button clicked was the 'Publish' one.
+		if ( isset( $data['publish'] )
+		&& current_user_can( $tax->cap->manage_terms ) ) {
+			$result = $this->publish_issue( $term_object );
+
+			// Return error or false if failed publish.
+			if ( is_null( $result ) || is_wp_error( $result ) ) {
+				if ( is_null( $result ) ) {
+					return false;
+				}
+				return $result;
+			}
+
+		}
+
+		// Issue Number update.
+		if ( isset( $data['number'] ) ) {
+			$pp_common->update_issue_number( $term_id, $data['number'] );
+		}
+
+		// Issue Date update.
+		if ( ! empty( $data['aa'] ) && is_numeric( $data['aa'] ) ) {
+
+			// Sanitize date input. 1 is the default for anything missing.
+			$year = absint( $data['aa'] );
+			$month = ( ! empty( $data['mm'] ) && ( 13 > intval( $data['mm'] ) ) )
+				? absint( $data['mm'] )
+				: 1;
+			$day = ( ! empty( $data['jj'] ) && ( 32 > intval( $data['jj'] ) ) )
+				? absint( $data['jj'] )
+				: 1;
+
+			$new_date = date_create();
+			$new_date->setDate( $year, $month, $day );
+
+			$pp_common->update_issue_meta( $term_id, 'pp_issue_date', $new_date->format( 'Y-m-d' ) );
+
+		}
+
+		/**
+		 * Hook for after an Issue is updated.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int    $term_id     The ID of the Issue taxonomy term that was
+		 *                            updated.
+		 * @param object $term_object The complete term object for the Issue.
+		 * @param array  $data        Data (eg $_POST) passed into this method.
+		 */
+		do_action( 'periodicalpress_update_issue', $term_id, $term_object, $data );
+
+		return $result;
+
+
+	}
+
+	/**
 	 * Delete an Issue from the plugin taxonomy.
 	 *
 	 * Includes deletion of metadata. Note that the returned success/failure/

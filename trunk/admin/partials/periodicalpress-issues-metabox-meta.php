@@ -53,7 +53,7 @@ $datefield = new PeriodicalPress_Touch_Time( $touch_date );
 		<?php echo esc_html_x( 'Issue Number:', 'Edit Issue', 'periodicalpress' ); ?>
 	</label>
 	<div class="pp-side-input-wrap">
-		<input type="text" name="pp_issue_number" id="pp-issue-number" size="4" maxlength="4" autocomplete="off" value="<?php echo $meta_number; ?>" />
+		<input type="text" name="number" id="pp-issue-number" size="4" maxlength="4" autocomplete="off" value="<?php echo $meta_number; ?>" />
 	</div>
 </div>
 
