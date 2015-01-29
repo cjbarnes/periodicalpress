@@ -40,6 +40,7 @@ if ( ! class_exists( 'PeriodicalPress_Touch_Time' ) ) {
 	require_once $this->plugin->get_plugin_path() . 'admin/class-periodicalpress-touch-time.php';
 }
 
+// Initialize the date-field outputting class.
 $touch_date = ( -1 !== $meta_date )
 	? mysql2date( 'U', $meta_date )
 	: -1;
