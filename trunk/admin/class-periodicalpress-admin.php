@@ -68,7 +68,13 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		add_action( 'admin_menu', array( $this, 'admin_menu_setup' ) );
 		add_filter( 'parent_file', array( $this, 'fix_submenu_parent_files' ) );
 
+		// Plugins page.
+		$plugin_name = $this->plugin->get_plugin_name();
+		$actions_filter = "plugin_action_links_$plugin_name/$plugin_name.php";
+		add_filter( $actions_filter, array( $this, 'add_plugin_row_actions' ), 10, 4 );
+
 	}
+
 
 	/**
 	 * Register the stylesheets for the Dashboard.
@@ -213,6 +219,32 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		}
 
 		return $parent_file;
+	}
+
+	/**
+	 * Add a Settings link for this plugin to the Plugins table.
+	 *
+	 * Filters the row-action links for this plugin's entry in the Plugins page
+	 * list table.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array  $actions     The currently set row-actions link elements.
+	 * @param string $plugin_file Path to the plugin file.
+	 * @param array  $plugin_data Array of plugin data.
+	 * @param string $context     The plugin context (e.g. Must-Use,
+	 *                            'Inactive').
+	 */
+	public function add_plugin_row_actions( $actions, $plugin_file, $plugin_data, $context ) {
+
+		$link = sprintf( '<a href="%s" title="%s" class="settings">%s</a>',
+			admin_url( 'admin.php?page=periodicalpress_settings' ),
+			esc_attr__( 'PeriodicalPress Settings', 'periodicalpress' ),
+			esc_html_x( 'Settings', 'Plugins table link to plugin settings page', 'periodicalpress' )
+		);
+
+		array_unshift( $actions, $link );
+		return $actions;
 	}
 
 	/**
