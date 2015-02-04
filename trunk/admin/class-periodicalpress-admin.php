@@ -269,29 +269,6 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 	}
 
 	/**
-	 * Output the Current Issue form.
-	 *
-	 * Only available to users with capability manage_pp_issues.
-	 *
-	 * @since 1.0.0
-	 */
-	public function current_issue_field() {
-
-		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
-
-		if ( current_user_can( $tax->cap->manage_terms ) ) {
-
-			/**
-			 * Output the Current Issue form.
-			 */
-			$path = $this->plugin->get_partials_path( 'admin' );
-			require $path . 'periodicalpress-current-issue-form.php';
-
-		}
-
-	}
-
-	/**
 	 * Save a newly selected Current Issue to the database.
 	 *
 	 * @since 1.0.0
