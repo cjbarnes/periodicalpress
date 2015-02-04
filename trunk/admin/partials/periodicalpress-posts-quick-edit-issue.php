@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 $tax_name = $this->plugin->get_taxonomy_name();
 
 ?>
@@ -34,16 +35,13 @@ $tax_name = $this->plugin->get_taxonomy_name();
 			 * {@link http://codex.wordpress.org/Plugin_API/Action_Reference/quick_edit_custom_box}.
 			 */
 			$args = array(
+				'hide_published'   => 1,
 				'show_option_none' => 'No issue',
-				'orderby'          => 'slug',
-				'order'            => 'DESC',
 				'name'             => 'pp_issue',
 				'id'               => 'pp-issue',
-				'taxonomy'         => $tax_name,
-				'hide_empty'       => 0,
 				'selected'         => 0
 			);
-			wp_dropdown_categories( $args );
+			$pp_common->dropdown_issues( $args );
 			?>
 		</label>
 	</div>
