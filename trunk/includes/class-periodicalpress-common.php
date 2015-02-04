@@ -187,7 +187,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	 *                           whose values match this param.
 	 * @return bool Success of deletion.
 	 */
-	public function delete_issue_meta( $issue_id, $meta_key, $meta_value ) {
+	public function delete_issue_meta( $issue_id, $meta_key, $meta_value = '' ) {
 		return delete_metadata( 'pp_term', $issue_id, $meta_key, $meta_value );
 	}
 
@@ -534,7 +534,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	 * @return bool True if not published, False if published.
 	 */
 	public function is_unpublished( $issue ) {
-		return ( ! is_published( $issue ) );
+		return ( ! $this->is_published( $issue ) );
 	}
 
 
@@ -677,15 +677,15 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 			$selected = ( '0' === strval($args['selected']) )
 				? " selected='selected'"
 				: '';
-			$output .= "\t<option value='0'$selected>$show_option_all</option>\n";
+			$out .= "\t<option value='0'$selected>$show_option_all</option>\n";
 		}
 
 		// None option.
 		if ( $args['show_option_none'] ) {
 			/** This filter is documented in wp-includes/category-template.php */
 			$show_option_none = apply_filters( 'list_cats', $args['show_option_none'] );
-			$selected = selected( $option_none_value, $args['selected'], false );
-			$output .= "\t<option value='" . esc_attr( $option_none_value ) . "'$selected>$show_option_none</option>\n";
+			$selected = selected( $args['option_none_value'], $args['selected'], false );
+			$out .= "\t<option value='" . esc_attr( $args['option_none_value'] ) . "'$selected>$show_option_none</option>\n";
 		}
 
 		// Output the individual Issue option elements.

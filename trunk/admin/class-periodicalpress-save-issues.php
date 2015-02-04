@@ -265,7 +265,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		$issues = wp_get_post_terms( $post->ID, $tax_name );
 
 		foreach( $issues as $issue ) {
-			unpublish_issue_if_empty( $issue, $tax_name );
+			$this->unpublish_issue_if_empty( $issue, $tax_name );
 		}
 
 	}
