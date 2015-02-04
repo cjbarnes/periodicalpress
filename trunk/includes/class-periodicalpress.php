@@ -172,8 +172,7 @@ class PeriodicalPress {
 	 *   site.
 	 * - PeriodicalPress_Template_Tags. All plugin template tags.
 	 *
-	 * Create an instance of the loader which will be used to register the hooks
-	 * with WordPress.
+	 * Instantiate the main plugin classes so they will register their hooks.
 	 *
 	 * @since 1.0.0
 	 * @access private
