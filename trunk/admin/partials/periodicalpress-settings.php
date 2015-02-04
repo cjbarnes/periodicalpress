@@ -120,7 +120,7 @@ $issue_date_format = get_option( 'pp_issue_date_format', get_option( 'date_forma
 							echo esc_html(
 								sprintf( _x( '%1$s: %2$s', 'Example of issue name format', 'periodicalpress' ),
 									$tax->labels->singular_name,
-									_x( 'Hello Dolly', 'Example issue title', 'periodicalpress' )
+									_x( 'The Windows of Siracusa County', 'Example issue title', 'periodicalpress' )
 								)
 							);
 							?>
