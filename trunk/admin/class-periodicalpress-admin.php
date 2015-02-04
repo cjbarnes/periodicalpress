@@ -68,6 +68,9 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		add_action( 'admin_menu', array( $this, 'admin_menu_setup' ) );
 		add_filter( 'parent_file', array( $this, 'fix_submenu_parent_files' ) );
 
+		// Date formats filter.
+		add_filter( 'periodicalpress_date_formats', array( $this, 'add_date_format_suggestions' ) );
+
 		// Plugins page.
 		$plugin_name = $this->plugin->get_plugin_name();
 		$actions_filter = "plugin_action_links_$plugin_name/$plugin_name.php";
@@ -247,6 +250,18 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 
 		array_unshift( $actions, $link );
 		return $actions;
+	}
+
+	/**
+	 * Filter to customize the date formats suggested for the Issue Date Format
+	 * setting.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $date_formats Date format string suggestions.
+	 */
+	public function add_date_format_suggestions( $date_formats ) {
+		return array_merge( $date_formats, array( 'F Y', 'Y: F', 'Y' ) );
 	}
 
 	/**
