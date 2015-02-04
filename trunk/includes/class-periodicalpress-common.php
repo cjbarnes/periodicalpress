@@ -491,6 +491,226 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Check if this Issue is published.
+	 *
+	 * Use as `array_filter()` callback with an array of Issues to remove all
+	 * not-published Issues.
+	 *
+	 * If an Issue Status meta value is not present in the Issue object, we try
+	 * to fetch it, then as a fallback we assume it is not published.
+	 *
+	 * When using this method to check an array of Issues, **always add the
+	 * Issue Status metadata to the `$issue` object before passing it to this
+	 * function!** Otherwise, every single use of this callback will separately
+	 * query the database for a single metadata value, which is expensive.
+	 * Instead, first setup the $issue objects to include the meta value in a
+	 * property named `$status`, **then** call `array_filter()` or similar.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param object $issue Term object for the Issue to be checked, with added
+	 *                      metadata.
+	 * @return bool True if published, false if not.
+	 */
+	public function is_published( $issue ) {
+		if ( ! isset( $issue->status ) ) {
+			$issue->status = $this->get_issue_meta( $issue->term_id, 'pp_issue_status' );
+		}
+		return ( 'publish' === $issue->status );
+	}
+
+	/**
+	 * Check if this Issue is not published.
+	 *
+	 * Exact reverse of {@see is_published()}. This means that this method
+	 * doesn't just match Issues that are explicitly set as Draft; instead, it
+	 * matches all Issues that are **not** explicitly set as Published.
+	 *
+	 * @since 1.0.0
+	 * @see PeriodicalPress_Common::is_published()
+	 *
+	 * @param object $issue Term object for the Issue to be checked, with added
+	 *                      metadata.
+	 * @return bool True if not published, False if published.
+	 */
+	public function is_unpublished( $issue ) {
+		return ( ! is_published( $issue ) );
+	}
+
+
+	/**
+	 * Return or output a dropdown of Issues.
+	 *
+	 * Revised version of `wp_dropdown_categories()`. Designed to retrieve
+	 * Issues data, and also makes sure the list items are sorted in proper
+	 * Issue order.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $args {
+	 *     Optional. An array of arguments. Most of the arguments from Core's
+	 *     {@link wp_dropdown_categories()} are supported and work as documented
+	 *     for that function.
+	 *
+	 *     @type bool   $hide_published    Don't show published Issues.
+	 *                                     Default 0/false.
+	 *     @type bool   $hide_unpublished  Don't show Issues that aren't
+	 *                                     published. Default 0/false.
+	 *     @type string $show_option_all   Text to display for showing all
+	 *                                     Issues. Default ''.
+	 *     @type string $show_option_none  Text to display for showing no
+	 *                                     Issues. Default ''.
+	 *     @type int|string $option_none_value The value attribute for the None
+	 *                                     option. Default -1.
+	 *     @type string $order             Sort order direction. Default 'DESC'.
+	 *                                     Accepts 'ASC', 'DESC'.
+	 *     @type bool   $show_count        Whether to show the number of posts
+	 *                                     in each Issue. Default 0/false.
+	 *     @type string $exclude           Issue IDs to exclude.
+	 *     @type string $include           Issue IDs to include.
+	 *     @type bool   $echo              Whether to output the dropdown's HTML
+	 *                                     or just return it. Default 1/true.
+	 *     @type int    $tab_index         Select element's `tabindex`
+	 *                                     attribute.
+	 *     @type string $name              Select element's `name`. Default is
+	 *                                     the Issue taxonomy name.
+	 *     @type string $id                Select element's `id`.
+	 *     @type string $class             Select element's `class` attribute.
+	 *                                     Default 'postform'.
+	 *     @type int    $selected          Which Issue ID should be selected.
+	 *     @type bool   $hide_if_empty     Whether to hide the dropdown if there
+	 *                                     are no Issues to choose from.
+	 *	                                   Default 0/false.
+	 * }
+	 * @return string HTML content only if 'echo' argument is false.
+	 */
+	public function dropdown_issues( $args = '' ) {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		$defaults = array(
+			'hide_published' => 0,
+			'hide_unpublished' => 0,
+			'show_option_all' => '',
+			'show_option_none' => '',
+			'option_none_value' => -1,
+			'order' => 'DESC',
+			'show_count' => 0,
+			'exclude' => '',
+			'include' => '',
+			'echo' => 1,
+			'tab_index' => 0,
+			'name' => $tax_name,
+			'id' => '',
+			'class' => 'postform',
+			'selected' => 0,
+			'hide_if_empty' => 0
+		);
+		$args = wp_parse_args( $args, $defaults );
+
+		// Set arguments used by {@link get_terms()} that cannot be overridden.
+		$args = array_merge( $args, array(
+			'taxonomy' => $tax_name,
+			'hide_empty' => false,
+			'orderby' => 'ID',
+			'hierarchical' => 0,
+			'depth' => 0,
+			'pad_counts' => 0
+		) );
+
+		// Get the Issue data.
+		$issues = get_terms( $tax_name, $args );
+
+		// Add metadata to the data, so we can filter and sort by it.
+		foreach ( $issues as $issue ) {
+			$meta = $this->get_issue_meta( $issue->term_id );
+			$issue->number = ! empty( $meta['pp_issue_number'] )
+				? $meta['pp_issue_number']
+				: '';
+			$issue->date = ! empty( $meta['pp_issue_date'] )
+				? $meta['pp_issue_date']
+				: '';
+			$issue->status = ! empty( $meta['pp_issue_status'] )
+				? $meta['pp_issue_status']
+				: '';
+			$issue->created_date = ! empty( $meta['pp_issue_created_date'] )
+				? $meta['pp_issue_created_date']
+				: 0;
+		}
+
+		// Filter the data.
+		if ( $args['hide_published'] ) {
+			$issues = array_filter( $issues, array( $this, 'is_unpublished' ) );
+		}
+		if ( $args['hide_unpublished'] ) {
+			$issues = array_filter( $issues, array( $this, 'is_published' ) );
+		}
+
+		// If `hide_if_empty` and there's no Issues to display, end here.
+		if ( $args['hide_if_empty'] && empty( $issues ) ) {
+			return '';
+		}
+
+		// Sort the data.
+		if ( 'ASC' === $args['order'] ) {
+			usort( $issues, array( $this, 'ascending_sort_issues' ) );
+		} else {
+			usort( $issues, array( $this, 'descending_sort_issues' ) );
+		}
+
+		// Assemble the select element's opening tag.
+		$name = esc_attr( $args['name'] );
+		$class = esc_attr( $args['class'] );
+		$id = $args['id']
+			? esc_attr( $args['id'] )
+			: $name;
+		$tab_index_attr = ( 0 < (int) $args['tab_index'] )
+			? "tabindex='{$args['tab_index']}'"
+			: '';
+
+		$out = "<select name='$name' id='$id' class='$class' $tab_index_attr>\n";
+
+		// All option.
+		if ( $args['show_option_all'] ) {
+			/** This filter is documented in wp-includes/category-template.php */
+			$show_option_all = apply_filters( 'list_cats', $args['show_option_all'] );
+			$selected = ( '0' === strval($args['selected']) )
+				? " selected='selected'"
+				: '';
+			$output .= "\t<option value='0'$selected>$show_option_all</option>\n";
+		}
+
+		// None option.
+		if ( $args['show_option_none'] ) {
+			/** This filter is documented in wp-includes/category-template.php */
+			$show_option_none = apply_filters( 'list_cats', $args['show_option_none'] );
+			$selected = selected( $option_none_value, $args['selected'], false );
+			$output .= "\t<option value='" . esc_attr( $option_none_value ) . "'$selected>$show_option_none</option>\n";
+		}
+
+		// Output the individual Issue option elements.
+		$out .= walk_category_dropdown_tree( $issues, -1, $args );
+
+		$out .= "</select>\n";
+
+		/**
+		 * Filter for the complete Issues dropdown HTML.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $out  The HTML.
+		 * @param array  $args The arguments (both passed in and defaults) used.
+		 */
+		$out = apply_filters( 'periodicalpress_dropdown_issues', $out, $args );
+
+		// Output.
+		if ( $args['echo'] ) {
+			echo $out;
+		}
+		return $out;
+	}
+
+	/**
 	 * Delete all cached Issue-related values.
 	 *
 	 * Called whenever Issue numbers are edited.
