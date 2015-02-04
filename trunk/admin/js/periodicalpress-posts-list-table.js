@@ -1,4 +1,5 @@
 /* global inlineEditPost */
+/* global l10n */
 
 (function( $ ) {
 	'use strict';
@@ -38,27 +39,41 @@
 			if ( postID > 0 ) {
 				var $editRow = $( '#edit-' + postID );
 				var $postRow = $( '#post-' + postID );
+				var $statusField = $( 'select[name=_status]' );
+				var $issueField = $editRow.find( '#pp-issue' );
+				var $issueLink = $postRow.find( '.column-pp_issue [data-issue-id]' );
 
-				// Get the existing Issue data from the DOM.
-				var $issues = $postRow.find( '.column-pp_issue [data-issue-id]' );
+				if ( $postRow.hasClass( 'status-publish' ) ) {
 
-				// -1 selects the 'No issue' option.
-				var issueID = -1;
-				if ( $issues.length ) {
-					issueID = parseInt( $issues.attr( 'data-issue-id' ), 10 );
+					// Add back the 'Published' Status option when the current
+					// post is already published, to prevent JS save errors due
+					// to the missing data.
+					$statusField.prepend( '<option value="publish">' + l10n.publishStatusName + '</option>' );
+
+					// Hide the Issue field, and show a simple link instead.
+					$issueLink.clone().prependTo( '.pp-issue-readonly' );
+					$issueField.hide();
+
+
+				} else {
+
+					// Re-remove 'Published' Status option for not-yet-published
+					// posts.
+					$statusField.find( 'option[value=publish]' ).remove();
+
+					// -1 selects the 'No issue' option in the Issues dropdown.
+					var issueID = -1;
+					if ( $issueLink.length ) {
+						issueID = parseInt( $issueLink.attr( 'data-issue-id' ), 10 );
+					}
+
+					// Select the correct Issue and display.
+					$issueField.val( issueID ).show();
+
+					// Hide the read-only Issue link.
+					$( '.pp-issue-readonly' ).empty();
+
 				}
-
-				// Select the correct Issue.
-				$editRow.find( '#pp-issue' ).val( issueID );
-
-				// Replace the Status field with a hidden field.
-				var $statusField = $editRow.find( 'select[name=_status]' );
-				var $status = $statusField.val() || 'publish';
-				$statusField
-					.parents('.inline-edit-group')
-						.eq(0)
-						.replaceWith( '<input type="hidden" name="_status" value="' + $status + '" />' )
-						.remove();
 
 			}
 

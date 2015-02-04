@@ -113,18 +113,20 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		// Script used thoughout the admin area.
 		wp_enqueue_script( $name, "{$path}periodicalpress-admin.js", array( 'jquery' ), $version, true );
 
-		/*
-		 * Localization object for the main script file. All key-value pairs
-		 * in this array will be available as a global 'l10n' object in the
-		 * JavaScript file ({@see wp_localize_script()}).
-		 */
-		wp_localize_script( $name, 'l10n', array() );
-
 		// Script that enables Quick Editing for posts.
 		$screen = get_current_screen();
 		if ( 'edit-post' === $screen->id ) {
 
 			wp_enqueue_script( "{$name}_posts_list_table", "{$path}periodicalpress-posts-list-table.js", array( 'jquery' ), $version, true );
+			/*
+			 * Localization object for the posts list table script file. All
+			 * key-value pairs in this array will be available as a global
+			 * 'l10n' object in the JavaScript file
+			 * ({@see wp_localize_script()}).
+			 */
+			wp_localize_script( "{$name}_posts_list_table", 'l10n', array(
+				'publishStatusName' => esc_html__( 'Published' )
+			) );
 
 		}
 

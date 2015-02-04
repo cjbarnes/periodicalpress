@@ -42,7 +42,13 @@ $tax_name = $this->plugin->get_taxonomy_name();
 				'selected'         => 0
 			);
 			$pp_common->dropdown_issues( $args );
+
+			/*
+			 * This element is used when the post is already published, to just
+			 * show the Issue link without the select field.
+			 */
 			?>
+			<strong class="pp-issue-readonly"></strong>
 		</label>
 	</div>
 </fieldset>
