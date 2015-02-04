@@ -259,9 +259,10 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 	 * @since 1.0.0
 	 *
 	 * @param array $date_formats Date format string suggestions.
+	 * @return array Revised date format suggestions.
 	 */
 	public function add_date_format_suggestions( $date_formats ) {
-		return array_merge( $date_formats, array( 'F Y', 'Y: F', 'Y' ) );
+		return array_merge( $date_formats, array( 'F Y', 'Y' ) );
 	}
 
 	/**
