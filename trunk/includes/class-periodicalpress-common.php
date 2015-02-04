@@ -428,6 +428,69 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Reversed sorting function for Issues.
+	 *
+	 * Comparison function for use by `usort()` etc.
+	 *
+	 * Sorts by:
+	 * 1. Unpublished issues (newest first)
+	 * 2. Unpublished issues with no created date
+	 * 3. Published issues (highest number first)
+	 *
+	 * Generates the default sort order of the Issues for list tables and
+	 * dropdowns etc.
+	 *
+	 * The term objects passed in **must** include the Issue metadata if set,
+	 * specifically:
+	 * - `number`       (meta key `pp_issue_number`)
+	 * - `created_date` (meta key `pp_issue_created_date`)
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param  object $obj1 Term object to compare.
+	 * @param  object $obj2 Term object to compare.
+	 * @return int The comparison result: -1 = greater than, 1 = lesser than,
+	 *             0 = equal to.
+	 */
+	public function descending_sort_issues( $obj1, $obj2 ) {
+
+		$compare = array();
+
+		foreach( array( $obj1, $obj2 ) as $n => $obj ) {
+			if ( ! empty( $obj->number ) ) {
+				$compare[ $n ] = $obj->number;
+			} else {
+				// All non-numbered issues should be at the top.
+				$compare[ $n ] = 9999;
+
+				// Sort non-numbered issues by created date.
+				if ( ! empty( $obj->created_date ) ) {
+					$compare[ $n ] += $obj->created_date;
+				}
+			}
+		}
+
+		return strnatcmp( $compare[1], $compare[0] );
+	}
+
+	/**
+	 * Natural sorting function for Issues.
+	 *
+	 * The opposite of {@see descending_sort_issues()}.
+	 *
+	 * @since 1.0.0
+	 * @see PeriodicalPress_Common::descending_sort_issues()
+	 *
+	 * @param  object $obj1 Term object to compare.
+	 * @param  object $obj2 Term object to compare.
+	 * @return int The comparison result: -1 = greater than, 1 = lesser than,
+	 *             0 = equal to.
+	 */
+	public function ascending_sort_issues( $obj1, $obj2 ) {
+		return $this->descending_sort_issues( $obj2, $obj1 );
+	}
+
+	/**
 	 * Delete all cached Issue-related values.
 	 *
 	 * Called whenever Issue numbers are edited.
