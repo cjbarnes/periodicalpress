@@ -22,6 +22,8 @@ $tax = get_taxonomy( $tax_name );
  */
 $issue_date_format = get_option( 'pp_issue_date_format', get_option( 'date_format' ) );
 
+$issue_naming = get_option( 'pp_issue_naming', '' );
+
 ?>
 <div class="wrap">
 <h2><?php echo sprintf( __( '%s Settings', 'periodicalpress' ), 'PeriodicalPress' ); ?></h2>
@@ -65,10 +67,10 @@ $issue_date_format = get_option( 'pp_issue_date_format', get_option( 'date_forma
 					</legend>
 					<p>
 						<label>
-							<input name="pp_issue_naming" type="radio" value="" class="tog" checked="checked" />
+							<input name="pp_issue_naming" type="radio" value="numbers" class="tog" <?php if ( 'numbers' === $issue_naming ) echo 'checked="checked"'; ?> />
 							<?php echo esc_html_x( 'Numbers', 'Issue names format option', 'periodicalpress' ); ?>
 						</label>
-						<?php esc_html_e( '–', 'periodicalpress' ); ?>
+						&ndash;
 						<code>
 							<?php
 							/*
@@ -92,10 +94,10 @@ $issue_date_format = get_option( 'pp_issue_date_format', get_option( 'date_forma
 					</p>
 					<p>
 						<label>
-							<input name="pp_issue_naming" type="radio" value="" class="tog" checked="checked" />
+							<input name="pp_issue_naming" type="radio" value="dates" class="tog" <?php if ( 'dates' === $issue_naming ) echo 'checked="checked"'; ?> />
 							<?php echo esc_html_x( 'Dates', 'Issue names format option', 'periodicalpress' ); ?>
 						</label>
-						<?php esc_html_e( '–', 'periodicalpress' ); ?>
+						&ndash;
 						<code>
 							<?php
 							/* Translators: this is documented above. */
@@ -110,10 +112,10 @@ $issue_date_format = get_option( 'pp_issue_date_format', get_option( 'date_forma
 					</p>
 					<p>
 						<label>
-							<input name="pp_issue_naming" type="radio" value="" class="tog" checked="checked" />
+							<input name="pp_issue_naming" type="radio" value="titles" class="tog" <?php if ( 'titles' === $issue_naming ) echo 'checked="checked"'; ?> />
 							<?php echo esc_html_x( 'Titles', 'Issue names format option', 'periodicalpress' ); ?>
 						</label>
-						<?php esc_html_e( '–', 'periodicalpress' ); ?>
+						&ndash;
 						<code>
 							<?php
 							/* Translators: this is documented above. */
@@ -218,14 +220,6 @@ $issue_date_format = get_option( 'pp_issue_date_format', get_option( 'date_forma
 			</td>
 		</tr>
 
-		<!-- TODO: Date precision (or maybe 'how often are issues published?') -->
-
-
-		<!-- TODO: Slug format? (Or just do it automatically) -->
-
-
-		<!-- TODO: js: preview what the Slug will look like -->
-
 	</tbody>
 	</table>
 
@@ -234,9 +228,6 @@ $issue_date_format = get_option( 'pp_issue_date_format', get_option( 'date_forma
 	<p class="submit">
 		<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_attr_e( 'Save and Update All Issues', 'periodicalpress' ); ?>" />
 	</p>
-
-	<!-- TODO: Clear Caches and Rebuild button -->
-
 
 </form>
 
