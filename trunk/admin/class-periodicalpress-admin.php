@@ -287,22 +287,22 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 	}
 
 	/**
-	 * Save a newly selected Current Issue to the database.
+	 * Save Plugin Settings page changes to the database.
 	 *
 	 * @since 1.0.0
 	 */
-	public function save_current_issue_field() {
+	public function save_plugin_settings() {
 
 		$tax_name = $this->plugin->get_taxonomy_name();
 		$tax = get_taxonomy( $tax_name );
 
-		// Check that the Current Issue form was submitted.
+		// Check that the Settings form was submitted.
 		if ( isset( $_POST['action'] )
-			&& ( 'set-current-issue' === $_POST['action'] ) ) {
+		&& ( 'set-current-issue' === $_POST['action'] ) ) {
 
 			// Check form nonce was properly set.
 			if ( empty( $_POST['periodicalpress-current-issue-nonce'] )
-				|| ( 1 !== wp_verify_nonce( $_POST['periodicalpress-current-issue-nonce'], 'set-current-issue' ) ) ) {
+			|| ( 1 !== wp_verify_nonce( $_POST['periodicalpress-settings-nonce'], 'save-plugin-settings' ) ) ) {
 				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
 			}
 
@@ -311,21 +311,64 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
 			}
 
-			if ( empty( $_POST['current-issue'] ) ) {
-				return;
-			}
-			$new_current_issue_id = $_POST['current-issue'];
+			/* OK to proceed with sanitizing and saving. */
 
-			/*
-			 * Check this Issue exists. Uses get_term() rather than
-			 * term_exists() because the POST data contains a term ID, not a
-			 * term slug.
-			 */
-			$new_current_issue = get_term( +$new_current_issue_id, $tax_name );
+			// Current issue.
+			if ( ! empty( $_POST['pp_current_issue'] ) ) {
 
-			if ( ! is_null( $new_current_issue ) ) {
-				update_option( 'pp_current_issue', $new_current_issue_id );
+				$current_issue_id = +$_POST['pp_current_issue'];
+
+				/*
+				 * Check this Issue exists. Uses get_term() rather than
+				 * term_exists() because the POST data contains a term ID, not a
+				 * term slug.
+				 */
+				if ( get_term( $current_issue_id, $tax_name ) ) {
+					update_option( 'pp_current_issue', $current_issue_id );
+				}
+
 			}
+
+			// Issue Name Format.
+			if ( ! empty( $_POST['pp_issue_naming'] ) ) {
+
+				$naming = strtolower( $_POST['pp_issue_naming'] );
+				switch ( $naming ) {
+					case 'numbers':
+					case 'dates':
+					case 'titles':
+						update_option( 'pp_issue_naming', $naming );
+						break;
+
+				}
+
+			}
+
+			// Issue Date Format.
+			if ( ! empty( $_POST['pp_issue_date_format'] ) ) {
+
+				// Use custom date if that's the chosen date format.
+				// CHECK: may need to unslash this.
+				if ( '\c\u\s\t\o\m' === $_POST['pp_issue_date_format'] ) {
+
+					$_POST['pp_issue_date_format'] = ( ! empty( $_POST['pp_issue_date_format_custom'] ) )
+						? $_POST['pp_issue_date_format_custom']
+						: '';
+
+				}
+
+				$format = sanitize_text_field( $_POST['pp_issue_date_format'] );
+				if ( '' !== $format ) {
+					update_option( 'pp_issue_date_format', $format );
+				}
+
+			}
+
+
+			// TODO: change titles if needed (could be needed by change of name
+			// format, or by change of date format while name format is date).
+
+
 
 		}
 

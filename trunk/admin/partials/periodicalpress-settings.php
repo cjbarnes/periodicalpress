@@ -17,11 +17,10 @@ $tax_name = $this->plugin->get_taxonomy_name();
 $tax = get_taxonomy( $tax_name );
 
 /*
- * The current Issue Date Format is used a few times, so load it here. Fall back
- * to the site-wide date format.
+ * Load existing options.
  */
+$current_issue = get_option( 'pp_current_issue', 0 );
 $issue_date_format = get_option( 'pp_issue_date_format', get_option( 'date_format' ) );
-
 $issue_naming = get_option( 'pp_issue_naming', '' );
 
 ?>
@@ -47,7 +46,7 @@ $issue_naming = get_option( 'pp_issue_naming', '' );
 					'hide_unpublished' => 1,
 					'name'             => 'pp_current_issue',
 					'id'               => 'current-issue',
-					'selected'         => get_option( 'pp_current_issue', 0 )
+					'selected'         => $current_issue
 				);
 				$pp_common->dropdown_issues( $args );
 				?>
@@ -58,7 +57,7 @@ $issue_naming = get_option( 'pp_issue_naming', '' );
 		<!-- Default Issue identifier: number, title, date? -->
 		<tr>
 			<th scope="row">
-				<label for="issue-naming"><?php esc_html_e( 'Issue Names Format', 'periodicalpress' ); ?></label>
+				<label><?php esc_html_e( 'Issue Names Format', 'periodicalpress' ); ?></label>
 			</th>
 			<td>
 				<fieldset>
@@ -158,7 +157,7 @@ $issue_naming = get_option( 'pp_issue_naming', '' );
 		?>
 		<tr>
 			<th scope="row">
-				<label for="pp_issue_date_format"><?php esc_html_e( 'Issue Date Format', 'periodicalpress' ); ?></label>
+				<label><?php esc_html_e( 'Issue Date Format', 'periodicalpress' ); ?></label>
 			</th>
 			<td>
 				<fieldset>
@@ -223,11 +222,15 @@ $issue_naming = get_option( 'pp_issue_naming', '' );
 	</tbody>
 	</table>
 
+	<?php
+	/*
+	 * Allows addition of further settings fields to this page by themes and
+	 * other plugins.
+	 */
+	do_settings_sections( 'periodicalpress_settings' );
+	?>
 
-	<!-- Submit button -->
-	<p class="submit">
-		<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_attr_e( 'Save and Update All Issues', 'periodicalpress' ); ?>" />
-	</p>
+	<?php submit_button( esc_attr_x( 'Save and Update All Issues', 'Submit button label', 'periodicalpress' ) ); ?>
 
 </form>
 
