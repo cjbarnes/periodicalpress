@@ -25,6 +25,7 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 	 * - PeriodicalPress_Edit_Issues. Issue editing screens.
 	 * - PeriodicalPress_Save_Issues. Issue saving/deleting methods.
 	 * - PeriodicalPress_Post_Metabox. Callbacks for Edit Post screen metabox.
+	 * - PeriodicalPress_Settings. The Plugin Settings page.
 	 *
 	 * PeriodicalPress_List_Table is a parent class only, so we do not
 	 * instantiate it here.
@@ -42,11 +43,13 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		require_once $path . 'admin/class-periodicalpress-edit-issues.php';
 		require_once $path . 'admin/class-periodicalpress-post-issue-box.php';
 		require_once $path . 'admin/class-periodicalpress-save-issues.php';
+		require_once $path . 'admin/class-periodicalpress-settings.php';
 
 		// Instantiate classes.
 		PeriodicalPress_Edit_Issues::get_instance( $this->plugin );
 		PeriodicalPress_Post_Issue_Box::get_instance( $this->plugin );
 		PeriodicalPress_Save_Issues::get_instance( $this->plugin );
+		PeriodicalPress_Settings::get_instance( $this->plugin );
 
 	}
 
@@ -64,17 +67,12 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		// Admin menu item setup.
+		// Admin menu items setup.
 		add_action( 'admin_menu', array( $this, 'admin_menu_setup' ) );
 		add_filter( 'parent_file', array( $this, 'fix_submenu_parent_files' ) );
 
 		// Date formats filter.
 		add_filter( 'periodicalpress_date_formats', array( $this, 'add_date_format_suggestions' ) );
-
-		// Plugins page.
-		$plugin_name = $this->plugin->get_plugin_name();
-		$actions_filter = "plugin_action_links_$plugin_name/$plugin_name.php";
-		add_filter( $actions_filter, array( $this, 'add_plugin_row_actions' ), 10, 4 );
 
 	}
 
@@ -136,7 +134,7 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 	}
 
 	/**
-	 * All changes to admin menu and submenu items.
+	 * Basic changes to admin menu and submenu items.
 	 *
 	 * @since 1.0.0
 	 */
@@ -169,19 +167,6 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 			$tax->labels->all_items,
 			$tax->cap->assign_terms,
 			'pp_edit_issues'
-		);
-
-		add_submenu_page(
-			'pp_edit_issues',
-			/*
-			 * For translators: HTML title of the plugin settings page. %s is
-			 * the plugin name.
-			 */
- 			sprintf( __( '%s Settings', 'periodicalpress' ), 'PeriodicalPress' ),
-			_x( 'Settings', 'Admin menu link for plugin settings page', 'periodicalpress' ),
-			$tax->cap->manage_terms,
-			'periodicalpress_settings',
-			array( $this, 'render_plugin_settings' )
 		);
 
 		/*
@@ -227,32 +212,6 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 	}
 
 	/**
-	 * Add a Settings link for this plugin to the Plugins table.
-	 *
-	 * Filters the row-action links for this plugin's entry in the Plugins page
-	 * list table.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array  $actions     The currently set row-actions link elements.
-	 * @param string $plugin_file Path to the plugin file.
-	 * @param array  $plugin_data Array of plugin data.
-	 * @param string $context     The plugin context (e.g. Must-Use,
-	 *                            'Inactive').
-	 */
-	public function add_plugin_row_actions( $actions, $plugin_file, $plugin_data, $context ) {
-
-		$link = sprintf( '<a href="%s" title="%s" class="settings">%s</a>',
-			admin_url( 'admin.php?page=periodicalpress_settings' ),
-			esc_attr__( 'PeriodicalPress Settings', 'periodicalpress' ),
-			esc_html_x( 'Settings', 'Plugins table link to plugin settings page', 'periodicalpress' )
-		);
-
-		array_unshift( $actions, $link );
-		return $actions;
-	}
-
-	/**
 	 * Filter to customize the date formats suggested for the Issue Date Format
 	 * setting.
 	 *
@@ -263,115 +222,6 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 	 */
 	public function add_date_format_suggestions( $date_formats ) {
 		return array_merge( $date_formats, array( 'F Y', 'Y' ) );
-	}
-
-	/**
-	 * Output the contents of the Plugin Settings page.
-	 *
-	 * @since 1.0.0
-	 */
-	public function render_plugin_settings() {
-
-		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
-
-		if ( current_user_can( $tax->cap->manage_terms ) ) {
-
-			/**
-			 * Output the Settings page partial.
-			 */
-			$path = $this->plugin->get_partials_path( 'admin' );
-			require $path . 'periodicalpress-settings.php';
-
-		}
-
-	}
-
-	/**
-	 * Save Plugin Settings page changes to the database.
-	 *
-	 * @since 1.0.0
-	 */
-	public function save_plugin_settings() {
-
-		$tax_name = $this->plugin->get_taxonomy_name();
-		$tax = get_taxonomy( $tax_name );
-
-		// Check that the Settings form was submitted.
-		if ( isset( $_POST['action'] )
-		&& ( 'set-current-issue' === $_POST['action'] ) ) {
-
-			// Check form nonce was properly set.
-			if ( empty( $_POST['periodicalpress-current-issue-nonce'] )
-			|| ( 1 !== wp_verify_nonce( $_POST['periodicalpress-settings-nonce'], 'save-plugin-settings' ) ) ) {
-				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
-			}
-
-			// Check current user has sufficient permissions.
-			if ( ! current_user_can( $tax->cap->manage_terms ) ) {
-				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
-			}
-
-			/* OK to proceed with sanitizing and saving. */
-
-			// Current issue.
-			if ( ! empty( $_POST['pp_current_issue'] ) ) {
-
-				$current_issue_id = +$_POST['pp_current_issue'];
-
-				/*
-				 * Check this Issue exists. Uses get_term() rather than
-				 * term_exists() because the POST data contains a term ID, not a
-				 * term slug.
-				 */
-				if ( get_term( $current_issue_id, $tax_name ) ) {
-					update_option( 'pp_current_issue', $current_issue_id );
-				}
-
-			}
-
-			// Issue Name Format.
-			if ( ! empty( $_POST['pp_issue_naming'] ) ) {
-
-				$naming = strtolower( $_POST['pp_issue_naming'] );
-				switch ( $naming ) {
-					case 'numbers':
-					case 'dates':
-					case 'titles':
-						update_option( 'pp_issue_naming', $naming );
-						break;
-
-				}
-
-			}
-
-			// Issue Date Format.
-			if ( ! empty( $_POST['pp_issue_date_format'] ) ) {
-
-				// Use custom date if that's the chosen date format.
-				// CHECK: may need to unslash this.
-				if ( '\c\u\s\t\o\m' === $_POST['pp_issue_date_format'] ) {
-
-					$_POST['pp_issue_date_format'] = ( ! empty( $_POST['pp_issue_date_format_custom'] ) )
-						? $_POST['pp_issue_date_format_custom']
-						: '';
-
-				}
-
-				$format = sanitize_text_field( $_POST['pp_issue_date_format'] );
-				if ( '' !== $format ) {
-					update_option( 'pp_issue_date_format', $format );
-				}
-
-			}
-
-
-			// TODO: change titles if needed (could be needed by change of name
-			// format, or by change of date format while name format is date).
-
-
-
-		}
-
 	}
 
 }
