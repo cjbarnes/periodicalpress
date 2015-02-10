@@ -953,3 +953,16 @@ table.links-table {
 	padding: 0.5em 1em;
 	text-align: right;
 }
+
+/**
+ * Edit Issue page
+ */
+
+/* Make read-only Issue Name field look like a normal heading. */
+#namediv #name.pp-issue-name:disabled {
+	border: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: #000;
+}

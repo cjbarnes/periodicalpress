@@ -94,12 +94,17 @@ do_action( 'periodicalpress_issue_edit_form_tag', $issue );
 					 * @param object $issue The Issue object.
 					 */
 					$name_placeholder = apply_filters( 'periodicalpress_issue_name_placeholder', __( 'Enter issue title here', 'periodicalpress' ), $issue );
+
+					$disabled = ( 'title' === get_option( 'pp_issue_naming' ) )
+						? ''
+						: 'disabled="disabled" ';
+
 					?>
 					<label class="screen-reader-text" id="name-prompt-text" for="name">
 						<?php echo $name_placeholder; ?>
 					</label>
 
-					<input name="name" size="30" value="<?php echo esc_attr( htmlspecialchars( $issue->name ) ); ?>" id="name" spellcheck="true" autocomplete="off" />
+					<input name="name" size="30" value="<?php echo esc_attr( htmlspecialchars( $issue->name ) ); ?>" class="pp-issue-name" id="name" spellcheck="true" autocomplete="off" <?php echo $disabled; ?>/>
 
 				</div><!-- /#namewrap -->
 
