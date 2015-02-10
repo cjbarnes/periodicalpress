@@ -491,6 +491,43 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Comparison function for posts' ordering within an Issue.
+	 *
+	 * Assumes that the property `$pp_issue_post_order` has been added to both
+	 * post objects being compared, by loading it from the Issues meta table.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param WP_Post $post1 Post object to compare.
+	 * @param WP_Post $post2 Post object to compare.
+	 * @return int Result of comparison.
+	 */
+	public function ascending_sort_issue_posts( $post1, $post2 ) {
+		$o1 = $post1->pp_issue_post_order;
+		$o2 = $post2->pp_issue_post_order;
+		if ( $o1 == $o2 ) {
+			return 0;
+		}
+		return ( $o1 > $o2 ) ? 1 : -1;
+	}
+
+	/**
+	 * Comparison function for posts' ordering within an Issue.
+	 *
+	 * The opposite of {@see ascending_sort_issue_posts()}.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param WP_Post $post1 Post object to compare.
+	 * @param WP_Post $post2 Post object to compare.
+	 * @return int Result of comparison.
+	 */
+	public function descending_sort_issue_posts( $post1, $post2 ) {
+		return $this->ascending_sort_issue_posts( $post2, $post1 );
+	}
+
+
+	/**
 	 * Check if this Issue is published.
 	 *
 	 * Use as `array_filter()` callback with an array of Issues to remove all

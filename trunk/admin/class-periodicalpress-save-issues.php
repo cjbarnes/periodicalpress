@@ -425,6 +425,26 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 		}
 
+		// Posts ordering update.
+		if ( isset( $data['pp_issue_posts_order'] ) ) {
+
+			/*
+			 * Make the ordering data into a simple sorted array of post IDs.
+			 * Prior to this step, the data is an associative array of:
+			 *
+			 *     post_id => order
+			 *
+			 * The data saved to the database is a simple array, sorted by
+			 * `order`, where each value is a post_id.
+			 */
+			$order_data = $data['pp_issue_posts_order'];
+			asort( $order_data );
+			$order = array_keys( $order_data );
+
+			$pp_common->update_issue_meta( $term_id, 'pp_issue_posts_order', $order );
+
+		}
+
 		/**
 		 * Hook for after an Issue is updated.
 		 *

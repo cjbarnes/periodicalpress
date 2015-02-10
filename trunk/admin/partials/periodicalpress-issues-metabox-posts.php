@@ -25,6 +25,29 @@ $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 
 // Order the posts.
 // @todo sort by manually-set order, or date (ascending) as secondary sort.
+$posts_order = $pp_common->get_issue_meta( $issue->term_id, 'pp_issue_posts_order' );
+
+if ( ! empty( $posts_order ) ) {
+
+	// Add order to posts objects for easier sorting.
+	foreach ( $posts as $post ) {
+		$index = array_search( $post->ID, $posts_order );
+		if ( false !== $index ) {
+			$post->pp_issue_post_order = $index;
+		} else {
+			/*
+			 * If this post has just been added to this Issue, move it to the
+			 * bottom. The order of multiple non-ordered posts is based on
+			 * their IDs, to ensure a non-random result.
+			 */
+			$post->pp_issue_post_order = 500 + $post->ID;
+		}
+	}
+
+	// Sort by order, then by date.
+	usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
+
+}
 
 ?>
 
@@ -57,11 +80,8 @@ $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 			?>
 			<li id="post-<?php echo $post->ID; ?>" class="issue-post">
 				<strong class="issue-post-title">
-					<?php echo esc_html( $post->post_title ); ?>
+					<?php echo esc_html( $post->post_title ); ?> – <span class="post-state"><?php echo $post_status; ?></span>
 				</strong>
-				<span class="issue-post-status">
-					<?php echo $post_status; ?>
-				</span>
 				<span class="issue-post-row-actions">
 					<!-- View/Preview link -->
 					<?php
@@ -84,6 +104,13 @@ $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 							<?php esc_html_e( _x( 'Edit', 'Edit Issue: post actions', 'periodicalpress' ) ); ?>
 						</a>
 					<?php endif; ?>
+
+					<!-- Ordering -->
+					<span class="separator">|</span>
+					<span class="issue-post-order-area">
+						<label class="screen-reader-text" for="issue-posts-order-<?php echo $post->ID; ?>">Order</label>
+						<input type="number" name="pp_issue_posts_order[<?php echo $post->ID; ?>]" id="issue-posts-order-<?php echo $post->ID; ?>" class="issue-posts-order" min="1" max="500" value="<?php echo 1 + $n; ?>" />
+					</span>
 				</span>
 			</li>
 		<?php endforeach; ?>

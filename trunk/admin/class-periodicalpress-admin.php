@@ -112,7 +112,7 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 		$version = $this->plugin->get_version();
 
 		// Script used thoughout the admin area.
-		wp_enqueue_script( $name, "{$path}periodicalpress-admin.js", array( 'jquery' ), $version, true );
+		wp_enqueue_script( $name, "{$path}periodicalpress-admin.js", array( 'jquery' ), $version );
 
 		// Script that enables Quick Editing for posts.
 		$screen = get_current_screen();
