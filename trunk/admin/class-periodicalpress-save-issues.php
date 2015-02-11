@@ -444,12 +444,14 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			$order = array_keys( $order_data );
 
 			/*
-			 * Update the DB. Note that the order value saved is `index + 1`,
-			 * because the indexes start at 0, but we want the DB values to
-			 * start at 1 to avoid the first item having a falsy value.
+			 * Update the DB. Note that the order value saved is `500 - order`,
+			 * so that we can use a descending-order sort to get posts from the
+			 * DB in the correct order. We want to use descending-order to mimic
+			 * ascending-order in this way, so that empty sort-order values will
+			 * be at the **bottom** not the top.
 			 */
 			foreach( $order as $value => $post_id ) {
-				update_post_meta( $post_id, 'pp_issue_sort_order', ($value + 1) );
+				update_post_meta( $post_id, 'pp_issue_sort_order', (500 - $value) );
 			}
 
 		}

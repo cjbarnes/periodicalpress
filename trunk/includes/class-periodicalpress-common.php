@@ -258,10 +258,10 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 
 		// Get the post objects.
 		$args = array(
-			'posts_per_page' => -1,
-			'orderby'        => 'none',
-			'post_status'    => $statuses,
-			'tax_query'      => array(
+			'posts_per_page'   => -1,
+			'orderby'          => 'none',
+			'post_status'      => $statuses,
+			'tax_query'        => array(
 				array(
 					'taxonomy' => $this->plugin->get_taxonomy_name(),
 					'field'    => 'term_id',
@@ -269,6 +269,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 				)
 			)
 		);
+
 		return get_posts( $args );
 	}
 
@@ -514,21 +515,24 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 
 		/*
 		 * If this post has just been added to this Issue, move it to the
-		 * bottom. The order of multiple non-ordered posts is based on
-		 * their IDs, to ensure a non-random result.
+		 * bottom.
 		 */
 		$o1 = ! empty( $o1_raw )
 			? (int) $o1_raw
-			: 500 + $post1->ID;
+			: 0;
 		$o2 = ! empty( $o2_raw )
 			? (int) $o2_raw
-			: 500 + $post2->ID;
+			: 0;
 
-		// Perform the actual comparison.
+		/*
+		 * Perform the actual comparison. Sort is stored in descending-order,
+		 * so the comparison operators used are the opposites of what you would
+		 * expect.
+		 */
 		if ( $o1 == $o2 ) {
 			return 0;
 		}
-		return ( $o1 > $o2 ) ? 1 : -1;
+		return ( $o1 < $o2 ) ? 1 : -1;
 	}
 
 	/**
