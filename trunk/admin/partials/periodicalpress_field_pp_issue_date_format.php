@@ -91,7 +91,7 @@ $date_formats = array_unique( apply_filters( 'periodicalpress_date_formats', $da
 		<?php echo esc_html_x( 'Custom:', 'Issue Date Format field', 'periodicalpress' ); ?>
 	</label>
 	<input type="text" name="<?php echo $field['name']; ?>_custom" value="<?php echo esc_attr( $issue_date_format ); ?>" class="small-text" />
-	<span class="example"> <?php echo date_i18n( $issue_date_format ); ?></span>
+	<span class="example pp-issue-date-format-example"> <?php echo date_i18n( $issue_date_format ); ?></span>
 	<span class="spinner"></span>
 	<p><?php _e( '<a href="http://codex.wordpress.org/Formatting_Date_and_Time">Documentation on date and time formatting</a>.' ); ?></p>
 </fieldset>

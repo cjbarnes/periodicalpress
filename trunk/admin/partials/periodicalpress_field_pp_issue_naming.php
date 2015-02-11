@@ -65,11 +65,9 @@ $issue_naming = get_option( 'pp_issue_naming', '' );
 		<code>
 			<?php
 			/* Translators: this is documented above. */
-			echo esc_html(
-				sprintf( _x( '%1$s: %2$s', 'Example of issue name format', 'periodicalpress' ),
-					$tax->labels->singular_name,
-					date_i18n( $issue_date_format )
-				)
+			printf( _x( '%1$s: %2$s', 'Example of issue name format', 'periodicalpress' ),
+				esc_html( $tax->labels->singular_name ),
+				'<span class="pp-issue-date-format-example"> ' . esc_html( date_i18n( $issue_date_format ) ) . '</span>'
 			);
 			?>
 		</code>

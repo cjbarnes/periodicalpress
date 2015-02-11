@@ -59,9 +59,9 @@ $( function initPeriodicalPress() {
 
 				if ( 'issue-date-format-custom-radio' != $( this ).attr( 'id' ) ) {
 					$( 'input[name="pp_issue_date_format_custom"]' )
-						.val( $( this ).val() )
-						.siblings( '.example' )
-							.text( $( this ).siblings( 'span' ).text() );
+						.val( $( this ).val() );
+					$( '.pp-issue-date-format-example' )
+						.text( $( this ).siblings( 'span' ).text() );
 				}
 
 			} );
@@ -81,7 +81,7 @@ $( function initPeriodicalPress() {
 					},
 					function ( d ) {
 						$this.siblings('.spinner').hide();
-						$this.siblings('.example').text( d );
+						$( '.pp-issue-date-format-example' ).text( d );
 					}
 				);
 
