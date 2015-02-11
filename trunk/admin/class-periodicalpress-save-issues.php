@@ -469,8 +469,6 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		do_action( 'periodicalpress_update_issue', $term_id, $term_object, $data );
 
 		return $result;
-
-
 	}
 
 	/**
@@ -541,11 +539,12 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		$term_posts = $pp_common->get_issue_posts( $term_id, $post_statuses );
 
 		/*
-		 * Update posts in this Issue. The Issue term is removed and the post is
-		 * moved to Trash.
+		 * Update posts in this Issue. The Issue term is removed, as are meta
+		 * items associated with Issues, and the post is moved to Trash.
 		 */
 		foreach ( $term_posts as $post ) {
 			wp_remove_object_terms( $post->ID, $term_id, $tax_name );
+			delete_post_meta( $post->ID, 'pp_issue_sort_order' );
 			$new_post_data = array(
 				'ID'          => $post->ID,
 				'post_status' => 'trash'

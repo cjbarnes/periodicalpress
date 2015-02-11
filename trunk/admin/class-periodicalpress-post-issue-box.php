@@ -264,6 +264,9 @@ class PeriodicalPress_Post_Issue_Box extends PeriodicalPress_Singleton {
 			return $post_id;
 		}
 
+		// Delete this post's sort order in the old Issue.
+		delete_post_meta( $post_id, 'pp_issue_sort_order' );
+
 		// Update the stored Issue number.
 		if ( -1 === $new_issue ) {
 
