@@ -68,6 +68,9 @@ class PeriodicalPress_Theme_Patching extends PeriodicalPress_Singleton {
 		add_filter( 'paginate_links', array( $this, 'issue_pagination_link' ) );
 		add_filter( 'get_pagenum_link', array( $this, 'issue_pagination_link' ) );
 
+		// Modify the main posts query to use a custom sort order.
+		add_filter( 'the_posts', array( $this, 'reorder_issue_query' ), 10, 2 );
+
 	}
 
 	/**
@@ -161,6 +164,38 @@ class PeriodicalPress_Theme_Patching extends PeriodicalPress_Singleton {
 		// Remove default pagination posts-per-page setting.
 		$query->set( 'posts_per_page', -1 );
 
+	}
+
+	/**
+	 * Reorder the main query on Issue pages to match the custom posts sort
+	 * order defined in the admin.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array    $posts The array of retrieved posts.
+	 * @param WP_Query $query The WP_Query instance.
+	 * @return array The modified posts array.
+	 */
+	public function reorder_issue_query( $posts, $query ) {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		if ( ! is_main_query() || ! $query->is_tax( $tax_name ) ) {
+			return $posts;
+		}
+
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+
+		/**
+		 * Perform the sort. The `@` is to suppress the usort PHP Warning:
+		 *
+		 *     usort(): Array was modified by the user comparison function
+		 *
+		 * which is a known bug in PHP.
+		 */
+		@usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
+
+		return $posts;
 	}
 
 	/**
