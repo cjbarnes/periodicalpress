@@ -78,14 +78,18 @@ usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
 						<a href="<?php echo get_edit_post_link( $post->ID ); ?>" class="issue-post-row-action-edit">
 							<?php esc_html_e( _x( 'Edit', 'Edit Issue: post actions', 'periodicalpress' ) ); ?>
 						</a>
-						<span class="separator">|</span>
 					<?php endif; ?>
 
 					<!-- Ordering -->
-					<span class="issue-post-order-area">
-						<label class="screen-reader-text" for="issue-posts-order-<?php echo $post->ID; ?>">Order</label>
-						<input type="number" name="pp_issue_posts_order[<?php echo $post->ID; ?>]" id="issue-posts-order-<?php echo $post->ID; ?>" class="issue-posts-order" min="1" max="500" value="<?php echo 1 + $n; ?>" />
-					</span>
+					<?php if ( 1 < count( $posts ) ) : ?>
+						<?php if ( current_user_can( 'edit_post', $post->ID ) ) : ?>
+							<span class="separator">|</span>
+						<?php endif; ?>
+						<span class="issue-post-order-area">
+							<label class="screen-reader-text" for="issue-posts-order-<?php echo $post->ID; ?>">Order</label>
+							<input type="number" name="pp_issue_posts_order[<?php echo $post->ID; ?>]" id="issue-posts-order-<?php echo $post->ID; ?>" class="issue-posts-order" min="1" max="500" value="<?php echo 1 + $n; ?>" />
+						</span>
+					<?php endif; ?>
 				</span>
 			</li>
 		<?php endforeach; ?>
