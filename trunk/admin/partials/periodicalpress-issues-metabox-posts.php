@@ -66,7 +66,7 @@ usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
 						</a>
 					<?php else : ?>
 						<a href="#todo" class="row-title" title="<?php printf( _x( 'Preview “%s”', 'Edit Issue: post actions title attribute', 'periodicalpress' ), esc_attr( $post->post_title ) ); ?>">
-							<?php echo esc_html( $post->title ); ?>
+							<?php echo esc_html( $post->post_title ); ?>
 						</a>
 					<?php endif; ?>
 					<!-- Post status -->

@@ -280,8 +280,8 @@ class PeriodicalPress_Post_Issue_Box extends PeriodicalPress_Singleton {
 
 				wp_set_post_terms( $post_id, $new_issue, $tax_name );
 
-				$pp_common = PeriodicalPress::get_instance( $this->plugin );
-				$issue_status = get_issue_meta( $new_issue, "{$tax_name}_status" );
+				$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+				$issue_status = $pp_common->get_issue_meta( $new_issue, "{$tax_name}_status" );
 
 				/*
 				 * Update whether this post should be published, based on
