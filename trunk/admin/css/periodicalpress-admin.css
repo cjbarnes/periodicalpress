@@ -913,7 +913,7 @@ table.links-table {
 	display: block;
 	width: 100%;
 	margin: 0 0 3px;
-	padding: 1em 240px 1em 40px;
+	padding: 1em 200px 1em 40px;
 	border: 1px solid #e5e5e5;
 	background: #f9f9f9;
 	-webkit-touch-callout: none;
@@ -922,10 +922,12 @@ table.links-table {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-	cursor: move;
 }
 .issue-post * {
 	box-sizing: border-box;
+}
+.issue-post a {
+	text-decoration: none;
 }
 .issue-post:before {
 	position: absolute;
@@ -933,10 +935,11 @@ table.links-table {
 	left: 10px;
 	width: 20px;
 }
-.issue-post a {
+.issue-post-row-actions a {
 	display: inline-block;
 	padding: 0.5em 0;
 	text-decoration: none;
+	cursor: pointer;
 }
 .issue-post-status {
 	position: absolute;
@@ -952,6 +955,10 @@ table.links-table {
 	right: 0;
 	padding: 0.5em 1em;
 	text-align: right;
+}
+.issue-post-order-label {
+	display: inline-block;
+	padding: 0.5em 0;
 }
 
 /**

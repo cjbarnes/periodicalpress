@@ -30,7 +30,6 @@ usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
 
 <div id="pp-posts-wrap">
 <?php if ( is_array( $posts ) && count( $posts ) ) : ?>
-	<p><?php echo _x( 'Click and drag posts to reorder them.', 'Edit Issue: posts list', 'periodicalpress' ); ?></p>
 	<ul id="pp-posts-list">
 		<?php foreach ( $posts as $n => $post ) : ?>
 			<?php
@@ -57,33 +56,32 @@ usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
 			?>
 			<li id="post-<?php echo $post->ID; ?>" class="issue-post">
 				<strong class="issue-post-title">
-					<?php echo esc_html( $post->post_title ); ?> – <span class="post-state"><?php echo $post_status; ?></span>
-				</strong>
-				<span class="issue-post-row-actions">
-					<!-- View/Preview link -->
+					<!-- Post title and view/Preview link -->
 					<?php
 					if ( ( 'publish' === $post->post_status )
 					|| ( 'private' === $post->post_status ) ) :
 					?>
-						<a href="<?php echo get_permalink( $post->ID ) ?>" class="issue-post-row-action-view">
-							<?php echo esc_html_x( 'View', 'Edit Issue: post actions', 'periodicalpress' ); ?>
+						<a href="<?php echo get_permalink( $post->ID ) ?>" class="row-title" title="<?php printf( _x( 'View “%s”', 'Edit Issue: post actions title attribute', 'periodicalpress' ), esc_attr( $post->post_title ) ); ?>">
+							<?php echo esc_html( $post->post_title ); ?>
 						</a>
 					<?php else : ?>
-						<a href="#todo" class="issue-post-row-action-preview">
-							<?php echo esc_html_x( 'Preview', 'Edit Issue: post actions', 'periodicalpress' ); ?>
+						<a href="#todo" class="row-title" title="<?php printf( _x( 'Preview “%s”', 'Edit Issue: post actions title attribute', 'periodicalpress' ), esc_attr( $post->post_title ) ); ?>">
+							<?php echo esc_html( $post->title ); ?>
 						</a>
 					<?php endif; ?>
-
+					<!-- Post status -->
+					– <span class="post-state"><?php echo $post_status; ?></span>
+				</strong>
+				<span class="issue-post-row-actions">
 					<!-- Edit link -->
 					<?php if ( current_user_can( 'edit_post', $post->ID ) ) : ?>
-						<span class="separator">|</span>
 						<a href="<?php echo get_edit_post_link( $post->ID ); ?>" class="issue-post-row-action-edit">
 							<?php esc_html_e( _x( 'Edit', 'Edit Issue: post actions', 'periodicalpress' ) ); ?>
 						</a>
+						<span class="separator">|</span>
 					<?php endif; ?>
 
 					<!-- Ordering -->
-					<span class="separator">|</span>
 					<span class="issue-post-order-area">
 						<label class="screen-reader-text" for="issue-posts-order-<?php echo $post->ID; ?>">Order</label>
 						<input type="number" name="pp_issue_posts_order[<?php echo $post->ID; ?>]" id="issue-posts-order-<?php echo $post->ID; ?>" class="issue-posts-order" min="1" max="500" value="<?php echo 1 + $n; ?>" />

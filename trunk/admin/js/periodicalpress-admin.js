@@ -18,7 +18,7 @@ $( function initPeriodicalPress() {
 			// Replace the ordering inputs with move up/down links.
 			var $orderInputs = $( '#pp_issue_postsdiv .issue-posts-order' );
 			$orderInputs.hide();
-			$orderInputs.after( '<span>Move:&nbsp;</span> <a class="issue-posts-updown issue-posts-up" data-direction="up" title="Move up"><span class="dashicons dashicons-arrow-up-alt2"></span></a> <span class="screen-reader-text">|</span> <a class="issue-posts-updown issue-posts-down" data-direction="down" title="Move down"><span class="dashicons dashicons-arrow-down-alt2"></span></a>' );
+			$orderInputs.after( '<span class="issue-post-order-label">Move:&nbsp;</span> <a class="issue-posts-updown issue-posts-up" data-direction="up" title="Move up"><span class="dashicons dashicons-arrow-up-alt"></span></a> <span class="screen-reader-text">|</span> <a class="issue-posts-updown issue-posts-down" data-direction="down" title="Move down"><span class="dashicons dashicons-arrow-down-alt"></span></a>' );
 
 			// Hook up the Up/Down click event listener.
 			$postsdiv.on( 'click', '.issue-posts-updown', function swapPosts( e ) {
