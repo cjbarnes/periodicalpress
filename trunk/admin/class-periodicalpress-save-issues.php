@@ -434,14 +434,23 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			 *
 			 *     post_id => order
 			 *
-			 * The data saved to the database is a simple array, sorted by
-			 * `order`, where each value is a post_id.
+			 * By converting into a simple array, sorted by `order`, we ensure
+			 * a simple ordered sequence of post numbers with no duplicate
+			 * positions and no gaps. Then we can use the indexes of the new
+			 * array as sanitized order values, ready for saving to the DB.
 			 */
 			$order_data = $data['pp_issue_posts_order'];
 			asort( $order_data );
 			$order = array_keys( $order_data );
 
-			$pp_common->update_issue_meta( $term_id, 'pp_issue_posts_order', $order );
+			/*
+			 * Update the DB. Note that the order value saved is `index + 1`,
+			 * because the indexes start at 0, but we want the DB values to
+			 * start at 1 to avoid the first item having a falsy value.
+			 */
+			foreach( $order as $value => $post_id ) {
+				update_post_meta( $post_id, 'pp_issue_sort_order', ($value + 1) );
+			}
 
 		}
 

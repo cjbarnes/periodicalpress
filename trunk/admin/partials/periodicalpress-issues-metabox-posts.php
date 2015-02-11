@@ -24,30 +24,7 @@ $pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 $posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
 
 // Order the posts.
-// @todo sort by manually-set order, or date (ascending) as secondary sort.
-$posts_order = $pp_common->get_issue_meta( $issue->term_id, 'pp_issue_posts_order' );
-
-if ( ! empty( $posts_order ) ) {
-
-	// Add order to posts objects for easier sorting.
-	foreach ( $posts as $post ) {
-		$index = array_search( $post->ID, $posts_order );
-		if ( false !== $index ) {
-			$post->pp_issue_post_order = $index;
-		} else {
-			/*
-			 * If this post has just been added to this Issue, move it to the
-			 * bottom. The order of multiple non-ordered posts is based on
-			 * their IDs, to ensure a non-random result.
-			 */
-			$post->pp_issue_post_order = 500 + $post->ID;
-		}
-	}
-
-	// Sort by order, then by date.
-	usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
-
-}
+usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
 
 ?>
 

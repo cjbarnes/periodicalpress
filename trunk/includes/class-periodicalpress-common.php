@@ -493,8 +493,13 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	/**
 	 * Comparison function for posts' ordering within an Issue.
 	 *
-	 * Assumes that the property `$pp_issue_post_order` has been added to both
-	 * post objects being compared, by loading it from the Issues meta table.
+	 * Ascending (this function's result) is the default ordering for posts
+	 * within an Issue.
+	 *
+	 * Note that althought this function calls `get_post_meta()` **twice for
+	 * every individual comparison**, this is not a significant performance
+	 * concern because metadata is cached {@see get_metadata()}. So we're not
+	 * constantly round-tripping to the DB.
 	 *
 	 * @since 1.0.0
 	 *
@@ -503,8 +508,23 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	 * @return int Result of comparison.
 	 */
 	public function ascending_sort_issue_posts( $post1, $post2 ) {
-		$o1 = $post1->pp_issue_post_order;
-		$o2 = $post2->pp_issue_post_order;
+
+		$o1_raw = get_post_meta( $post1->ID, 'pp_issue_sort_order', true );
+		$o2_raw = get_post_meta( $post2->ID, 'pp_issue_sort_order', true );
+
+		/*
+		 * If this post has just been added to this Issue, move it to the
+		 * bottom. The order of multiple non-ordered posts is based on
+		 * their IDs, to ensure a non-random result.
+		 */
+		$o1 = ! empty( $o1_raw )
+			? (int) $o1_raw
+			: 500 + $post1->ID;
+		$o2 = ! empty( $o2_raw )
+			? (int) $o2_raw
+			: 500 + $post2->ID;
+
+		// Perform the actual comparison.
 		if ( $o1 == $o2 ) {
 			return 0;
 		}
