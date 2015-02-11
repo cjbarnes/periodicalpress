@@ -39,7 +39,7 @@ $date_formats = array_unique( apply_filters( 'periodicalpress_date_formats', $da
 // Output begins here:
 ?>
 
-<fieldset>
+<fieldset class="pp-issue-date-format">
 	<legend class="screen-reader-text">
 		<span><?php echo esc_html( $field['label'] ); ?></span>
 	</legend>

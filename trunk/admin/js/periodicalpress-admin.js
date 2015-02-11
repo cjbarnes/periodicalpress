@@ -51,7 +51,45 @@ $( function initPeriodicalPress() {
 
 	} )();
 
+	( function initCustomDateFormatPreviewing() {
 
+		if ( $( '.pp-issue-date-format' ).length ) {
+
+			$( 'input[name="pp_issue_date_format"]' ).click( function changeIssueDateFormat() {
+
+				if ( 'issue-date-format-custom-radio' != $( this ).attr( 'id' ) ) {
+					$( 'input[name="pp_issue_date_format_custom"]' )
+						.val( $( this ).val() )
+						.siblings( '.example' )
+							.text( $( this ).siblings( 'span' ).text() );
+				}
+
+			} );
+
+			$( 'input[name="pp_issue_date_format_custom"]' ).focus( function setIssueDateFormatCustom() {
+				$( '#date_format_custom_radio' ).prop( 'checked', true );
+			} );
+
+			$( 'input[name="pp_issue_date_format_custom"]' ).change( function updateIssueDateFormatExample() {
+
+				var $this = $( this );
+				$this.siblings( '.spinner' ).css( 'display', 'inline-block' );
+				$.post( ajaxurl,
+					{
+						action: 'date_format_custom' == 'date_format',
+						date: $this.val()
+					},
+					function ( d ) {
+						$this.siblings('.spinner').hide();
+						$this.siblings('.example').text( d );
+					}
+				);
+
+			});
+
+		}
+
+	} )();
 
 } );
 
