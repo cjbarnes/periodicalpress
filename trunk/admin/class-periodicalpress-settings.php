@@ -327,7 +327,7 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 				'no-input',
 				__( 'The Issue Date Format cannot be empty. Please either choose a suggested format or type a custom format into the "Custom" field.', 'periodicalpress' )
 			);
-			$result = get_option( 'pp_issue_date_format', '' );
+			$result = get_option( 'pp_issue_date_format', get_option( 'date_format' ) );
 		}
 
 		return $result;
