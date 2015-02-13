@@ -101,7 +101,7 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 		$fields = array(
 			array( 'name' => 'pp_current_issue', 'id' => 'current-issue', 'label' => __( 'Current Issue', 'periodicalpress' ) ),
 			array( 'name' => 'pp_issue_naming', 'id' => 'issue-naming', 'label' => __( 'Issue Names Format', 'periodicalpress' ) ),
-			array( 'name' => 'pp_issue_date_format', 'id' => 'issue-date-format', 'label' => __( 'Issue Date Format', 'periodicalpress' ) ),
+			array( 'name' => 'pp_issue_date_format', 'id' => 'issue-date-format', 'label' => __( 'Issue Date Format', 'periodicalpress' ) )
 		);
 
 		add_settings_section(
@@ -230,8 +230,6 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 			$result = get_option( 'pp_current_issue', 0 );
 		}
 
-		write_log($result);
-
 		return $result;
 	}
 
@@ -278,11 +276,13 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 			}
 		}
 
-		// @todo: Iterate through Issue Names and change them if needed.
+			}
 
-		write_log($result);
+			return $result;
+		} else {
+			return $old_val;
+		}
 
-		return $result;
 	}
 
 	/**
@@ -329,10 +329,6 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 			);
 			$result = get_option( 'pp_issue_date_format', '' );
 		}
-
-		// @todo: Iterate through Issue Names and change them if needed.
-
-		write_log($result);
 
 		return $result;
 	}
