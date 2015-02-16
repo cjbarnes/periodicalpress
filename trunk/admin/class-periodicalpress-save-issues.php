@@ -336,15 +336,36 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			? wp_kses_data( $data['description'] )
 			: $term_object->description;
 
+		// Prep the slug based on the title (if not user-specified).
+		$new_term_data['slug'] = ! empty( $data['slug'] )
+			? sanitize_title_with_dashes( $data['slug'], null, 'save' )
+			: sanitize_title_with_dashes( $new_term_data['name'], null, 'save' );
+
+		// Slug must be unique. If not, go back to the old slug.
+		if ( ( $new_term_data['slug'] !== $term_object->slug )
+		&& get_term_by( 'slug', $new_term_data['slug'], $tax_name ) ) {
+			$new_term_data['slug'] = $term_object->slug;
+		}
+
+		/*
+		 * Update the terms table. End here if the DB doesn't update properly.
+		 * Note that we do this below the metadata changes so that the term
+		 * name can be altered to reflect Issue date/number changes.
+		 */
+		$result = wp_update_term( $term_id, $tax_name, $new_term_data );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
 		// Issue Number update.
 		if ( isset( $data['number'] ) ) {
 
 			// @todo: handle return False (i.e. this number is a duplicate).
 			$result = $pp_common->update_issue_number( $term_id, $data['number'] );
 
-			// Also update the Issue name if necessary.
+			// Also update the Issue name/slug if the number is part of that.
 			if ( 'numbers' === get_option( 'pp_issue_naming' ) ) {
-				$new_term_data['name'] = $data['number'];
+				update_issue_names( $term_object );
 			}
 
 		}
@@ -366,34 +387,11 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 			$pp_common->update_issue_meta( $term_id, 'pp_issue_date', $new_date->format( 'Y-m-d' ) );
 
-			// Also update the Issue name if the date is included in that.
+			// Also update the Issue name/slug if the date is included in that.
 			if ( 'dates' === get_option( 'pp_issue_naming' ) ) {
-				$issue_date_format = get_option( 'pp_issue_date_format', get_option( 'date_format' ) );
-
-				$new_term_data['name'] = $new_date->format( $issue_date_format );
+				update_issue_names( $term_object );
 			}
 
-		}
-
-		// Prep the slug based on the title.
-		$new_term_data['slug'] = ! empty( $data['slug'] )
-			? sanitize_title_with_dashes( $data['slug'], null, 'save' )
-			: sanitize_title_with_dashes( $new_term_data['name'], null, 'save' );
-
-		// Slug must be unique. If not, go back to the old slug.
-		if ( ( $new_term_data['slug'] !== $term_object->slug )
-		&& get_term_by( 'slug', $new_term_data['slug'], $tax_name ) ) {
-			$new_term_data['slug'] = $term_object->slug;
-		}
-
-		/*
-		 * Update the terms table. End here if the DB doesn't update properly.
-		 * Note that we do this below the metadata changes so that the term
-		 * name can be altered to reflect Issue date/number changes.
-		 */
-		$result = wp_update_term( $term_id, $tax_name, $new_term_data );
-		if ( is_wp_error( $result ) ) {
-			return $result;
 		}
 
 		// Publish this if the submit button clicked was the 'Publish' one.
@@ -587,7 +585,6 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			delete_option( 'pp_rename_issues_on_next_load' );
 		}
 
-
 	}
 
 	/**
@@ -753,11 +750,6 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		}
 
 		$new_issue_num = $highest_num + 1;
-
-		// Get the next number that is not taken.
-		while ( get_term_by( 'slug', "$new_issue_num", $tax_name ) ) {
-			$new_issue_num++;
-		}
 
 		// Cache new highest issue number for later.
 		set_transient( $transient, $new_issue_num, 2 * HOUR_IN_SECONDS );
