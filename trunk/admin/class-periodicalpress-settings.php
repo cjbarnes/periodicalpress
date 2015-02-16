@@ -255,6 +255,8 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 			);
 		}
 
+		$old_val = get_option( 'pp_issue_naming', '' );
+
 		if ( ! empty( $input ) ) {
 			$naming = strtolower( $input );
 
@@ -264,6 +266,17 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 				case 'dates':
 				case 'titles':
 					$result = $naming;
+					if ( $result !== $old_val ) {
+						/*
+						 * Because the name format has changed, we need to
+						 * rename all the existing Issues. This must be done at
+						 * the start of the next page load, not at the end of
+						 * this one, because there's no hook we can use to
+						 * reliably target the moment after all settings have
+						 * been saved.
+						 */
+						add_option( 'pp_rename_issues_on_next_load', 1 );
+					}
 					break;
 
 				default:
@@ -272,9 +285,7 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 						'invalid-input',
 						__( 'Could not change Issue Names Format: that format does not exist.', 'periodicalpress' )
 					);
-					$result = get_option( 'pp_issue_naming', '' );
-			}
-		}
+					$result = $old_val;
 
 			}
 
@@ -307,6 +318,8 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 			);
 		}
 
+		$old_val = get_option( 'pp_issue_date_format', '' );
+
 		if ( ! empty( $input ) ) {
 
 			// Use custom date if that's the chosen date format.
@@ -318,6 +331,21 @@ class PeriodicalPress_Settings extends PeriodicalPress_Singleton {
 			}
 
 			$result = sanitize_text_field( $input );
+
+			if ( ( $old_val !== $result )
+			&& ( 'dates' === get_option( 'pp_issue_naming' ) )
+			&& ! has_action(
+				'update_option_pp_issue_date_format',
+				array( PeriodicalPress_Save_Issues::get_instance( $this->plugin ), 'update_issue_names' )
+				)
+			) {
+				/*
+				 * This option is documented in
+				 * {@link PeriodicalPress_Settings::validate_pp_issue_naming()}.
+				 */
+				add_option( 'pp_rename_issues_on_next_load', 1 );
+			}
+
 		}
 
 		// Fallback to previous DB value if the result is now empty.

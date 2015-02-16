@@ -31,6 +31,9 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	 */
 	protected function define_hooks() {
 
+		// Check whether a rename-all-Issues flag has been set.
+		add_action( 'init', array( $this, 'rename_all_issues_check' ) );
+
 		// Unpublish an Issue when all posts within it are unpublished.
 		add_action( 'transition_post_status', array( $this, 'unpublish_post_issues_if_empty' ), 10, 3 );
 		add_action( 'edited_term_taxonomy', array( $this, 'unpublish_issue_if_empty' ), 10, 2 );
@@ -565,7 +568,39 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		return $result;
 	}
 
+	/**
+	 * Checks for a 'rename all' settings flag, and if it is present, updates
+	 * all Issue names to match the chosen Issue name format.
+	 *
+	 * @since 1.0.0
+	 */
+	public function rename_all_issues_check() {
 
+		if ( get_option( 'pp_rename_issues_on_next_load' ) ) {
+
+			/*
+			 * Call the Issue name updater, with no arguments (meaning that all
+			 * Issues will be updated).
+			 */
+			$this->update_issue_names();
+
+			delete_option( 'pp_rename_issues_on_next_load' );
+		}
+
+
+	}
+
+	/**
+	 * Change name and slug of an array of Issues to match the current site-wide
+	 * Issue naming format.
+	 *
+	 * If no array of Issues is passed in, renames **all** Issues.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $terms The Issues to be renamed (either their term objects
+	 *                     or their term_ids).
+	 */
 	public function update_issue_names( $terms = array() ) {
 
 		if ( ! is_array( $terms ) ) {
