@@ -22,6 +22,9 @@ $tax_name = $this->plugin->get_taxonomy_name();
 $tax = get_taxonomy( $tax_name );
 
 // Get status and its display name.
+if ( empty( $issue ) ) {
+	$status = 'draft';
+}
 if ( empty( $status ) ) {
 	$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 	$status = $pp_common->get_issue_meta( $issue->term_id, 'pp_issue_status' );
@@ -48,6 +51,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 		<span class="spinner"></span>
 	</div>
 
+	<?php if ( ! empty( $issue ) ) : ?>
 	<!-- Preview button -->
 	<div id="preview-action">
 		<?php
@@ -73,6 +77,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 		<a class="preview button" href="<?php echo $preview_link; ?>" target="wp-preview-<?php echo (int) $issue->term_id; ?>" id="issue-preview"><?php echo $preview_button; ?></a>
 		<input type="hidden" name="wp-preview" id="wp-preview" value="" />
 	</div>
+	<?php endif; ?>
 
 	<div class="clear"></div>
 </div><!-- /minor-publishing-actions -->
@@ -87,7 +92,8 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 		<strong id="issue-status-display">
 			<?php
 			$current_issue = (int) get_option( 'pp_current_issue', 0 );
-			if ( $current_issue === $issue->term_id ) {
+			if ( ! empty( $issue )
+			&& ( $current_issue === $issue->term_id ) ) {
 				// Translators: %s = Issue Status display name.
 				printf( _x( '%s (Current Issue)', 'Edit Issue', 'periodicalpress' ), $status_name );
 			} else {
@@ -97,6 +103,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 		</strong>
 	</div>
 
+	<?php if ( ! empty( $issue ) ) : ?>
 	<!-- Issue Posts count -->
 	<div class="misc-pub-section misc-pub-issue-posts">
 		<label class="issue-posts-label">
@@ -115,6 +122,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 			<span class="screen-reader-text">View Posts</span>
 		</a>
 	</div>
+	<?php endif; ?>
 
 	<?php
 	/**
@@ -142,6 +150,7 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 	do_action( 'periodicalpress_issue_submitbox_start' );
 	?>
 
+	<?php if ( ! empty( $issue ) ) : ?>
 	<!-- Unpublish/Delete link -->
 	<div id="delete-action">
 		<?php if ( 'publish' === $status ) : ?>
@@ -165,23 +174,26 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 			<?php endif; ?>
 		<?php endif; ?>
 	</div>
+	<?php endif; ?>
 
 	<!-- Publish/Update button -->
 	<div id="publishing-action">
 		<span class="spinner"></span>
-		<?php if ( ( 'publish' !== $status) || ( 0 === $issue->term_id ) ) : ?>
-			<!-- Publish button -->
-			<?php
-			if ( current_user_can( $tax->cap->manage_terms )
-			&& ( 0 < $issue->count ) ) :
-			?>
-				<input name="original_publish" type="hidden" id="original_publish" value="<?php echo esc_attr_x( 'Publish', 'Edit Issue', 'periodicalpress' ) ?>" />
-				<?php submit_button( _x( 'Publish', 'Edit Issue', 'periodicalpress' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) ); ?>
+		<?php if ( ! empty( $issue ) ) : ?>
+			<?php if ( 'publish' !== $status) : ?>
+				<!-- Publish button -->
+				<?php
+				if ( current_user_can( $tax->cap->manage_terms )
+				&& ( 0 < $issue->count ) ) :
+				?>
+					<input name="original_publish" type="hidden" id="original_publish" value="<?php echo esc_attr_x( 'Publish', 'Edit Issue', 'periodicalpress' ) ?>" />
+					<?php submit_button( _x( 'Publish', 'Edit Issue', 'periodicalpress' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) ); ?>
+				<?php endif; ?>
+			<?php else: ?>
+				<!-- Update button -->
+				<input name="original_publish" type="hidden" id="original_publish" value="<?php echo esc_attr_x( 'Update', 'Edit Issue', 'periodicalpress' ) ?>" />
+				<input name="save" type="submit" class="button button-primary button-large" id="publish" accesskey="p" value="<?php echo esc_attr_x( 'Update', 'Edit Issue', 'periodicalpress' ); ?>" />
 			<?php endif; ?>
-		<?php else: ?>
-			<!-- Update button -->
-			<input name="original_publish" type="hidden" id="original_publish" value="<?php echo esc_attr_x( 'Update', 'Edit Issue', 'periodicalpress' ) ?>" />
-			<input name="save" type="submit" class="button button-primary button-large" id="publish" accesskey="p" value="<?php echo esc_attr_x( 'Update', 'Edit Issue', 'periodicalpress' ); ?>" />
 		<?php endif; ?>
 	</div>
 

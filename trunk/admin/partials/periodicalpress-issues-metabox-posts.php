@@ -21,7 +21,9 @@ if ( ! defined( 'ABSPATH' ) || ! isset( $issue ) ) {
 $pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
 // Get posts for this issue.
-$posts = $pp_common->get_issue_posts( $issue->term_id, 'any' );
+$posts = ! empty( $issue )
+	? $pp_common->get_issue_posts( $issue->term_id, 'any' )
+	: array();
 
 // Order the posts.
 usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
@@ -97,9 +99,16 @@ usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
 <?php else : ?>
 	<p>
 		<?php echo _x( 'No posts in this issue.', 'Edit Issue', 'periodicalpress' ); ?>
-		<a href="<?php echo esc_url( admin_url( 'post-new.php' ) ) ?>" class="add-new-post">
-			<?php echo _x( 'Add New', 'Edit Issue: Add New Post', 'periodicalpress' ); ?>
-		</a>
+		<?php
+		/*
+		 * Don't show the Add New Post link if this is a New Issue, as we don't
+		 * want users to accidentally navigate away from here.
+		 */
+		if ( ! empty( $issue ) ) : ?>
+			<a href="<?php echo esc_url( admin_url( 'post-new.php' ) ) ?>" class="add-new-post">
+				<?php echo _x( 'Add New', 'Edit Issue: Add New Post', 'periodicalpress' ); ?>
+			</a>
+		<?php endif; ?>
 	</p>
 <?php endif; ?>
 
@@ -111,7 +120,9 @@ usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
  * function.
  */
 $pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
-$status = $pp_common->get_issue_meta( $issue->term_id, 'pp_issue_status' );
+$status = ! empty( $issue )
+	? $pp_common->get_issue_meta( $issue->term_id, 'pp_issue_status' )
+	: 'draft';
 /**
  * Array filtering function to get WP_Post objects with a status of 'pending'.
  *

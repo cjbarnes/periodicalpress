@@ -140,7 +140,7 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 	 */
 	public function admin_menu_setup() {
 
-		$plugin_edit_issues = PeriodicalPress_Edit_Issues::get_instance( $this->plugin );
+		$pp_edit_issues = PeriodicalPress_Edit_Issues::get_instance( $this->plugin );
 
 		$tax = get_taxonomy( $this->plugin->get_taxonomy_name() );
 
@@ -155,7 +155,7 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 			$tax->labels->menu_name,
 			$tax->cap->assign_terms, // user capability required to show this menu
 			'pp_edit_issues',
-			array( $plugin_edit_issues, 'edit_issues_screen' ),
+			array( $pp_edit_issues, 'edit_issues_screen' ),
 			'dashicons-pressthis',
 			'4.44' // position in the menu (Posts is 5)
 		);
@@ -167,6 +167,16 @@ class PeriodicalPress_Admin extends PeriodicalPress_Singleton {
 			$tax->labels->all_items,
 			$tax->cap->assign_terms,
 			'pp_edit_issues'
+		);
+
+		// Issues submenu: Add new Issue.
+		add_submenu_page(
+			'pp_edit_issues',
+			$tax->labels->add_new_item,
+			_x( 'Add New', 'Admin menu link to Add New Issue', 'periodicalpress' ),
+			$tax->cap->edit_terms,
+			'pp_add_issue',
+			array( $pp_edit_issues, 'add_issue_screen' )
 		);
 
 		/*

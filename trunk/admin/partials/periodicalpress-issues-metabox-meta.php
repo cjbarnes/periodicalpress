@@ -3,7 +3,7 @@
 /**
  * Display the Issue Date/Number metadata editing box
  *
- * Used on the Edit Issue screen.
+ * Used on the Edit Issue and Add Issue screens.
  *
  * @todo Implement input type=month, input type=week, and a select for year -
  * depending on Issues settings
@@ -25,13 +25,19 @@ $pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 $tax_name = $this->plugin->get_taxonomy_name();
 
 // Get the Issue's metadata.
-$meta = $pp_common->get_issue_meta( $issue->term_id );
-$meta_date = isset( $meta['pp_issue_date'] )
-	? $meta['pp_issue_date']
-	: -1;
-$meta_number = isset( $meta['pp_issue_number'] )
-	? $meta['pp_issue_number']
-	: '';
+if ( ! empty( $issue ) ) {
+	$meta = $pp_common->get_issue_meta( $issue->term_id );
+	$meta_date = isset( $meta['pp_issue_date'] )
+		? $meta['pp_issue_date']
+		: -1;
+	$meta_number = isset( $meta['pp_issue_number'] )
+		? $meta['pp_issue_number']
+		: '';
+} else {
+	$meta_date = -1;
+	$meta_number = '';
+}
+
 
 if ( ! class_exists( 'PeriodicalPress_Touch_Time' ) ) {
 	/**

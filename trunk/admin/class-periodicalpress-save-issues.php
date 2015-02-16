@@ -277,6 +277,108 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Create a new Issue from user-submitted data.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $data The Issue's data (usually a $_POST object).
+	 * @return array|WP_Error Associative array of the new Issue's $term_id and
+	 *                        $term_taxonomy_id, or error object on failure.
+	 */
+	public function create_issue( $data ) {
+
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$tax_name = $this->plugin->get_taxonomy_name();
+		$tax = get_taxonomy( $tax_name );
+
+		/**
+		 * Hook for just before an Issue is created.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $data Data (eg $_POST) passed into this method.
+		 */
+		do_action( 'periodicalpress_before_create_issue', $data );
+
+		// Sanitize and prep for wp_update_term().
+		$new_term_data = array();
+
+		$new_term_name = ! empty( $data['name'] )
+			? sanitize_text_field( $data['name'] )
+			: _x( '(No Title)', 'Title for issues missing a title', 'periodicalpress' );
+
+		$new_term_data['description'] = isset( $data['description'] )
+			? wp_kses_data( $data['description'] )
+			: '';
+
+		// Prep the slug based on the title (if not user-specified).
+		if ( ! empty( $data['slug'] ) ) {
+			$new_term_data['slug'] = sanitize_title_with_dashes( $data['slug'], null, 'save' );
+		}
+
+		// Update the terms table. End here if the DB doesn't update properly.
+		$result = wp_insert_term( $new_term_name, $tax_name, $new_term_data );
+		if ( is_wp_error( $result ) || ! isset( $result['term_id'] ) ) {
+			return $result;
+		}
+
+		$term_id = $result['term_id'];
+
+		// Set Issue Status.
+		$pp_common->add_issue_meta( $term_id, 'pp_issue_status', 'draft' );
+
+		// Set Issue Number metadata.
+		if ( isset( $data['number'] ) ) {
+
+			// @todo: handle return False (i.e. this number is a duplicate).
+			$result = $pp_common->update_issue_number( $term_id, $data['number'] );
+
+			// Also update the Issue name/slug if the number is part of that.
+			if ( 'numbers' === get_option( 'pp_issue_naming' ) ) {
+				$this->update_issue_names( $term_id );
+			}
+
+		}
+
+		// Issue Date update.
+		if ( ! empty( $data['aa'] ) && is_numeric( $data['aa'] ) ) {
+
+			// Sanitize date input. 1 is the default for anything missing.
+			$year = absint( $data['aa'] );
+			$month = ( ! empty( $data['mm'] ) && ( 13 > intval( $data['mm'] ) ) )
+				? absint( $data['mm'] )
+				: 1;
+			$day = ( ! empty( $data['jj'] ) && ( 32 > intval( $data['jj'] ) ) )
+				? absint( $data['jj'] )
+				: 1;
+
+			$new_date = date_create();
+			$new_date->setDate( $year, $month, $day );
+
+			$pp_common->add_issue_meta( $term_id, 'pp_issue_date', $new_date->format( 'Y-m-d' ) );
+
+			// Also update the Issue name/slug if the date is included in that.
+			if ( 'dates' === get_option( 'pp_issue_naming' ) ) {
+				$this->update_issue_names( $term_id );
+			}
+
+		}
+
+		/**
+		 * Hook for after an Issue is created.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int    $term_id The ID of the Issue taxonomy term that was
+		 *                        created.
+		 * @param array  $data    Data (eg $_POST) passed into this method.
+		 */
+		do_action( 'periodicalpress_create_issue', $term_id, $data );
+
+		return $result;
+	}
+
+	/**
 	 * Save changes to an Issue.
 	 *
 	 * @since 1.0.0
@@ -284,7 +386,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	 * @param int|object $term Either the Issue's term ID or its term object.
 	 * @param array      $data The changes to be made to the issue (usually a
 	 *                         $_POST object).
-	 * @return bool|WP_Error Success/failure of term deletion, or error object.
+	 * @return bool|WP_Error Success/failure of term updating, or error object.
 	 */
 	public function update_issue( $term, $data ) {
 
@@ -293,7 +395,6 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		}
 
 		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
-
 		$tax_name = $this->plugin->get_taxonomy_name();
 		$tax = get_taxonomy( $tax_name );
 
@@ -347,11 +448,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			$new_term_data['slug'] = $term_object->slug;
 		}
 
-		/*
-		 * Update the terms table. End here if the DB doesn't update properly.
-		 * Note that we do this below the metadata changes so that the term
-		 * name can be altered to reflect Issue date/number changes.
-		 */
+		// Update the terms table. End here if the DB doesn't update properly.
 		$result = wp_update_term( $term_id, $tax_name, $new_term_data );
 		if ( is_wp_error( $result ) ) {
 			return $result;
@@ -365,7 +462,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 			// Also update the Issue name/slug if the number is part of that.
 			if ( 'numbers' === get_option( 'pp_issue_naming' ) ) {
-				update_issue_names( $term_object );
+				$this->update_issue_names( $term_object );
 			}
 
 		}
@@ -389,7 +486,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 			// Also update the Issue name/slug if the date is included in that.
 			if ( 'dates' === get_option( 'pp_issue_naming' ) ) {
-				update_issue_names( $term_object );
+				$this->update_issue_names( $term_object );
 			}
 
 		}
@@ -435,7 +532,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			 * be at the **bottom** not the top.
 			 */
 			foreach( $order as $value => $post_id ) {
-				update_post_meta( $post_id, 'pp_issue_sort_order', (500 - $value) );
+				$this->update_post_meta( $post_id, 'pp_issue_sort_order', (500 - $value) );
 			}
 
 		}

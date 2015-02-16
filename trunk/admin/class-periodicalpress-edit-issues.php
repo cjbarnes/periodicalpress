@@ -30,8 +30,9 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 		// Set up screen options and help tabs for Edit Issues screen.
 		add_action( 'load-toplevel_page_pp_edit_issues', array( $this, 'edit_issues_screen_options' ) );
 
-		// Set up the metaboxes for the Edit Issue page.
+		// Set up the metaboxes for the Add Issue and Edit Issue pages.
 		add_action( 'add_meta_boxes_pp_issue', array( $this, 'add_remove_metaboxes' ) );
+		add_action( 'add_meta_boxes_pp_issue_new', array( $this, 'add_remove_metaboxes' ) );
 
 	}
 
@@ -64,6 +65,16 @@ class PeriodicalPress_Edit_Issues extends PeriodicalPress_Singleton {
 			'default' => 20,
 			'option' => 'edit_' . $tax->name . '_per_page'
 		) );
+
+	}
+
+	public function add_issue_screen() {
+
+		/**
+		 * Output the Add Issues page.
+		 */
+		$path = $this->plugin->get_partials_path( 'admin' );
+		require $path . 'periodicalpress-add-issue.php';
 
 	}
 

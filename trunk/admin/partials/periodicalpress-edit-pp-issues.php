@@ -15,9 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*
- * Load the taxonomy.
- */
+// Load the taxonomy.
 $tax_name = $this->plugin->get_taxonomy_name();
 $tax = get_taxonomy( $tax_name );
 if ( ! is_object( $tax ) ) {
@@ -26,7 +24,7 @@ if ( ! is_object( $tax ) ) {
 
 $title = $tax->labels->name;
 
-// Check security
+// Check security.
 if ( ! current_user_can( $tax->cap->assign_terms ) ) {
 	exit();
 }
@@ -81,6 +79,40 @@ switch ( $list_table->current_action() ) {
 		include $this->plugin->get_plugin_path() . 'admin/partials/periodicalpress-edit-issue.php';
 
 		exit;
+
+	case 'new':
+
+		$location = 'admin.php?page=pp_edit_issues';
+
+		// Check nonce has been correctly passed via URL.
+		check_admin_referer( 'new-tag' );
+
+		// Check permissions.
+		if ( ! current_user_can( $tax->cap->edit_terms ) ) {
+			// Not Added error message.
+			$msg_id = 4;
+			$location = add_query_arg( 'message', $msg_id, $location );
+			break;
+		}
+
+		$pp_save_issues = PeriodicalPress_Save_Issues::get_instance( $this->plugin );
+
+		/*
+		 * Actually create the Issue in the database using the method on
+		 * {@see PeriodicalPress_Save_Issues}, and add result message to the URL
+		 * query string.
+		 */
+		$result = $pp_save_issues->create_issue( $_POST );
+
+		if ( ! is_wp_error( $result ) && $result ) {
+			$msg_id = 1;
+		} else {
+			$msg_id = 4;
+		}
+
+		$location = add_query_arg( 'message', $msg_id, $location );
+
+		break;
 
 	case 'update':
 	case 'delete':
