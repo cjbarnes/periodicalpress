@@ -31,7 +31,7 @@ $status = $pp_common->get_issue_meta( $issue->term_id, 'pp_issue_status' );
 /**
  * Fires after all hard-coded metaboxes have been added.
  *
- * @since 3.0.0
+ * @since 1.0.0
  *
  * @param object $issue The Issue object.
  */
