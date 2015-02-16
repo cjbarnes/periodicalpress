@@ -95,16 +95,35 @@ do_action( 'periodicalpress_issue_edit_form_tag', $issue );
 					 */
 					$name_placeholder = apply_filters( 'periodicalpress_issue_name_placeholder', __( 'Enter issue title here', 'periodicalpress' ), $issue );
 
-					$disabled = ( 'title' === get_option( 'pp_issue_naming' ) )
-						? ''
-						: 'disabled="disabled" ';
-
+					$disabled = ( 'title' !== get_option( 'pp_issue_naming' ) )
+						? true
+						: false;
 					?>
 					<label class="screen-reader-text" id="name-prompt-text" for="name">
 						<?php echo $name_placeholder; ?>
 					</label>
-
-					<input name="name" size="30" value="<?php echo esc_attr( htmlspecialchars( $issue->name ) ); ?>" class="pp-issue-name" id="name" spellcheck="true" autocomplete="off" <?php echo $disabled; ?>/>
+					<?php if ( $disabled ) : ?>
+						<?php
+						/*
+						 * Translators:
+						 * '%1$s' = the Issue taxonomy's singular name.
+						 * '%2$s' = the unique part of the Issue name.
+						 *
+						 * This is only used in the admin area to demo how
+						 * Issue name formats will appear in unmodified
+						 * themes, so only localize the ordering if the
+						 * Core themes localize it as well.
+						 */
+						$prefixed_issue_name = sprintf(
+							_x( '%1$s: %2$s', 'Issue name format', 'periodicalpress' ),
+							$tax->labels->singular_name,
+							$issue->name
+						);
+						?>
+						<input name="name" size="30" value="<?php echo esc_attr( htmlspecialchars( $prefixed_issue_name ) ); ?>" class="pp-issue-name" id="name" disabled="disabled" />
+					<?php else : ?>
+						<input name="name" size="30" value="<?php echo esc_attr( htmlspecialchars( $issue->name ) ); ?>" class="pp-issue-name" id="name" spellcheck="true" autocomplete="off" />
+					<?php endif; ?>
 
 				</div><!-- /#namewrap -->
 
