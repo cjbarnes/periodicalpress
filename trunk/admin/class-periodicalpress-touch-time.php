@@ -158,7 +158,7 @@ class PeriodicalPress_Touch_Time {
 			$month .= "<select id='pp-mm' name='mm'{$tab_index_attribute} >\n";
 
 			// Empty date option.
-			$month .= "\t<option value='-1'>--</option>\n";
+			$month .= "\t<option value='-1'>" . __( 'month', 'periodicalpress' ) . "</option>\n";
 
 			// Assemble the twelve month options.
 			for ( $i = 1; $i < 13; $i = $i +1 ) {
