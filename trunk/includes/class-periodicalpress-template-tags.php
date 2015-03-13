@@ -44,6 +44,24 @@ class PeriodicalPress_Template_Tags {
 	}
 
 	/**
+	 * Retrieve the current Issue's term ID.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return int|null The Issue ID.
+	 */
+	public function get_the_issue_id() {
+
+		// Get the Issue object to work with.
+		$issue = $this->get_the_issue_object( $issue_id );
+		if ( empty( $issue ) || is_wp_error( $issue ) ) {
+			return;
+		}
+
+		return $issue->term_id;
+	}
+
+	/**
 	 * Retrieve the current Issue's title.
 	 *
 	 * @since 1.0.0
@@ -54,7 +72,7 @@ class PeriodicalPress_Template_Tags {
 	public function get_the_issue_title( $issue_id = 0 ) {
 
 		// Get the Issue object to work with.
-		$issue = $this->get_the_issue( $issue_id );
+		$issue = $this->get_the_issue_object( $issue_id );
 		if ( empty( $issue ) || is_wp_error( $issue ) ) {
 			return;
 		}
@@ -82,7 +100,7 @@ class PeriodicalPress_Template_Tags {
 	public function get_the_issue_description( $issue_id = 0 ) {
 
 		// Get the Issue object to work with.
-		$issue = $this->get_the_issue( $issue_id );
+		$issue = $this->get_the_issue_object( $issue_id );
 		if ( empty( $issue ) || is_wp_error( $issue ) ) {
 			return;
 		}
@@ -114,7 +132,7 @@ class PeriodicalPress_Template_Tags {
 	public function get_the_issue_number( $issue_id = 0 ) {
 
 		// Get the Issue object to work with.
-		$issue = $this->get_the_issue( $issue_id );
+		$issue = $this->get_the_issue_object( $issue_id );
 		if ( empty( $issue ) || is_wp_error( $issue ) ) {
 			return;
 		}
@@ -155,7 +173,7 @@ class PeriodicalPress_Template_Tags {
 	public function get_the_issue_date( $format = '', $issue_id = 0 ) {
 
 		// Get the Issue object to work with.
-		$issue = $this->get_the_issue( $issue_id );
+		$issue = $this->get_the_issue_object( $issue_id );
 		if ( empty( $issue ) || is_wp_error( $issue ) ) {
 			return;
 		}
@@ -191,6 +209,79 @@ class PeriodicalPress_Template_Tags {
 		 *                                Issue.
 		 */
 		return apply_filters( 'periodicalpress_the_issue_date', date_i18n( $format, $d->getTimestamp() ), $d->getTimestamp(), $issue_id );
+	}
+
+	/**
+	 * Retrieve the current Issue's permalink URL.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $issue_id Optional. The Issue's term ID.
+	 * @return string|null The Issue URL.
+	 */
+	public function get_the_issue_link( $issue_id = 0 ) {
+
+		// Get the Issue object to work with.
+		$issue = $this->get_the_issue_object( $issue_id );
+		if ( empty( $issue ) || is_wp_error( $issue ) ) {
+			return;
+		}
+		$issue_id = $issue->term_id;
+
+		$link = get_term_link( $issue );
+
+		/**
+		 * Filter the Issue link for front-end outputting.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $link      The Issue URL.
+		 * @param int    $issue_id  The taxonomy term ID for this Issue.
+		 */
+		return apply_filters( 'periodicalpress_the_issue_link', $link, $issue_id );
+	}
+
+	/**
+	 * Reusable Issue term object getter.
+	 *
+	 * Starts with ID manually passed in, or failing that, tries to get the
+	 * right Issue from the current taxonomy-query or post.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $issue_id Optional. The specific Issue to get (if known).
+	 * @return object|null|WP_Error The Issue term object, or null/error on
+	 *                              failure.
+	 */
+	public function get_the_issue_object( $issue_id = 0 ) {
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		if ( ! empty( $issue_id ) ) {
+			$issue = get_term( absint( $issue_id ), $tax_name );
+		} else {
+			$queried_object = get_queried_object();
+
+			if ( isset( $queried_object->term_id )
+			&& ( $tax_name === $queried_object->taxonomy ) ) {
+
+				$issue = get_term( absint( $queried_object->term_id ), $tax_name );
+
+			} elseif ( is_a( $queried_object, 'WP_Post' ) ) {
+
+				$issues = wp_get_post_terms( $queried_object->ID, $tax_name, array( 'fields' => 'ids' ) );
+
+				if ( ! empty( $issues ) && ! is_wp_error( $issues ) ) {
+					$issue = get_term( $issues[0], $tax_name );
+				}
+
+			}
+		}
+
+		if ( ! empty( $issue ) ) {
+			return $issue;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -279,6 +370,18 @@ class PeriodicalPress_Template_Tags {
 	}
 
 	/**
+	 * Display or retrieve the current Issue's permalink URL.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $echo Optional. Whether to display or return. Default true.
+	 * @return string|null The Issue URL.
+	 */
+	public function the_issue_link( $echo = true ) {
+		return $this->the_the( 'get_the_issue_link', '', '', $echo );
+	}
+
+	/**
 	 * Generic function for 'the_issue_XXX()' template tags.
 	 *
 	 * @since 1.0.0
@@ -313,50 +416,6 @@ class PeriodicalPress_Template_Tags {
 	    } else {
 	        return $result;
 	    }
-	}
-
-	/**
-	 * Reusable Issue term object getter.
-	 *
-	 * Starts with ID manually passed in, or failing that, tries to get the
-	 * right Issue from the current taxonomy-query or post.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @param int $issue_id Optional. The specific Issue to get (if known).
-	 * @return object|null|WP_Error The Issue term object, or null/error on
-	 *                              failure.
-	 */
-	protected function get_the_issue( $issue_id = 0 ) {
-		$tax_name = $this->plugin->get_taxonomy_name();
-
-		if ( ! empty( $issue_id ) ) {
-			$issue = get_term( absint( $issue_id ), $tax_name );
-		} else {
-			$queried_object = get_queried_object();
-
-			if ( isset( $queried_object->term_id )
-			&& ( $tax_name === $queried_object->taxonomy ) ) {
-
-				$issue = get_term( absint( $queried_object->term_id ), $tax_name );
-
-			} elseif ( is_a( $queried_object, 'WP_Post' ) ) {
-
-				$issues = wp_get_post_terms( $queried_object->ID, $tax_name, array( 'fields' => 'ids' ) );
-
-				if ( ! empty( $issues ) && ! is_wp_error( $issues ) ) {
-					$issue = get_term( $issues[0], $tax_name );
-				}
-
-			}
-		}
-
-		if ( ! empty( $issue ) ) {
-			return $issue;
-		} else {
-			return null;
-		}
 	}
 
 }
