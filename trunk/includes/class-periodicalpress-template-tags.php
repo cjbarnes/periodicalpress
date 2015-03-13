@@ -58,6 +58,7 @@ class PeriodicalPress_Template_Tags {
 		if ( empty( $issue ) || is_wp_error( $issue ) ) {
 			return;
 		}
+		$issue_id = $issue->term_id;
 
 		/**
 		 * Filter the Issue title for front-end outputting.
@@ -67,7 +68,39 @@ class PeriodicalPress_Template_Tags {
 		 * @param string $issue_title The Issue title.
 		 * @param int    $issue_id    The taxonomy term ID for this Issue.
 		 */
-		return apply_filters( 'periodicalpress_the_issue_title', $issue->name, intval( $issue->term_id ) );
+		return apply_filters( 'periodicalpress_the_issue_title', $issue->name, intval( $issue_id ) );
+	}
+
+	/**
+	 * Retrieve the current Issue's description.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $issue_id Optional. The Issue's term ID.
+	 * @return string|null The Issue description.
+	 */
+	public function get_the_issue_description( $issue_id = 0 ) {
+
+		// Get the Issue object to work with.
+		$issue = $this->get_the_issue( $issue_id );
+		if ( empty( $issue ) || is_wp_error( $issue ) ) {
+			return;
+		}
+		$issue_id = $issue->term_id;
+
+		if ( empty( $issue->description ) ) {
+			return;
+		}
+
+		/**
+		 * Filter the Issue description for front-end outputting.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $description The Issue description.
+		 * @param int    $issue_id    The taxonomy term ID for this Issue.
+		 */
+		return apply_filters( 'periodicalpress_the_issue_title', $issue->description, $issue_id );
 	}
 
 	/**
@@ -173,6 +206,26 @@ class PeriodicalPress_Template_Tags {
 	 */
 	public function the_issue_title( $before = '', $after = '', $echo = true ) {
 		return $this->the_the( 'get_the_issue_title', $before, $after, $echo );
+	}
+
+	/**
+	 * Display the current Issue's description.
+	 *
+	 * @since 1.0.0
+	 */
+	public function the_issue_description() {
+		$description = $this->the_the( 'get_the_issue_description', '', '', false );
+		if ( ! empty( $description ) ) {
+			/**
+			 * Filter the description like post excerpts are formatted.
+			 *
+			 * @since 1.0.0
+			 * @link http://codex.wordpress.org/Function_Reference/the_excerpt
+			 *
+			 * @param string $description The content to format like an excerpt.
+			 */
+			echo apply_filters( 'the_excerpt', $description );
+		}
 	}
 
 	/**
