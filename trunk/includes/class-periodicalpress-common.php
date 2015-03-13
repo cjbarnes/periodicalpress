@@ -39,6 +39,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 
 		// Include all other common-functionality classes.
 		require_once $path . 'includes/class-periodicalpress-taxonomy.php';
+		require_once $path . 'includes/class-periodicalpress-template-tags.php';
 
 		// Instantiate classes.
 		PeriodicalPress_Taxonomy::get_instance( $this->plugin );

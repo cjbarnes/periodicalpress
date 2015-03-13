@@ -196,8 +196,6 @@ class PeriodicalPress {
 			require_once $path . 'public/class-periodicalpress-public.php';
 		}
 
-		require_once $path . 'includes/periodicalpress-template-tags.php';
-
 		// Prepare internationalization class and hooks.
 		$this->set_locale();
 
