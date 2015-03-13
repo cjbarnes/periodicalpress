@@ -44,6 +44,25 @@ class PeriodicalPress_Template_Tags {
 	}
 
 	/**
+	 * Conditional tag to test whether this page is an Issue page.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool True if an Issue page, False if not.
+	 */
+	public function is_issue() {
+		$tax_name = $this->plugin->get_taxonomy_name();
+		$queried_object = get_queried_object();
+
+		if ( ( isset( $queried_object->term_id ) && ( $tax_name === $queried_object->taxonomy ) ) ) {
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Retrieve the current Issue's term ID.
 	 *
 	 * @since 1.0.0
