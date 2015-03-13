@@ -44,6 +44,225 @@ class PeriodicalPress_Template_Tags {
 	}
 
 	/**
+	 * Retrieve the current Issue's title.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $issue_id Optional. The Issue's term ID.
+	 * @return string|null The Issue title.
+	 */
+	public function get_the_issue_title( $issue_id = 0 ) {
+
+		// Get the Issue object to work with.
+		$issue = $this->get_the_issue( $issue_id );
+		if ( empty( $issue ) || is_wp_error( $issue ) ) {
+			return;
+		}
+
+		/**
+		 * Filter the Issue title for front-end outputting.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $issue_title The Issue title.
+		 * @param int    $issue_id    The taxonomy term ID for this Issue.
+		 */
+		return apply_filters( 'periodicalpress_the_issue_title', $issue->name, intval( $issue->term_id ) );
+	}
+
+	/**
+	 * Retrieve the current Issue's number.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $issue_id Optional. The Issue's term ID.
+	 * @return string The Issue number formatted as a string.
+	 */
+	public function get_the_issue_number( $issue_id = 0 ) {
+
+		// Get the Issue object to work with.
+		$issue = $this->get_the_issue( $issue_id );
+		if ( empty( $issue ) || is_wp_error( $issue ) ) {
+			return;
+		}
+		$issue_id = $issue->term_id;
+
+		// Get the Issue number.
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$issue_num = intval( $pp_common->get_issue_meta( $issue_id, 'pp_issue_number' ) );
+
+		if ( empty( $issue_num ) ) {
+			return;
+		}
+
+		/**
+		 * Filter the Issue number for front-end outputting.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $issue_number  The (localized) Issue number output.
+		 * @param int    $issue_num_int The Issue number value, as integer.
+		 * @param int    $issue_id      The taxonomy term ID for this
+		 *                              Issue.
+		 */
+		return apply_filters( 'periodicalpress_the_issue_number', number_format_i18n( $issue_num ), $issue_num, intval( $issue_id ) );
+	}
+
+    /**
+	 * Retrieve the current Issue's formatted date string.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $format   Optional. Date format to output the date in. If
+	 *                         '', use the user-set Issue date format.
+	 *                         Default ''.
+	 * @param int    $issue_id Optional. The Issue's term ID.
+	 * @return string|null The Issue number formatted as a string.
+	 */
+	public function get_the_issue_date( $format = '', $issue_id = 0 ) {
+
+		// Get the Issue object to work with.
+		$issue = $this->get_the_issue( $issue_id );
+		if ( empty( $issue ) || is_wp_error( $issue ) ) {
+			return;
+		}
+		$issue_id = $issue->term_id;
+
+		// Get the Issue date.
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$issue_date = $pp_common->get_issue_meta( $issue_id, 'pp_issue_date' );
+
+		if ( empty( $issue_date ) ) {
+			return;
+		}
+
+		// Convert the DB date format to a Unix timestamp.
+		$d = DateTime::createFromFormat( 'Y-m-d', $issue_date );
+
+		/*
+		 * Fallback date formats: Issue Date Format setting, then site-wide
+		 * date format setting.
+		 */
+		if ( empty( $format ) ) {
+			$format = get_option( 'pp_issue_date_format', get_option( 'date_format' ) );
+		}
+
+		/**
+		 * Filter the Issue date for front-end outputting.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $issue_date      The formatted Issue date.
+		 * @param int    $issue_datestamp The Issue date as a Unix timestamp.
+		 * @param int    $issue_id        The taxonomy term ID for this
+		 *                                Issue.
+		 */
+		return apply_filters( 'periodicalpress_the_issue_date', date_i18n( $format, $d->getTimestamp() ), $d->getTimestamp(), $issue_id );
+	}
+
+	/**
+	 * Display or retrieve the current Issue's title.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $before Optional. Content to prepend to title.
+	 * @param string $after  Optional. Content to append to title.
+	 * @param bool   $echo   Optional. Whether to display or return. Default
+	 *                       true.
+	 * @return string|null The title HTML.
+	 */
+	public function the_issue_title( $before = '', $after = '', $echo = true ) {
+		return $this->the_the( 'get_the_issue_title', $before, $after, $echo );
+	}
+
+	/**
+	 * Display or retrieve the current Issue's number.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $before Optional. Content to prepend to number.
+	 * @param string $after  Optional. Content to append to number.
+	 * @param bool   $echo   Optional. Whether to display or return. Default
+	 *                       true.
+	 * @return string|null The number HTML.
+	 */
+	public function the_issue_number( $before = '', $after = '', $echo = true ) {
+		return $this->the_the( 'get_the_issue_number', $before, $after, $echo );
+	}
+
+	/**
+	 * Display or retrieve the current Issue's date.
+	 *
+	 * Doesn't use the generic `the_the()` method because of the additional
+	 * $format param.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $format Optional. Date format to output the date in. If '',
+	 *                       use the user-set Issue date format. Default ''.
+	 * @param string $before Optional. Content to prepend to date.
+	 * @param string $after  Optional. Content to append to date.
+	 * @param bool   $echo   Optional. Whether to display or return. Default
+	 *                       true.
+	 * @return string|null The date HTML.
+	 */
+	public function the_issue_date( $format = '', $before = '', $after = '', $echo = true ) {
+
+		$result = $this->get_the_issue_date( $format );
+		if ( 0 == strlen( $result ) ) {
+			return null;
+		}
+
+		// Add prefix and suffix.
+	    $result = $before . $result . $after;
+
+	    // Output/return.
+	    if ( $echo ) {
+	        echo $result;
+	        return null;
+	    } else {
+	        return $result;
+	    }
+	}
+
+	/**
+	 * Generic function for 'the_issue_XXX()' template tags.
+	 *
+	 * @since 1.0.0
+	 * @access protected
+	 *
+	 * @param string $get_method Which get_the_XXXX() template tag to call.
+	 * @param string $before     Optional. Content to prepend to this string.
+	 * @param string $after      Optional. Content to append to this string.
+	 * @param bool   $echo       Optional. Whether to display or return.
+	 *                           Default true.
+	 * @return string|null The resulting HTML.
+	 */
+	protected function the_the( $get_method, $before = '', $after = '', $echo = true ) {
+
+		// Get the get_the_XXXX() method results.
+		$result = '';
+		if ( isset( $get_method ) && method_exists( $this, $get_method ) ) {
+			$result = $this->$get_method();
+		}
+
+	    if ( 0 == strlen( $result ) ) {
+	        return null;
+	    }
+
+	    // Add prefix and suffix.
+	    $result = $before . $result . $after;
+
+	    // Output/return.
+	    if ( $echo ) {
+	        echo $result;
+	        return null;
+	    } else {
+	        return $result;
+	    }
+	}
+
+	/**
 	 * Reusable Issue term object getter.
 	 *
 	 * Starts with ID manually passed in, or failing that, tries to get the
@@ -85,61 +304,6 @@ class PeriodicalPress_Template_Tags {
 		} else {
 			return null;
 		}
-	}
-
-	/**
-	 * Display or retrieve the current Issue's title.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $before Optional. Content to prepend to title.
-	 * @param string $after  Optional. Content to append to title.
-	 * @param bool   $echo   Optional. Whether to display or return. Default
-	 *                       true.
-	 * @return string|null The title HTML, or null if echoing the title.
-	 */
-	public function the_issue_title( $before = '', $after = '', $echo = true ) {
-		$issue_title = $this->get_the_issue_title();
-
-	    if ( strlen( $issue_title ) == 0 ) {
-	        return;
-	    }
-
-	    $issue_title = $before . $issue_title . $after;
-
-	    if ( $echo ) {
-	        echo $issue_title;
-	    } else {
-	        return $issue_title;
-	    }
-	}
-
-	/**
-	 * Retrieve the current Issue's title.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param int $issue_id Optional. The Issue's term ID.
-	 * @return string The Issue title.
-	 */
-	public function get_the_issue_title( $issue_id = 0 ) {
-
-		// Get the Issue object to work with.
-		$issue = $this->get_the_issue( $issue_id );
-		if ( empty( $issue ) || is_wp_error( $issue ) ) {
-			return '';
-		}
-
-
-		/**
-		 * Filter the Issue title for front-end outputting.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param string $issue_title The Issue title.
-		 * @param int    $issue_id    The taxonomy term ID for this Issue.
-		 */
-		return apply_filters( 'periodicalpress_the_issue_title', $issue->name, intval( $issue->term_id ) );
 	}
 
 }
