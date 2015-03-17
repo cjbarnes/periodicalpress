@@ -123,10 +123,8 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		do_action( 'periodicalpress_transition_issue_status', 'publish', $old_status, $term_id );
 
 		// Only set status to Published if all other changes were successful.
-		if ( in_array( false, $result ) ) {
+		if ( $result ) {
 			$result = $pp_common->update_issue_meta( $term_id, "{$tax_name}_status", 'publish' );
-		} else {
-			$result = false;
 		}
 		return $result;
 	}
@@ -532,7 +530,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			 * be at the **bottom** not the top.
 			 */
 			foreach( $order as $value => $post_id ) {
-				$this->update_post_meta( $post_id, 'pp_issue_sort_order', (500 - $value) );
+				update_post_meta( $post_id, 'pp_issue_sort_order', (500 - $value) );
 			}
 
 		}
