@@ -221,8 +221,10 @@ class PeriodicalPress_Theme_Patching extends PeriodicalPress_Singleton {
 			 * the next issue is published the address being redirected to will
 			 * change.
 			 */
-			wp_redirect( get_term_link( $current_issue, $tax_name ), 302 );
-			exit();
+			if ( $current_issue ) {
+				wp_redirect( get_term_link( $current_issue, $tax_name ), 302 );
+				exit();
+			}
 
 		}
 
