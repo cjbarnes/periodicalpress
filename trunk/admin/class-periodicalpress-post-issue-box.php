@@ -97,10 +97,9 @@ class PeriodicalPress_Post_Issue_Box extends PeriodicalPress_Singleton {
 		$tax = get_taxonomy( $tax_name );
 
 		$tax_col = "taxonomy-$tax_name";
-		$tax_col_label = $columns[ $tax_col ];
 
 		// Only make changes if the Issue column exists.
-		if ( ! empty( $tax_col_label ) ) {
+		if ( ! empty( $columns[ $tax_col ] ) ) {
 
 			unset( $columns[ $tax_col ] );
 
