@@ -203,4 +203,4 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 
 <?php
 
-// TODO: Set Current Issue option. Unpublish, then Delete permanently.
+// TODO: Set Current Issue option.
