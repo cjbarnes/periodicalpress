@@ -835,7 +835,6 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 				}
 				$new_data['slug'] = $new_slug;
 			}
-			$new_data['slug'] = $new_slug;
 
 			/**
 			 * Filter to change Issue title/slug data before saving to DB.
