@@ -22,7 +22,7 @@ $current_issue = get_option( 'pp_current_issue', 0 );
 // Dropdown of published Issues.
 $args = array(
 	'hide_unpublished' => 1,
-	'name'             => $field['name'],
+	'field_name'       => $field['name'],
 	'id'               => $field['id'],
 	'selected'         => $current_issue
 );

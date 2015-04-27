@@ -669,7 +669,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 			'include' => '',
 			'echo' => 1,
 			'tab_index' => 0,
-			'name' => $tax_name,
+			'field_name' => $tax_name,
 			'id' => '',
 			'class' => 'postform',
 			'selected' => 0,
@@ -679,7 +679,6 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 
 		// Set arguments used by {@link get_terms()} that cannot be overridden.
 		$args = array_merge( $args, array(
-			'taxonomy' => $tax_name,
 			'hide_empty' => false,
 			'orderby' => 'ID',
 			'hierarchical' => 0,
@@ -728,7 +727,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 		}
 
 		// Assemble the select element's opening tag.
-		$name = esc_attr( $args['name'] );
+		$name = esc_attr( $args['field_name'] );
 		$class = esc_attr( $args['class'] );
 		$id = $args['id']
 			? esc_attr( $args['id'] )
