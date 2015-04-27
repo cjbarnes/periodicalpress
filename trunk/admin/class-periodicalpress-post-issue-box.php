@@ -283,23 +283,10 @@ class PeriodicalPress_Post_Issue_Box extends PeriodicalPress_Singleton {
 				$issue_status = $pp_common->get_issue_meta( $new_issue, "{$tax_name}_status" );
 
 				/*
-				 * Update whether this post should be published, based on
-				 * whether its new Issue is published.
+				 * Unpublish this post if its new Issue is not published yet.
 				 */
-				if ( 'publish' === $issue_status ) {
-
-					$this->update_post_status( $post_id, 'publish' );
-
-				} else {
-
-					/*
-					 * Revert post to Pending Review if it used to be published
-					 * and now shouldn't be.
-					 */
-					if ( 'publish' === $post->post_status ) {
-						$this->update_post_status( $post_id, 'pending' );
-					}
-
+				if ( ( 'publish' !== $issue_status ) && ( 'publish' === $post->post_status ) ) {
+					$this->update_post_status( $post_id, 'pending' );
 				}
 
 			}
