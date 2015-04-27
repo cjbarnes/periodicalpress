@@ -84,12 +84,10 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 		// Get a free issue number if there isn't one yet.
 		$issue_num = $pp_common->get_issue_meta( $term_id, "{$tax_name}_number" );
-		if ( ! is_int( $issue_num ) ) {
-			$issue_num = $this->create_issue_number();
+		if ( ( '' === $issue_num ) || ( false === $issue_num ) ) {
+			$issue_num = $this->create_issue_number();// Metadata changes.
+			$pp_common->update_issue_meta( $term_id, "{$tax_name}_number", $issue_num );
 		}
-
-		// Metadata changes.
-		$result = $pp_common->update_issue_meta( $term_id, "{$tax_name}_number", $issue_num );
 
 		// Get the ready-to-publish posts attached to this Issue.
 		$post_statuses = array(
@@ -122,10 +120,9 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		 */
 		do_action( 'periodicalpress_transition_issue_status', 'publish', $old_status, $term_id );
 
-		// Only set status to Published if all other changes were successful.
-		if ( $result ) {
-			$result = $pp_common->update_issue_meta( $term_id, "{$tax_name}_status", 'publish' );
-		}
+		// Finally set status to Published.
+		$result = $pp_common->update_issue_meta( $term_id, "{$tax_name}_status", 'publish' );
+
 		return $result;
 	}
 
@@ -361,7 +358,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			? wp_kses_data( $data['description'] )
 			: '';
 
-		// Prep the slug based on the title (if not user-specified).
+		// Prep the slug (if user-specified).
 		if ( ! empty( $data['slug'] ) ) {
 			$new_term_data['slug'] = sanitize_title_with_dashes( $data['slug'], null, 'save' );
 		}
@@ -821,19 +818,22 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			}
 
 			// Make sure the new slug is unique, by appending `-N` if necessary.
-			$suffix = 2;
 			$new_slug = $new_data['slug'];
-			while ( get_term_by( 'slug', $new_slug, $tax_name ) ) {
-				/*
-				 * Translators: %1$s is the original slug, %2$s is the
-				 * (localized) number added to distinguish it from the other
-				 * slug it clashes with.
-				 */
-				$new_slug = sprintf(
-					_x( '%1$s-%2$s', 'Format for duplicate Issue slugs', 'periodicalpress' ),
-					$new_data['slug'],
-					number_format_i18n( $suffix++ )
-				);
+			if ( $new_slug !== $term_object->slug ) {
+				$suffix = 2;
+				while ( get_term_by( 'slug', $new_slug, $tax_name ) ) {
+					/*
+					 * Translators: %1$s is the original slug, %2$s is the
+					 * (localized) number added to distinguish it from the other
+					 * slug it clashes with.
+					 */
+					$new_slug = sprintf(
+						_x( '%1$s-%2$s', 'Format for duplicate Issue slugs', 'periodicalpress' ),
+						$new_data['slug'],
+						number_format_i18n( $suffix++ )
+					);
+				}
+				$new_data['slug'] = $new_slug;
 			}
 			$new_data['slug'] = $new_slug;
 
