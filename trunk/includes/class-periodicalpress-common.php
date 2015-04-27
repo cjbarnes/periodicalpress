@@ -113,11 +113,12 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	 * @return bool Success or failure of the DB update.
 	 */
 	public function update_issue_number( $issue_id, $issue_num ) {
-		if ( ! is_numeric( $issue_num )
-		|| ! ( $issue_num = absint( $issue_num ) ) ) {
+
+		if ( ! is_numeric( $issue_num ) ) {
 			return false;
 		}
 
+		$issue_num = absint( $issue_num );
 		$existing_num = $this->get_issue_meta( $issue_id, 'pp_issue_number' );
 
 		// Check if this issue already has that number.
