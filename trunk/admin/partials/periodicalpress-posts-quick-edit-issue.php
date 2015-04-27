@@ -35,9 +35,8 @@ $tax_name = $this->plugin->get_taxonomy_name();
 			 * {@link http://codex.wordpress.org/Plugin_API/Action_Reference/quick_edit_custom_box}.
 			 */
 			$args = array(
-				'hide_published'   => 1,
 				'show_option_none' => 'No issue',
-				'name'             => 'pp_issue',
+				'field_name'       => 'pp_issue',
 				'id'               => 'pp-issue',
 				'selected'         => 0
 			);

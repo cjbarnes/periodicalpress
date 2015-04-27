@@ -84,12 +84,10 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 		// Get a free issue number if there isn't one yet.
 		$issue_num = $pp_common->get_issue_meta( $term_id, "{$tax_name}_number" );
-		if ( ! is_int( $issue_num ) ) {
-			$issue_num = $this->create_issue_number();
+		if ( ( '' === $issue_num ) || ( false === $issue_num ) ) {
+			$issue_num = $this->create_issue_number();// Metadata changes.
+			$pp_common->update_issue_meta( $term_id, "{$tax_name}_number", $issue_num );
 		}
-
-		// Metadata changes.
-		$result = $pp_common->update_issue_meta( $term_id, "{$tax_name}_number", $issue_num );
 
 		// Get the ready-to-publish posts attached to this Issue.
 		$post_statuses = array(
@@ -98,7 +96,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		);
 		$term_posts = $pp_common->get_issue_posts( $term_id, $post_statuses );
 
-		// Publish the waiting Issues.
+		// Publish the waiting posts.
 		foreach ( $term_posts as $post ) {
 			$new_post_data = array(
 				'ID'          => $post->ID,
@@ -122,10 +120,9 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		 */
 		do_action( 'periodicalpress_transition_issue_status', 'publish', $old_status, $term_id );
 
-		// Only set status to Published if all other changes were successful.
-		if ( $result ) {
-			$result = $pp_common->update_issue_meta( $term_id, "{$tax_name}_status", 'publish' );
-		}
+		// Finally set status to Published.
+		$result = $pp_common->update_issue_meta( $term_id, "{$tax_name}_status", 'publish' );
+
 		return $result;
 	}
 
@@ -200,6 +197,58 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		$pp_common->delete_issue_transients();
 
 		return $result;
+	}
+
+	/**
+	 * Publish all pending posts in an already published Issue.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int|object $term Either the Issue's term ID or its term object.
+	 * @return bool|WP_Error Success/failure of publish, or error object.
+	 */
+	public function republish_issue( $term ) {
+
+		if ( empty( $term ) ) {
+			return false;
+		}
+
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		/*
+		 * Check this ID matches an existing Issue. If a term slug or object was
+		 * passed in (instead of an integer term_id), get the term_id.
+		 */
+		$term_object = get_term( $term, $tax_name );
+
+		// Return FALSE if Issue doesn't exist, WP_Error if error.
+		if ( is_null( $term_object ) || is_wp_error( $term_object ) ) {
+			if ( is_null( $term_object ) ) {
+				$term_object = false;
+			}
+			return $term_object;
+		}
+
+		$term_id = $term_object->term_id;
+
+		// Get the ready-to-publish posts attached to this Issue.
+		$post_statuses = array(
+			'pending',
+			'future'
+		);
+		$term_posts = $pp_common->get_issue_posts( $term_id, $post_statuses );
+
+		// Publish the waiting Issues.
+		foreach ( $term_posts as $post ) {
+			$new_post_data = array(
+				'ID'          => $post->ID,
+				'post_status' => 'publish'
+			);
+			wp_update_post( $new_post_data );
+		}
+
+		return true;
 	}
 
 	/**
@@ -309,7 +358,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			? wp_kses_data( $data['description'] )
 			: '';
 
-		// Prep the slug based on the title (if not user-specified).
+		// Prep the slug (if user-specified).
 		if ( ! empty( $data['slug'] ) ) {
 			$new_term_data['slug'] = sanitize_title_with_dashes( $data['slug'], null, 'save' );
 		}
@@ -769,21 +818,23 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 			}
 
 			// Make sure the new slug is unique, by appending `-N` if necessary.
-			$suffix = 2;
 			$new_slug = $new_data['slug'];
-			while ( get_term_by( 'slug', $new_slug, $tax_name ) ) {
-				/*
-				 * Translators: %1$s is the original slug, %2$s is the
-				 * (localized) number added to distinguish it from the other
-				 * slug it clashes with.
-				 */
-				$new_slug = sprintf(
-					_x( '%1$s-%2$s', 'Format for duplicate Issue slugs', 'periodicalpress' ),
-					$new_data['slug'],
-					number_format_i18n( $suffix++ )
-				);
+			if ( $new_slug !== $term_object->slug ) {
+				$suffix = 2;
+				while ( get_term_by( 'slug', $new_slug, $tax_name ) ) {
+					/*
+					 * Translators: %1$s is the original slug, %2$s is the
+					 * (localized) number added to distinguish it from the other
+					 * slug it clashes with.
+					 */
+					$new_slug = sprintf(
+						_x( '%1$s-%2$s', 'Format for duplicate Issue slugs', 'periodicalpress' ),
+						$new_data['slug'],
+						number_format_i18n( $suffix++ )
+					);
+				}
+				$new_data['slug'] = $new_slug;
 			}
-			$new_data['slug'] = $new_slug;
 
 			/**
 			 * Filter to change Issue title/slug data before saving to DB.
@@ -811,10 +862,6 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	/**
 	 * Returns the next Issue number.
 	 *
-	 * Uses the transient `periodicalpress_highest_issue_num` for caching, so
-	 * this should be invalidated whenever an Issue number is changed elsewhere
-	 * (e.g. if an Issue is unpublished or manually edited).
-	 *
 	 * @since 1.0.0
 	 *
 	 * @return int The next free Issue number.
@@ -823,39 +870,30 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
-		$transient = 'periodicalpress_highest_issue_num';
 		$tax_name = $this->plugin->get_taxonomy_name();
 
 		// Get the highest existing Issue number.
-		$highest_num = (int) get_transient( $transient );
-		if ( empty( $highest_num ) ) {
-
-			$existing_issues = $pp_common->get_issues_metadata_column( 'pp_issue_number' );
-			if ( ! is_array( $existing_issues ) ) {
-				return false;
-			}
-
-			// Empty array returned, so this is Issue 1.
-			if ( ! $existing_issues ) {
-				return 1;
-			}
-
-			$highest_num = (int) max( $existing_issues );
-
+		$existing_issues = $pp_common->get_issues_metadata_column( 'pp_issue_number' );
+		if ( ! is_array( $existing_issues ) ) {
+			return false;
 		}
 
+		// Empty array returned, so this is Issue 1.
+		if ( ! $existing_issues ) {
+			/**
+			 * Filter for newly created Issue numbers.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param int $new_issue_num The Issue number that was created.
+			 */
+			return apply_filters( 'periodicalpress-new-issue-number', 1 );
+		}
+
+		$highest_num = (int) max( $existing_issues );
 		$new_issue_num = $highest_num + 1;
 
-		// Cache new highest issue number for later.
-		set_transient( $transient, $new_issue_num, 2 * HOUR_IN_SECONDS );
-
-		/**
-		 * Filter for newly created Issue numbers.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param int $new_issue_num The Issue number that was created.
-		 */
+		/** This filter is documented above. */
 		return apply_filters( 'periodicalpress-new-issue-number', $new_issue_num );
 	}
 

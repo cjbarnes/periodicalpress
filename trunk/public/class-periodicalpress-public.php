@@ -53,51 +53,11 @@ class PeriodicalPress_Public extends PeriodicalPress_Singleton {
 	 */
 	protected function define_hooks() {
 
-		// Public-facing CSS and JavaScript
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
 		/*
 		 * Register the theme patching actions and filters, after init (to
 		 * allow time for add_theme_supports() to be called by the theme).
 		 */
 		add_action( 'init', array( $this, 'patch_theme' ), 999 );
-
-	}
-
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * Stylesheets used:
-	 * - periodicalpress-public.css - Styles loaded on whole public site.
-	 *
-	 * @since 1.0.0
-	 */
-	public function enqueue_styles() {
-
-		$name = $this->plugin->get_plugin_name();
-		$path = plugin_dir_url( __FILE__ ) . 'css/';
-		$version = $this->plugin->get_version();
-
-		wp_enqueue_style( $name, "{$path}periodicalpress-public.css", array(), $version, 'all' );
-
-	}
-
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * Scripts used:
-	 * - periodicalpress-admin.js - Script loaded on whole public site.
-	 *
-	 * @since 1.0.0
-	 */
-	public function enqueue_scripts() {
-
-		$name = $this->plugin->get_plugin_name();
-		$path = plugin_dir_url( __FILE__ ) . 'js/';
-		$version = $this->plugin->get_version();
-
-		wp_enqueue_script( $name, "{$path}periodicalpress-public.js", array( 'jquery' ), $version, true );
 
 	}
 

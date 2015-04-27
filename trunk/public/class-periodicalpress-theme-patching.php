@@ -330,15 +330,4 @@ class PeriodicalPress_Theme_Patching extends PeriodicalPress_Singleton {
 			: '/[\?&]paged=(\d+)/';
 	}
 
-	/**
-	 * The reference to the object that orchestrates the hooks for this class.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return PeriodicalPress_Loader Orchestrates this class's hooks.
-	 */
-	public function get_loader() {
-		return $this->loader;
-	}
-
 }

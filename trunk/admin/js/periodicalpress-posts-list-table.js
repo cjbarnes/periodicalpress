@@ -50,10 +50,6 @@
 					// to the missing data.
 					$statusField.prepend( '<option value="publish">' + l10n.publishStatusName + '</option>' );
 
-					// Hide the Issue field, and show a simple link instead.
-					$issueLink.clone().prependTo( '.pp-issue-readonly' );
-					$issueField.hide();
-
 
 				} else {
 
@@ -61,19 +57,16 @@
 					// posts.
 					$statusField.find( 'option[value=publish]' ).remove();
 
-					// -1 selects the 'No issue' option in the Issues dropdown.
-					var issueID = -1;
-					if ( $issueLink.length ) {
-						issueID = parseInt( $issueLink.attr( 'data-issue-id' ), 10 );
-					}
-
-					// Select the correct Issue and display.
-					$issueField.val( issueID ).show();
-
-					// Hide the read-only Issue link.
-					$( '.pp-issue-readonly' ).empty();
-
 				}
+
+				// -1 selects the 'No issue' option in the Issues dropdown.
+				var issueID = -1;
+				if ( $issueLink.length ) {
+					issueID = parseInt( $issueLink.attr( 'data-issue-id' ), 10 );
+				}
+
+				// Select the correct Issue and display.
+				$issueField.val( issueID ).show();
 
 			}
 

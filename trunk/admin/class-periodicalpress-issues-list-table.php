@@ -270,7 +270,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 */
 		foreach ( $issues as $issue ) {
 			$meta = $pp_common->get_issue_meta( $issue->term_id );
-			$issue->number = ! empty( $meta['pp_issue_number'] )
+			$issue->number = isset( $meta['pp_issue_number'] )
 				? $meta['pp_issue_number']
 				: '';
 			$issue->date = ! empty( $meta['pp_issue_date'] )
@@ -285,10 +285,10 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		}
 
 		/*
-		 * Sort Issues data if 'name' (the default) is the orderby choice.
-		 * Although get_terms() allows ordering by name, we need to order
-		 * manually so we can do a natural sort on Issue numbers - e.g.
-		 * 'Issue 10' > 'Issue 2'.
+		 * Sort Issues data if 'number' (the default) is the orderby choice.
+		 * Although get_terms() allows ordering, we need to order manually so
+		 * we can do a natural sort on Issue numbers - e.g. 'Issue 10' > 'Issue
+		 * 2'.
 		 */
 		if ( 'number' === $orderby ) {
 			if ( 'DESC' === $order ) {
@@ -562,7 +562,7 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 	 */
 	protected function column_default( $item, $column_name ) {
 
-		if ( ! empty ( $item[ $column_name ] ) ) {
+		if ( ! empty ( $item[ $column_name ] ) || ( '0' === $item[ $column_name ] ) ) {
 			$out = esc_html( $item[ $column_name ] );
 		} else {
 			$out = '&mdash;';

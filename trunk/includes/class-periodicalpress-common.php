@@ -113,9 +113,17 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	 * @return bool Success or failure of the DB update.
 	 */
 	public function update_issue_number( $issue_id, $issue_num ) {
-		if ( ! is_numeric( $issue_num )
-		|| ! ( $issue_num = absint( $issue_num ) ) ) {
+
+		if ( ! is_numeric( $issue_num ) ) {
 			return false;
+		}
+
+		$issue_num = absint( $issue_num );
+		$existing_num = $this->get_issue_meta( $issue_id, 'pp_issue_number' );
+
+		// Check if this issue already has that number.
+		if ( ( '' !== $existing_num ) && ( $issue_num === absint( $existing_num ) ) ) {
+			return true;
 		}
 
 		// Check for uniqueness of this value.
@@ -430,6 +438,52 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Retrieves all Issues (not just Published) in descending order of issue.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb The WordPress database class.
+	 *
+	 * @return array An ordered array of Issue term IDs.
+	 */
+	public function get_all_issue_IDs() {
+		global $wpdb;
+
+		// Try the cached values first.
+		$term_ids = get_transient( 'periodicalpress_all_issues' );
+		if ( ! $term_ids ) {
+
+			$tax_name = $this->plugin->get_taxonomy_name();
+
+			// Get the Current Issue for use in the query.
+			$current_issue = (int) get_option( 'pp_current_issue' , 0 );
+
+			// Assemble query for the term_ids of all published issues.
+			$sql = "
+				SELECT pp_term_id
+				FROM {$wpdb->pp_termmeta}
+				WHERE meta_key = 'pp_issue_number'
+				ORDER BY meta_value DESC
+			";
+
+			// Run the query.
+			$term_id_strings = $wpdb->get_col( $sql );
+			if ( ! empty( $term_id_strings ) ) {
+
+				// Cast results to integers.
+				$term_ids = array_map( 'intval', $term_id_strings );
+
+				// Save for reuse.
+				set_transient( 'periodicalpress_all_issues', $term_ids, HOUR_IN_SECONDS );
+
+			}
+
+		}
+
+		return $term_ids;
+	}
+
+	/**
 	 * Reversed sorting function for Issues.
 	 *
 	 * Comparison function for use by `usort()` etc.
@@ -459,7 +513,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 		$compare = array();
 
 		foreach( array( $obj1, $obj2 ) as $n => $obj ) {
-			if ( ! empty( $obj->number ) ) {
+			if ( ! empty( $obj->number ) || ( 0 !== $obj->number ) ) {
 				$compare[ $n ] = $obj->number;
 			} else {
 				// All non-numbered issues should be at the top.
@@ -662,7 +716,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 			'include' => '',
 			'echo' => 1,
 			'tab_index' => 0,
-			'name' => $tax_name,
+			'field_name' => $tax_name,
 			'id' => '',
 			'class' => 'postform',
 			'selected' => 0,
@@ -672,7 +726,6 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 
 		// Set arguments used by {@link get_terms()} that cannot be overridden.
 		$args = array_merge( $args, array(
-			'taxonomy' => $tax_name,
 			'hide_empty' => false,
 			'orderby' => 'ID',
 			'hierarchical' => 0,
@@ -721,7 +774,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 		}
 
 		// Assemble the select element's opening tag.
-		$name = esc_attr( $args['name'] );
+		$name = esc_attr( $args['field_name'] );
 		$class = esc_attr( $args['class'] );
 		$id = $args['id']
 			? esc_attr( $args['id'] )
@@ -784,8 +837,8 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 		// The ordered list of Issue term_ids.
 		delete_transient( 'periodicalpress_ordered_issues' );
 
-		// The highest Issue number.
-		delete_transient( 'periodicalpress_highest_issue_num' );
+		// The list of all Issue term_ids.
+		delete_transient( 'periodicalpress_all_issues' );
 
 	}
 
