@@ -285,10 +285,10 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		}
 
 		/*
-		 * Sort Issues data if 'name' (the default) is the orderby choice.
-		 * Although get_terms() allows ordering by name, we need to order
-		 * manually so we can do a natural sort on Issue numbers - e.g.
-		 * 'Issue 10' > 'Issue 2'.
+		 * Sort Issues data if 'number' (the default) is the orderby choice.
+		 * Although get_terms() allows ordering, we need to order manually so
+		 * we can do a natural sort on Issue numbers - e.g. 'Issue 10' > 'Issue
+		 * 2'.
 		 */
 		if ( 'number' === $orderby ) {
 			if ( 'DESC' === $order ) {

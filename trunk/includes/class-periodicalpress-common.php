@@ -513,7 +513,7 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 		$compare = array();
 
 		foreach( array( $obj1, $obj2 ) as $n => $obj ) {
-			if ( ! empty( $obj->number ) ) {
+			if ( ! empty( $obj->number ) || ( 0 !== $obj->number ) ) {
 				$compare[ $n ] = $obj->number;
 			} else {
 				// All non-numbered issues should be at the top.
