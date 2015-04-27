@@ -34,8 +34,9 @@ if ( ! empty( $issue ) ) {
 		? $meta['pp_issue_number']
 		: '';
 } else {
+	$pp_save_issues = PeriodicalPress_Save_Issues::get_instance( $this->plugin );
 	$meta_date = -1;
-	$meta_number = '';
+	$meta_number = $pp_save_issues->create_issue_number();
 }
 
 

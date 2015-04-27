@@ -437,6 +437,52 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Retrieves all Issues (not just Published) in descending order of issue.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @global wpdb $wpdb The WordPress database class.
+	 *
+	 * @return array An ordered array of Issue term IDs.
+	 */
+	public function get_all_issue_IDs() {
+		global $wpdb;
+
+		// Try the cached values first.
+		$term_ids = get_transient( 'periodicalpress_all_issues' );
+		if ( ! $term_ids ) {
+
+			$tax_name = $this->plugin->get_taxonomy_name();
+
+			// Get the Current Issue for use in the query.
+			$current_issue = (int) get_option( 'pp_current_issue' , 0 );
+
+			// Assemble query for the term_ids of all published issues.
+			$sql = "
+				SELECT pp_term_id
+				FROM {$wpdb->pp_termmeta}
+				WHERE meta_key = 'pp_issue_number'
+				ORDER BY meta_value DESC
+			";
+
+			// Run the query.
+			$term_id_strings = $wpdb->get_col( $sql );
+			if ( ! empty( $term_id_strings ) ) {
+
+				// Cast results to integers.
+				$term_ids = array_map( 'intval', $term_id_strings );
+
+				// Save for reuse.
+				set_transient( 'periodicalpress_all_issues', $term_ids, HOUR_IN_SECONDS );
+
+			}
+
+		}
+
+		return $term_ids;
+	}
+
+	/**
 	 * Reversed sorting function for Issues.
 	 *
 	 * Comparison function for use by `usort()` etc.
@@ -790,8 +836,8 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 		// The ordered list of Issue term_ids.
 		delete_transient( 'periodicalpress_ordered_issues' );
 
-		// The highest Issue number.
-		delete_transient( 'periodicalpress_highest_issue_num' );
+		// The list of all Issue term_ids.
+		delete_transient( 'periodicalpress_all_issues' );
 
 	}
 

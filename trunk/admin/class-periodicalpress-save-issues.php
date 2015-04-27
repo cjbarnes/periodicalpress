@@ -811,10 +811,6 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	/**
 	 * Returns the next Issue number.
 	 *
-	 * Uses the transient `periodicalpress_highest_issue_num` for caching, so
-	 * this should be invalidated whenever an Issue number is changed elsewhere
-	 * (e.g. if an Issue is unpublished or manually edited).
-	 *
 	 * @since 1.0.0
 	 *
 	 * @return int The next free Issue number.
@@ -823,39 +819,30 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 
 		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
 
-		$transient = 'periodicalpress_highest_issue_num';
 		$tax_name = $this->plugin->get_taxonomy_name();
 
 		// Get the highest existing Issue number.
-		$highest_num = (int) get_transient( $transient );
-		if ( empty( $highest_num ) ) {
-
-			$existing_issues = $pp_common->get_issues_metadata_column( 'pp_issue_number' );
-			if ( ! is_array( $existing_issues ) ) {
-				return false;
-			}
-
-			// Empty array returned, so this is Issue 1.
-			if ( ! $existing_issues ) {
-				return 1;
-			}
-
-			$highest_num = (int) max( $existing_issues );
-
+		$existing_issues = $pp_common->get_issues_metadata_column( 'pp_issue_number' );
+		if ( ! is_array( $existing_issues ) ) {
+			return false;
 		}
 
+		// Empty array returned, so this is Issue 1.
+		if ( ! $existing_issues ) {
+			/**
+			 * Filter for newly created Issue numbers.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param int $new_issue_num The Issue number that was created.
+			 */
+			return apply_filters( 'periodicalpress-new-issue-number', 1 );
+		}
+
+		$highest_num = (int) max( $existing_issues );
 		$new_issue_num = $highest_num + 1;
 
-		// Cache new highest issue number for later.
-		set_transient( $transient, $new_issue_num, 2 * HOUR_IN_SECONDS );
-
-		/**
-		 * Filter for newly created Issue numbers.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param int $new_issue_num The Issue number that was created.
-		 */
+		/** This filter is documented above. */
 		return apply_filters( 'periodicalpress-new-issue-number', $new_issue_num );
 	}
 
