@@ -96,7 +96,7 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 		);
 		$term_posts = $pp_common->get_issue_posts( $term_id, $post_statuses );
 
-		// Publish the waiting Issues.
+		// Publish the waiting posts.
 		foreach ( $term_posts as $post ) {
 			$new_post_data = array(
 				'ID'          => $post->ID,
