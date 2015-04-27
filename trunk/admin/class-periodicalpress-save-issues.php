@@ -203,6 +203,58 @@ class PeriodicalPress_Save_Issues extends PeriodicalPress_Singleton {
 	}
 
 	/**
+	 * Publish all pending posts in an already published Issue.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int|object $term Either the Issue's term ID or its term object.
+	 * @return bool|WP_Error Success/failure of publish, or error object.
+	 */
+	public function republish_issue( $term ) {
+
+		if ( empty( $term ) ) {
+			return false;
+		}
+
+		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		/*
+		 * Check this ID matches an existing Issue. If a term slug or object was
+		 * passed in (instead of an integer term_id), get the term_id.
+		 */
+		$term_object = get_term( $term, $tax_name );
+
+		// Return FALSE if Issue doesn't exist, WP_Error if error.
+		if ( is_null( $term_object ) || is_wp_error( $term_object ) ) {
+			if ( is_null( $term_object ) ) {
+				$term_object = false;
+			}
+			return $term_object;
+		}
+
+		$term_id = $term_object->term_id;
+
+		// Get the ready-to-publish posts attached to this Issue.
+		$post_statuses = array(
+			'pending',
+			'future'
+		);
+		$term_posts = $pp_common->get_issue_posts( $term_id, $post_statuses );
+
+		// Publish the waiting Issues.
+		foreach ( $term_posts as $post ) {
+			$new_post_data = array(
+				'ID'          => $post->ID,
+				'post_status' => 'publish'
+			);
+			wp_update_post( $new_post_data );
+		}
+
+		return true;
+	}
+
+	/**
 	 * If this post is being unpublished, check whether its Issue is now empty
 	 * and therefore should also be unpublished.
 	 *

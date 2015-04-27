@@ -118,6 +118,7 @@ switch ( $list_table->current_action() ) {
 	case 'delete':
 	case 'publish':
 	case 'unpublish':
+	case 'republish':
 
 		$action = $list_table->current_action();
 		$location = 'admin.php?page=pp_edit_issues';
@@ -153,7 +154,7 @@ switch ( $list_table->current_action() ) {
 		} elseif ( ! current_user_can( $tax->cap->manage_terms ) ) {
 
 			// Not Published/Unpublished error message.
-			if ( 'publish' === $action ) {
+			if ( ( 'publish' === $action ) || ( 'republish' === $action ) ) {
 				$msg_id = 87;
 			} elseif ( 'unpublish' === $action ) {
 				$msg_id = 89;
@@ -207,6 +208,7 @@ switch ( $list_table->current_action() ) {
 						$msg_id = 2;
 						break;
 					case 'publish':
+					case 'republish':
 						$msg_id = 86;
 						break;
 					case 'unpublish':
@@ -219,6 +221,7 @@ switch ( $list_table->current_action() ) {
 						$msg_id = 82;
 						break;
 					case 'publish':
+					case 'republish':
 						$msg_id = 87;
 						break;
 					case 'unpublish':

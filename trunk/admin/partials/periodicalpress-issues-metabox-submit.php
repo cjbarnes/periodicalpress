@@ -47,19 +47,21 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 	<div id="save-action">
 		<?php if ( 'publish' != $status ) : ?>
 			<input type="submit" name="save" id="save-post" value="<?php echo esc_attr_x( 'Save Draft', 'Edit Issue', 'periodicalpress' ); ?>" class="button" />
+		<?php else : ?>
+			<?php
+			$republish_url = wp_nonce_url( admin_url( 'admin.php?page=pp_edit_issues' ) . "&amp;action=republish&amp;tag_id={$issue->term_id}&amp;republish-tag_{$issue->term_id}", "republish-tag_{$issue->term_id}" );
+			?>
+			<a id="republish" class="button" href="<?php echo $republish_url; ?>"><?php echo esc_html_x( 'Publish All Pending Posts', 'Edit Issue', 'periodicalpress' ); ?></a>
 		<?php endif; ?>
 		<span class="spinner"></span>
 	</div>
 
-	<?php if ( ! empty( $issue ) ) : ?>
-	<!-- Preview button -->
-	<div id="preview-action">
-		<?php
-		$preview_link = esc_url( get_term_link( $issue, $tax_name ) );
-
-		if ( 'publish' === $status ) {
-			$preview_button = _x( 'Preview Changes', 'Edit Issue', 'periodicalpress' );
-		} else {
+	<?php if ( ! empty( $issue ) && ( 'publish' !== $status ) ) : ?>
+		<!-- Preview button -->
+		<div id="preview-action">
+			<?php
+			$preview_button = _x( 'Preview', 'Edit Issue', 'periodicalpress' );
+			$preview_link = esc_url( get_term_link( $issue, $tax_name ) );
 			$preview_link = add_query_arg( 'preview', 'true', $preview_link );
 			/**
 			 * Filter the URI of an Issue preview in the Edit Issue submit box.
@@ -72,11 +74,10 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 			 */
 			$preview_link = esc_url( apply_filters( 'periodicalpress_preview_issue_link', $preview_link, $issue ) );
 			$preview_button = _x( 'Preview', 'Edit Issue', 'periodicalpress' );
-		}
-		?>
-		<a class="preview button" href="<?php echo $preview_link; ?>" target="wp-preview-<?php echo (int) $issue->term_id; ?>" id="issue-preview"><?php echo $preview_button; ?></a>
-		<input type="hidden" name="wp-preview" id="wp-preview" value="" />
-	</div>
+			?>
+			<a class="preview button" href="<?php echo $preview_link; ?>" target="wp-preview-<?php echo (int) $issue->term_id; ?>" id="issue-preview"><?php echo $preview_button; ?></a>
+			<input type="hidden" name="wp-preview" id="wp-preview" value="" />
+		</div>
 	<?php endif; ?>
 
 	<div class="clear"></div>
