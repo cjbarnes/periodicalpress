@@ -314,7 +314,12 @@ if ( isset( $_REQUEST['message'] )
 }
 ?>
 <div class="wrap nosubsub">
-	<h2><?php echo esc_html( $title ); ?></h2>
+	<h2>
+		<?php echo esc_html( $title ); ?>
+		<?php if ( current_user_can( $tax->cap->edit_terms ) ) : ?>
+			<a href="<?php echo admin_url( 'admin.php?page=pp_add_issue' ); ?>" class="add-new-h2"><?php echo esc_html_x( 'Add New', 'New Issue button', 'periodicalpress'); ?></a>
+		<?php endif; ?>
+	</h2>
 	<?php if ( $message ) : ?>
 		<div id="message" class="updated">
 			<p><?php echo $message; ?></p>

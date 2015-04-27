@@ -43,7 +43,12 @@ $screen_columns = 2;
 
 <div class="wrap">
 
-<h2><?php echo esc_html( $tax->labels->edit_item ); ?></h2>
+<h2>
+	<?php echo esc_html( $tax->labels->edit_item ); ?>
+	<?php if ( current_user_can( $tax->cap->edit_terms ) ) : ?>
+		<a href="<?php echo admin_url( 'admin.php?page=pp_add_issue' ); ?>" class="add-new-h2"><?php echo esc_html_x( 'Add New', 'New Issue button', 'periodicalpress'); ?></a>
+	<?php endif; ?>
+</h2>
 
 <form name="editpp_issue" id="editpp-issue" method="post" action="admin.php?page=pp_edit_issues" autocomplete="off"<?php
 /**
