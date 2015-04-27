@@ -118,6 +118,13 @@ class PeriodicalPress_Common extends PeriodicalPress_Singleton {
 			return false;
 		}
 
+		$existing_num = $this->get_issue_meta( $issue_id, 'pp_issue_number' );
+
+		// Check if this issue already has that number.
+		if ( ( '' !== $existing_num ) && ( $issue_num === absint( $existing_num ) ) ) {
+			return true;
+		}
+
 		// Check for uniqueness of this value.
 		$all_nums = $this->get_issues_metadata_column( 'pp_issue_number' );
 		if ( in_array( $issue_num, $all_nums ) ) {
