@@ -156,10 +156,9 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 		<?php if ( 'publish' === $status ) : ?>
 			<!-- Unpublish link -->
 			<?php
-			// TODO: Unpublish link.
-			$unpublish_link = '';
+			$unpublish_link = wp_nonce_url( admin_url( 'admin.php?page=pp_edit_issues' ) . "&amp;action=unpublish&amp;tag_id={$issue->term_id}&amp;unpublish-tag_{$issue->term_id}", "unpublish-tag_{$issue->term_id}" );;
 			?>
-			<a class="submitdelete unpublish" href="<?php echo esc_url( $unpublish_link ); ?>">
+			<a class="submitdelete unpublish" href="<?php echo $unpublish_link; ?>">
 				<?php echo _x( 'Unpublish Issue', 'Edit Issue', 'periodicalpress' ); ?>
 			</a>
 		<?php else: ?>
