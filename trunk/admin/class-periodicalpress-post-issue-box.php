@@ -224,8 +224,15 @@ class PeriodicalPress_Post_Issue_Box extends PeriodicalPress_Singleton {
 		 * If this is an autosave, our form has not been submitted, so we don't
 		 * want to do anything.
 		 */
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return $post_id;
+		}
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+        	return $post_id;
+		}
+        if ( false !== wp_is_post_revision( $post_id ) ) {
+        	return;
+        }
 
 		// Check this is the correct post type.
 		if ( ! isset( $_POST['post_type'] )
