@@ -159,11 +159,7 @@ class PeriodicalPress_Template_Tags {
 
 		// Get the Issue number.
 		$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
-		$issue_num = intval( $pp_common->get_issue_meta( $issue_id, 'pp_issue_number' ) );
-
-		if ( empty( $issue_num ) ) {
-			return;
-		}
+		$issue_num = (int) $pp_common->get_issue_meta( $issue_id, 'pp_issue_number' );
 
 		/**
 		 * Filter the Issue number for front-end outputting.
@@ -293,6 +289,13 @@ class PeriodicalPress_Template_Tags {
 					$issue = get_term( $issues[0], $tax_name );
 				}
 
+			} elseif ( is_home() ) {
+				$current_issue = (int) get_option( 'pp_current_issue' , 0 );
+				if ( ! $current_issue ) {
+					$pp_common = PeriodicalPress_Common::get_instance( $this->plugin );
+					$current_issue = $pp_common->get_newest_issue_id();
+				}
+				$issue = get_term( $current_issue, $tax_name );
 			}
 		}
 
