@@ -59,6 +59,9 @@ class PeriodicalPress_Public extends PeriodicalPress_Singleton {
 		 */
 		add_action( 'init', array( $this, 'patch_theme' ), 999 );
 
+		// When previewing an Issue, include Pending posts in query results.
+		add_action( 'pre_get_posts', array( $this, 'preview_issue' ) );
+
 	}
 
 	/**
@@ -76,6 +79,41 @@ class PeriodicalPress_Public extends PeriodicalPress_Singleton {
 		if ( ! current_theme_supports( 'periodicalpress' ) ) {
 			PeriodicalPress_Theme_Patching::get_instance( $this->plugin );
 		}
+
+	}
+
+	/**
+	 * Convert Issue query into a Preview Issue query if preview flag is set.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_Query $query The query object.
+	 */
+	public function preview_issue( $query ) {
+
+		$tax_name = $this->plugin->get_taxonomy_name();
+
+		/*
+		 * The standard conditional function is_main_query() does not return the
+		 * right results within the pre_get_posts hook.
+		 */
+		if ( ! $query->is_main_query()
+		|| ! ( $query->is_tax( $tax_name ) || $query->is_home() )
+		|| ! is_preview() ) {
+			return;
+		}
+
+		// Get post statuses currently included in query.
+		$statuses = $query->get( 'post_status' );
+		if ( empty( $statuses ) ) {
+			$statuses = array( 'publish' );
+		} elseif ( ! is_array( $statuses ) ) {
+			$statuses = array( $statuses );
+		}
+
+		// Add Pending posts to the queried statuses.
+		$statuses[] = 'pending';
+		$query->set( 'post_status', $statuses );
 
 	}
 
