@@ -49,14 +49,24 @@ $status_name = ( isset( $allowed_statuses[ $status ] ) )
 			<input type="submit" name="save" id="save-post" value="<?php echo esc_attr_x( 'Save Draft', 'Edit Issue', 'periodicalpress' ); ?>" class="button" />
 		<?php else : ?>
 			<?php
-			$republish_url = wp_nonce_url( admin_url( 'admin.php?page=pp_edit_issues' ) . "&amp;action=republish&amp;tag_id={$issue->term_id}&amp;republish-tag_{$issue->term_id}", "republish-tag_{$issue->term_id}" );
-			?>
-			<a id="republish" class="button" href="<?php echo $republish_url; ?>"><?php echo esc_html_x( 'Publish All Pending Posts', 'Edit Issue', 'periodicalpress' ); ?></a>
+			$pending = get_posts( array(
+				'tax_query' => array(
+					array(
+						'taxonomy' => $tax_name,
+						'terms' => $issue->term_id
+					)
+				),
+				'post_status'    => 'pending',
+				'posts_per_page' => 1
+			) );
+			if ( ! empty( $pending ) ) : ?>
+				<?php $republish_url = wp_nonce_url( admin_url( 'admin.php?page=pp_edit_issues' ) . "&amp;action=republish&amp;tag_id={$issue->term_id}&amp;republish-tag_{$issue->term_id}", "republish-tag_{$issue->term_id}" ); ?>
+				<a id="republish" class="button" href="<?php echo $republish_url; ?>"><?php echo esc_html_x( 'Publish Pending Posts', 'Edit Issue', 'periodicalpress' ); ?></a>
+			<?php endif; ?>
 		<?php endif; ?>
-		<span class="spinner"></span>
 	</div>
 
-	<?php if ( ! empty( $issue ) && ( 'publish' !== $status ) ) : ?>
+	<?php if ( ! empty( $issue ) ) : ?>
 		<!-- Preview button -->
 		<div id="preview-action">
 			<?php

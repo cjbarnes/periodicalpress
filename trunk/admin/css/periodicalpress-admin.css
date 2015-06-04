@@ -975,3 +975,8 @@ table.links-table {
 	box-shadow: none;
 	color: #000;
 }
+
+/* Align Publish Pending Posts button next to Preview button */
+#save-action #republish {
+	float: left;
+}

@@ -439,9 +439,12 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 */
 		$view_url = get_term_link( $term_id, $this->tax->name );
 		if ( ! is_wp_error( $view_url ) ) {
-			$view_label = ( 'publish' === $item['status'] )
-				? _x( 'View', 'periodicalpress' )
-				: _x( 'Preview', 'periodicalpress' );
+			if ( 'publish' === $item['status'] ) {
+				$view_label = _x( 'View', 'periodicalpress' );
+			} else {
+				$view_label = _x( 'Preview', 'periodicalpress' );
+				$view_url .= '?preview=true';
+			}
 			$actions['view'] = "<a href='$view_url'>$view_label</a>";
 		}
 
