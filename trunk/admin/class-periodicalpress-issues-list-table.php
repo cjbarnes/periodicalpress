@@ -183,9 +183,9 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		 * @param array $sortable_columns Associative array of columns in form
 		 *                                ( name => array( name, order ) ).
 		 */
-		$sortable_columns = apply_filters( "manage_{$this->tax->name}_hidden_columns", array(
-			'number' => array( 'number', false ),
-			'posts'  => array( 'posts', false )
+		$sortable_columns = apply_filters( "manage_{$this->tax->name}_sortable_columns", array(
+			'number' => array( 'number',  false ),
+			'posts'  => array( 'posts',   false ),
 		) );
 
 		return $sortable_columns;
@@ -371,7 +371,6 @@ class PeriodicalPress_Issues_List_Table extends PeriodicalPress_List_Table {
 		echo '</tr>';
 
 	}
-
 
 	/**
 	 * Formats the data for cells in the Name column.
