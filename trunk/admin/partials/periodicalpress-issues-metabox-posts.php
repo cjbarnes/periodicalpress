@@ -67,7 +67,8 @@ usort( $posts, array( $pp_common, 'ascending_sort_issue_posts' ) );
 							<?php echo esc_html( $post->post_title ); ?>
 						</a>
 					<?php else : ?>
-						<a href="#todo" class="row-title" title="<?php printf( _x( 'Preview “%s”', 'Edit Issue: post actions title attribute', 'periodicalpress' ), esc_attr( $post->post_title ) ); ?>">
+						<?php $preview = esc_url( apply_filters( 'preview_post_link', add_query_arg( 'preview', 'true', get_permalink( $post->ID ) ), $post ) ); ?>
+						<a href="<?php echo $preview; ?>" class="row-title" title="<?php printf( _x( 'Preview “%s”', 'Edit Issue: post actions title attribute', 'periodicalpress' ), esc_attr( $post->post_title ) ); ?>">
 							<?php echo esc_html( $post->post_title ); ?>
 						</a>
 					<?php endif; ?>
