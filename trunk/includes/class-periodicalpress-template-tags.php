@@ -63,6 +63,33 @@ class PeriodicalPress_Template_Tags {
 	}
 
 	/**
+	 * Conditional tag to test whether this page is the Current Issue term page.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool True if the Current Issue page, False if not.
+	 */
+	public function is_current_issue() {
+
+		if ( is_home() ) {
+
+			return true;
+
+		} elseif ( $this->is_issue() ) {
+
+			$queried_object = get_queried_object();
+			$term_id = $queried_object->term_id;
+
+			if ( $term_id === (int) get_option( 'pp_current_issue' , 0 ) ) {
+				return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	/**
 	 * Retrieve the current Issue's term ID.
 	 *
 	 * @since 1.0.0
